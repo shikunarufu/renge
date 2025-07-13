@@ -18,14 +18,15 @@ white="\033[1;37m"
 
 
 # Clear the terminal screen
-echo -e "         "${light_gray}"Clearing "${white}"Terminal Screen"
+echo -e "         "${light_gray}"Clearing "${white}"Terminal Screen"${color_off}""
 clear
-echo -e ""${light_gray}"[  "${green}"OK  "${light_gray}"] Cleared "${white}"Terminal Screen"
+echo -e ""${light_gray}"[  "${green}"OK  "${light_gray}"] Cleared "${white}"Terminal Screen"${color_off}""
 
 
 # Set the console keyboard layout and font
-echo -e ""${green}"Setting the console keyboard layout"
+echo -e "         "${light_gray}"Setting Console Keyboard Layout"
 loadkeys "${consolekeyboard}"
+echo -e ""${light_gray}"[  "${green}"OK  "${light_gray}"] Set "${white}"Console Keyboard Layout"${color_off}""
 echo -e ""${green}"Setting the console font"
 setfont "${consolefont}"
 
@@ -63,8 +64,13 @@ sgdisk --typecode=1:EF00 --typecode=2:8200 --typecode=3:8300 /dev/"${ssd1}"
 sgdisk --typecode=1:8300  /dev/"${hdd1}"
 sgdisk --change-name=1:"EFI system partition" --change-name=2:"Linux swap" --change-name=3:"Linux filesystem" /dev/"${ssd1}"
 sgdisk --change-name=1:"Linux filesystem" /dev/"${hdd1}"
+
+
+# Reread the partition table
+sleep 2
 partprobe /dev/"${ssd1}"
 partprobe /dev/"${hdd1}"
+sleep 2
 
 
 # Format the partitions
@@ -111,4 +117,6 @@ cp 2-chroot.sh /mnt/ALIS
 
 # Chroot
 echo -e ""${green}"Changing root into the new system"
-arch-chroot /mnt ./ALIS/2-chroot.sh
+arch-chroot /mnt
+chmod +x ./ALIS/2-chroot.sh
+./ALIS/2-chroot.sh
