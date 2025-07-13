@@ -44,12 +44,12 @@ systemctl enable NetworkManager.service
 
 # Root password
 echo -e ""${green}"Setting the root password"
-passwd "${rpasswd}"
+passwd root
 
 
 # Boot loader
 echo -e ""${green}"Installing boot loader"
-pacman -S grub efibootmgr
+pacman -S --noconfirm grub efibootmgr
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
@@ -57,9 +57,8 @@ grub-mkconfig -o /boot/grub/grub.cfg
 # User management
 echo -e ""${green}"Adding a new user"
 useradd --create-home --groups wheel "${username}"
-passwd "${upasswd}"
+passwd "${username}"
 
 
-# Reboot
-echo -e ""${green}"Exiting the chroot environment"
-exit
+# Done
+echo -e ""${green}"Done!"
