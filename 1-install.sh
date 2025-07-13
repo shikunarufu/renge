@@ -126,7 +126,7 @@ echo -e "${prefix2}Selected "${white}"Mirrors"${color_off}""
 
 # Install essential packages
 echo -e "${prefix1}Installing "${white}"Essential Packages"${color_off}""
-pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo
+pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo  > /dev/null 2>&1
 echo -e "${prefix2}Installed "${white}"Essential Packages"${color_off}""
 
 
@@ -136,9 +136,15 @@ genfstab -U /mnt >> /mnt/etc/fstab
 echo -e "${prefix2}Generated "${white}"Fstab File"${color_off}""
 
 
+# Scripts
+mkdir /mnt/ALIS
+cp 2-chroot.sh /mnt/ALIS
+chmod +x /mnt/ALIS/2-chroot.sh
+
+
 # Chroot
 echo -e ""${green}"Changing root into the new system"
-arch-chroot /mnt
+arch-chroot /mnt ./mnt/ALIS/2-chroot.sh
 
 
 
