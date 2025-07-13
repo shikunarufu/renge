@@ -137,11 +137,13 @@ echo -e "${prefix2}Generated "${white}"Fstab File"${color_off}""
 
 
 # Scripts
-mkdir /mnt/ALIS
-cp 2-chroot.sh /mnt/ALIS
-chmod +x /mnt/ALIS/2-chroot.sh
+# mkdir /mnt/ALIS
+# cp 2-chroot.sh /mnt/ALIS
+# chmod +x /mnt/ALIS/2-chroot.sh
 
 
 # Chroot
 echo -e ""${green}"Changing root into the new system"
-arch-chroot /mnt /mnt/ALIS/2-chroot.sh
+arch-chroot /mnt /bin/bash <<END
+echo "hello world"
+END
