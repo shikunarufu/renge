@@ -111,4 +111,4 @@ cp 2-chroot.sh /mnt/ALIS
 
 # Chroot
 echo -e ""${green}"Changing root into the new system"
-arch-chroot /mnt ./2-chroot.sh
+arch-chroot /mnt ./ALIS/2-chroot.sh
