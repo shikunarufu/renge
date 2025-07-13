@@ -16,7 +16,7 @@ clear
 
 
 # Set the console keyboard layout and font
-echo "Setting the console keyboard"
+echo "Setting the console keyboard layout"
 loadkeys "${consolekeyboard}"
 echo "Setting the console font"
 setfont "${consolefont}"
@@ -86,13 +86,14 @@ reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose -f 20 -l 200 -p 
 
 # Install essential packages
 echo "Installing essential packages"
-pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g
+pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo
 
 
 # Fstab
 echo "Generating an fstab file"
 genfstab -U /mnt >> /mnt/etc/fstab
 
+
 # Chroot
 echo "Changing root into the new system"
-arch-chroot /mnt
+arch-chroot /mnt ./2-chroot.sh
