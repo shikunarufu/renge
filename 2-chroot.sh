@@ -14,48 +14,51 @@ rpasswd="nyanpasu"
 username="Shiku"
 upasswd="narufu"
 
+# Colors
+green="\033[0;32m"
+
 
 # Time
-echo "Setting the time zone"
+echo ""${green}"Setting the time zone"
 ln -sf /usr/share/zoneinfo/"${timezone}" /etc/localtime
 hwclock --systohc
 
 
 # Localization
-echo "Generating the locales"
+echo ""${green}"Generating the locales"
 sed --in-place 's/"#${utflocale}"/"${utflocale}"/' /etc/locale.gen
 sed --in-place 's/"#${isolocale}"/"${isolocale}"/' /etc/locale.gen
 locale-gen
-echo "Setting the system locale"
+echo ""${green}"Setting the system locale"
 echo "LANG="${lang}"" >> /etc/locale.conf
-echo "Setting the console keyboard layout"
+echo ""${green}"Setting the console keyboard layout"
 echo "KEYMAP="${consolekeyboard}"" >> /etc/vconsole.conf
 
 
 # Network configuration
-echo "Configuring the network connection"
+echo ""${green}"Configuring the network connection"
 echo "${hostname}" >> /etc/hostname
 systemctl enable NetworkManager.service
 
 
 # Root password
-echo "Setting the root password"
+echo ""${green}"Setting the root password"
 passwd "${rpasswd}"
 
 
 # Boot loader
-echo "Installing boot loader"
+echo ""${green}"Installing boot loader"
 pacman -S grub efibootmgr
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
 
 # User management
-echo "Adding a new user"
+echo ""${green}"Adding a new user"
 useradd --create-home --groups wheel "${username}"
 passwd "${upasswd}"
 
 
 # Reboot
-echo "Exiting the chroot environment"
+echo ""${green}"Exiting the chroot environment"
 exit
