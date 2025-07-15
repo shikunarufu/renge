@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Arch Linux Installation Script
+# Shiku's Arch Linux Installation Script
 
 # Configuration
 consolekeyboard="us"
@@ -19,149 +19,181 @@ username="Shiku"
 upasswd="narufu"
 
 
-# Colors
-color_off="\033[0m"
-green="\033[0;32m"
-light_gray="\033[0;37m"
-white="\033[1;37m"
-
-
-# Prefix
-prefix1="         "${light_gray}""
-prefix2=""${light_gray}"[  "${green}"OK  "${light_gray}"] "
+# Aesthetic
+entry_status() {
+  echo -n "\033[10G"
+  if [[ $1 == *" "* ]]; then
+    local subject=${1%% *}
+    local predicate=${1#* }
+    echo -e "${subject} \033[1;37m${predicate}\033[0m"
+  else
+    echo -e "$1"
+}
+info_status() {
+  echo -n "\033[10G"
+}
+exit_status() {
+  echo -n "["
+  echo -n "\033[1;32m"
+  echo -n "  OK  "
+  echo -n "\033[0m"
+  echo -n "]"
+  entry_status
+}
 
 
 # Clear the terminal screen
-echo -e "${prefix1}Clearing "${white}"Terminal Screen"${color_off}""
+entry_status "Clearing Terminal Screen"
 clear
-echo -e "${prefix2}Cleared "${white}"Terminal Screen"${color_off}""
+exit_status "Cleared Terminal Screen"
 
 
 # Set the console keyboard layout and font
-echo -e "${prefix1}Setting "${white}"Console Keyboard Layout"${color_off}""
+entry_status "Setting Console Keyboard Layout"
 loadkeys "${consolekeyboard}"
-echo -e "${prefix2}Set "${white}"Console Keyboard Layout to "${consolekeyboard}""${color_off}""
-echo -e "${prefix1}Setting "${white}"Console Font"${color_off}""
+exit_status "Set Console Keyboard Layout to "${consolekeyboard}""
+entry_status "Setting Console Font"
 setfont "${consolefont}"
-echo -e "${prefix2}Set "${white}"Console Font "${consolefont}""${color_off}""
+exit_status "Set Console Font to "${consolefont}""
 
 
 # Verify the boot mode
-echo -e "${prefix1}Verifying "${white}"Boot Mode"${color_off}""
+entry_status "Verifying Boot Mode"
 bootmode=$(< /sys/firmware/efi/fw_platform_size)
 if [[ "${bootmode}" == "64" ]]; then
-  echo -e "${prefix1}System is booted in UEFI mode and has a 64-bit x64 UEFI"${color_off}""
+  entry_status "System is booted in UEFI mode and has a 64-bit x64 UEFI"
 elif [[ "${bootmode}" == "32" ]]; then
-  echo -e "${prefix1}System is booted in UEFI mode and has a 32-bit IA32 UEFI"${color_off}""
+  entry_status "System is booted in UEFI mode and has a 32-bit IA32 UEFI"
 else
-  echo -e "${prefix1}System may be booted in BIOS (or CSM) mode"${color_off}""
-  echo -e "${prefix1}Refer to your motherboard's manual"${color_off}""
+  entry_status "System may be booted in BIOS (or CSM) mode"
+  entry_status "Refer to your motherboard's manual"
 fi
-echo -e "${prefix2}Verified "${white}"Boot Mode"${color_off}""
+exit_status "Verified Boot Mode"
 
 
 # Connect to the internet
-echo -e "${prefix1}Connecting to "${white}"Internet"${color_off}""
+entry_status "Connecting to Internet"
 ping -c 5 archlinux.org > /dev/null 2>&1
-echo -e "${prefix2}Connected to "${white}"Internet"${color_off}""
+exit_status "Connected to Internet"
 
 
 # Update the system clock
-echo -e "${prefix1}Updating "${white}"System Clock"${color_off}""
+entry_status "Updating System Clock"
 timedatectl set-ntp true
-echo -e "${prefix2}Updated "${white}"System Clock"${color_off}""
+exit_status "Updated System Clock"
 
 
 # Partition the disks
-echo -e "${prefix1}Partitioning "${white}"Disks"${color_off}""
-echo -e "${prefix1}Destroying "${white}"GPT and MBR Data Structures in /dev/"${ssd1}""${color_off}""
-sgdisk --zap-all /dev/"${ssd1}"
-echo -e "${prefix2}Destroyed "${white}"GPT and MBR Data Structures in /dev/"${ssd1}""${color_off}""
-echo -e "${prefix1}Destroying "${white}"GPT and MBR Data Structures in /dev/"${hdd1}""${color_off}""
-sgdisk --zap-all /dev/"${hdd1}"
-echo -e "${prefix2}Destroyed "${white}"GPT and MBR Data Structures in /dev/"${hdd1}""${color_off}""
-echo -e "${prefix1}Creating "${white}"New Partition in /dev/"${ssd1}""${color_off}""
-sgdisk --new=1:0:+1G --new=2:0:+4G --new=3:0:0 /dev/"${ssd1}"
-echo -e "${prefix2}Created "${white}"New Partition in /dev/"${ssd1}""${color_off}""
-echo -e "${prefix1}Creating "${white}"New Partition in /dev/"${hdd1}""${color_off}""
-sgdisk --new=1:0:0 /dev/"${hdd1}"
-echo -e "${prefix2}Created "${white}"New Partition in /dev/"${hdd1}""${color_off}""
-echo -e "${prefix1}Changing "${white}"Partition Type Code in /dev/"${ssd1}""${color_off}""
-sgdisk --typecode=1:EF00 --typecode=2:8200 --typecode=3:8300 /dev/"${ssd1}"
-echo -e "${prefix2}Changed "${white}"Partition Type Code in /dev/"${ssd1}""${color_off}""
-echo -e "${prefix1}Changing "${white}"Partition Type Code in /dev/"${hdd1}""${color_off}""
-sgdisk --typecode=1:8300  /dev/"${hdd1}"
-echo -e "${prefix2}Changed "${white}"Partition Type Code in /dev/"${hdd1}""${color_off}""
-echo -e "${prefix1}Changing "${white}"GPT Name of Partition in /dev/"${ssd1}""${color_off}""
-sgdisk --change-name=1:"EFI system partition" --change-name=2:"Linux swap" --change-name=3:"Linux filesystem" /dev/"${ssd1}"
-echo -e "${prefix2}Changed "${white}"GPT Name of Partition in /dev/"${ssd1}""${color_off}""
-echo -e "${prefix1}Changing "${white}"GPT Name of Partition in /dev/"${hdd1}""${color_off}""
-sgdisk --change-name=1:"Linux filesystem" /dev/"${hdd1}"
-echo -e "${prefix2}Changed "${white}"GPT Name of Partition in /dev/"${hdd1}""${color_off}""
-echo -e "${prefix2}Partitioned "${white}"Disks"${color_off}""
-
-
-# Reread the partition table
-echo -e "${prefix1}Rereading "${white}"Partition Table"${color_off}""
-sleep 2
-partprobe /dev/"${ssd1}"
-partprobe /dev/"${hdd1}"
-sleep 2
-echo -e "${prefix2}Reread "${white}"Partition Table"${color_off}""
+entry_status "Partitioning Disks"
+entry_status "Destroying GPT and MBR Data Structures"
+#sgdisk --zap-all /dev/"${ssd1}" > /dev/null 2>&1
+exit_status "Destroyed GPT and MBR Data Structures in /dev/"${ssd1}""
+entry_status "Destroying GPT and MBR Data Structures"
+#sgdisk --zap-all /dev/"${hdd1}" > /dev/null 2>&1
+exit_status "Destroyed GPT and MBR Data Structures in /dev/"${hdd1}""
+entry_status "Erasing All Available Signatures"
+#wipefs --all --force /dev/"${ssd1}"
+exit_status "Erased All Available Signatures in /dev/"${ssd1}""
+entry_status "Erasing All Available Signatures"
+#wipefs --all --force /dev/"${hdd1}"
+exit_status "Erased All Available Signatures in /dev/"${hdd1}""
+entry_status "Rereading Partition Table"
+#partprobe /dev/"${ssd1}"
+exit_status "Reread Partition Table in /dev/"${ssd1}""
+entry_status "Rereading Partition Table"
+#partprobe /dev/"${hdd1}"
+exit_status "Reread Partition Table in /dev/"${hdd1}""
+entry_status "Creating New Partition"
+#sgdisk --new=1:0:+1G --new=2:0:+4G --new=3:0:0 /dev/"${ssd1}" > /dev/null 2>&1
+exit_status "Created New Partition in /dev/"${ssd1}""
+entry_status "Creating New Partition"
+#sgdisk --new=1:0:0 /dev/"${hdd1}" > /dev/null 2>&1
+exit_status "Created New Partition in /dev/"${hdd1}""
+entry_status "Changing Partition Type Code"
+#sgdisk --typecode=1:EF00 --typecode=2:8200 --typecode=3:8300 /dev/"${ssd1}" > /dev/null 2>&1
+exit_status "Changed Partition Type Code in /dev/"${ssd1}""
+entry_status "Changing Partition Type Code"
+#sgdisk --typecode=1:8300  /dev/"${hdd1}" > /dev/null 2>&1
+exit_status "Changed Partition Type Code in /dev/"${hdd1}""
+entry_status "Changing GPT Name of Partition"
+#sgdisk --change-name=1:"EFI system partition" --change-name=2:"Linux swap" --change-name=3:"Linux filesystem" /dev/"${ssd1}" > /dev/null 2>&1
+exit_status "Changed GPT Name of Partition in /dev/"${ssd1}""
+entry_status "Changing GPT Name of Partition"
+#sgdisk --change-name=1:"Linux filesystem" /dev/"${hdd1}" > /dev/null 2>&1
+exit_status "Changed GPT Name of Partition in /dev/"${hdd1}""
+entry_status "Rereading Partition Table"
+#partprobe /dev/"${ssd1}"
+exit_status "Reread Partition Table in /dev/"${ssd1}""
+entry_status "Rereading Partition Table"
+#partprobe /dev/"${hdd1}"
+exit_status "Reread Partition Table in /dev/"${hdd1}""
+exit_status "Partitioned Disks"
 
 
 # Format the partitions
-echo -e "${prefix1}Formatting "${white}"Partitions"${color_off}""
+entry_status "Formatting Partitions"
 root_partition="${ssd1}3"
 home_partition="${hdd1}1"
 swap_partition="${ssd1}2"
 efi_system_partition="${ssd1}1"
-mkfs.ext4 -F /dev/"${root_partition}"
-mkfs.ext4 -F /dev/"${home_partition}"
-mkswap /dev/"${swap_partition}"
-mkfs.fat -F 32 /dev/"${efi_system_partition}"
-echo -e "${prefix2}Formatted "${white}"Partitions"${color_off}""
+entry_status "Creating Ext4 File System"
+#mkfs.ext4 -F /dev/"${root_partition}"
+exit_status "Created Ext4 File System in /dev/"${root_partition}""
+entry_status "Creating Ext4 File System"
+#mkfs.ext4 -F /dev/"${home_partition}"
+exit_status "Created Ext4 File System in /dev/"${home_partition}""
+entry_status "Initializing Linux Swap"
+#mkswap /dev/"${swap_partition}"
+exit_status "Initialized Linux Swap in /dev/"${swap_partition}""
+entry_status "Formatting EFI System Partition"
+#mkfs.fat -F 32 /dev/"${efi_system_partition}"
+exit_status "Formatted EFI System Partition in /dev/"${efi_system_partition}""
+exit_status "Formatted Partitions"
 
 
 # Mount the file systems
-echo -e "${prefix1}Mounting "${white}"File Systems"${color_off}""
-mount /dev/"${root_partition}" /mnt
-mkdir /mnt/boot
-mount /dev/"${efi_system_partition}" /mnt/boot
-mkdir /mnt/home
-mount /dev/"${home_partition}" /mnt/home
-swapon /dev/"${swap_partition}"
-echo -e "${prefix2}Mounted "${white}"File Systems"${color_off}""
+entry_status "Mounting File Systems"
+entry_status "Mounting Root Volume"
+#mount /dev/"${root_partition}" /mnt
+exit_status "Mounted Root Volume in /mnt"
+entry_status "Creating Directory for EFI System Partition"
+#mkdir /mnt/boot
+exit_status "Created Directory for EFI System Partition in /mnt/boot"
+entry_status "Mounting EFI System Partition"
+#mount /dev/"${efi_system_partition}" /mnt/boot
+exit_status "Mounted EFI System Partition in /mnt/boot"
+entry_status "Creating Directory for Home Partition"
+#mkdir /mnt/home
+exit_status "Created Directory for Home Partition in /mnt/boot"
+entry_status "Mounting Home Partition"
+#mount /dev/"${home_partition}" /mnt/home
+exit_status "Mounted Home Partition in /mnt/home"
+entry_status "Enabling Swap Partition"
+#swapon /dev/"${swap_partition}"
+exit_status "Enabling Swap Partition"
+exit_status "Mounted File Systems"
 
 
 # Select the mirrors
-echo -e "${prefix1}Selecting "${white}"Mirrors"${color_off}""
+entry_status "Selecting Mirrors"
 #reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose -f 20 -l 200 -p https,http
-echo -e "${prefix2}Selected "${white}"Mirrors"${color_off}""
+exit_status "Selected Mirrors"
 
 
 # Install essential packages
-echo -e "${prefix1}Installing "${white}"Essential Packages"${color_off}""
-pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo  > /dev/null 2>&1
-echo -e "${prefix2}Installed "${white}"Essential Packages"${color_off}""
+entry_status "Installing Essential Packages"
+#pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo  > /dev/null 2>&1
+exit_status "Installed Essential Packages"
 
 
 # Fstab
-echo -e "${prefix1}Generating "${white}"Fstab File"${color_off}""
-genfstab -U /mnt >> /mnt/etc/fstab
-echo -e "${prefix2}Generated "${white}"Fstab File"${color_off}""
-
-
-# Copy scripts from github
-mkdir /mnt/ALIS
-cp 2-chroot.sh /mnt/ALIS/
+entry_status "Generating Fstab File"
+#genfstab -U /mnt >> /mnt/etc/fstab
+exit_status "Generated Fstab File /mnt/etc/fstab"
 
 
 # Chroot
-echo -e ""${green}"Changing root into the new system"
-arch-chroot /mnt /bin/bash <<END
-mkdir /ALIS
-mv /ALIS/2-chroot.sh /mnt/ALIS
-chmod +x /ALIS/2-chroot.sh
-./ALIS/2-chroot.sh
+entry_status "Changing root into the new system"
+#arch-chroot /mnt /bin/bash <<END
+
 END
