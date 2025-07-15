@@ -28,6 +28,7 @@ entry_status() {
     echo -e "${subject} \033[1;37m${predicate}\033[0m"
   else
     echo -e "$1"
+  fi
 }
 info_status() {
   echo -n "\033[10G"
