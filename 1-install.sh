@@ -8,37 +8,38 @@ consolefont="Lat2-Terminus16"
 ssd1="sdb"
 hdd1="sda"
 
-timezone="Asia/Manila"
-utflocale="en_GB.UTF-8 UTF-8"
-isolocale="en_GB ISO-8859-1"
-lang="en_GB.UTF-8"
+#timezone="Asia/Manila"
+#utflocale="en_GB.UTF-8 UTF-8"
+#isolocale="en_GB ISO-8859-1"
+#lang="en_GB.UTF-8"
 
-hostname="Renge"
-rpasswd="nyanpasu"
-username="Shiku"
-upasswd="narufu"
+#hostname="Renge"
+#rpasswd="nyanpasu"
+#username="Shiku"
+#upasswd="narufu"
 
 
 # Aesthetic
 entry_status() {
-  echo -n "\033[10G"
+  printf "\033[10G"
   if [[ $1 == *" "* ]]; then
     local subject=${1%% *}
     local predicate=${1#* }
-    echo -e "${subject} \033[1;37m${predicate}\033[0m"
+    printf "%s \033[1;37m%s\033[0m" "${subject}" "${predicate}"
+    
   else
-    echo -e "$1"
+    printf "%s" "$1"
   fi
 }
 info_status() {
-  echo -n "\033[10G"
+  printf "\033[10G"
 }
 exit_status() {
-  echo -n "["
-  echo -n "\033[1;32m"
-  echo -n "  OK  "
-  echo -n "\033[0m"
-  echo -n "]"
+  printf "["
+  printf "\033[1;32m"
+  printf "  OK  "
+  printf "\033[0m"
+  printf "]"
   entry_status
 }
 
@@ -52,10 +53,10 @@ exit_status "Cleared Terminal Screen"
 # Set the console keyboard layout and font
 entry_status "Setting Console Keyboard Layout"
 loadkeys "${consolekeyboard}"
-exit_status "Set Console Keyboard Layout to "${consolekeyboard}""
+exit_status "Set Console Keyboard Layout to ${consolekeyboard}"
 entry_status "Setting Console Font"
 setfont "${consolefont}"
-exit_status "Set Console Font to "${consolefont}""
+exit_status "Set Console Font to ${consolefont}"
 
 
 # Verify the boot mode
@@ -88,46 +89,46 @@ exit_status "Updated System Clock"
 entry_status "Partitioning Disks"
 entry_status "Destroying GPT and MBR Data Structures"
 #sgdisk --zap-all /dev/"${ssd1}" > /dev/null 2>&1
-exit_status "Destroyed GPT and MBR Data Structures in /dev/"${ssd1}""
+exit_status "Destroyed GPT and MBR Data Structures in /dev/${ssd1}"
 entry_status "Destroying GPT and MBR Data Structures"
 #sgdisk --zap-all /dev/"${hdd1}" > /dev/null 2>&1
-exit_status "Destroyed GPT and MBR Data Structures in /dev/"${hdd1}""
+exit_status "Destroyed GPT and MBR Data Structures in /dev/${hdd1}"
 entry_status "Erasing All Available Signatures"
 #wipefs --all --force /dev/"${ssd1}"
-exit_status "Erased All Available Signatures in /dev/"${ssd1}""
+exit_status "Erased All Available Signatures in /dev/${ssd1}"
 entry_status "Erasing All Available Signatures"
 #wipefs --all --force /dev/"${hdd1}"
-exit_status "Erased All Available Signatures in /dev/"${hdd1}""
+exit_status "Erased All Available Signatures in /dev/${hdd1}"
 entry_status "Rereading Partition Table"
 #partprobe /dev/"${ssd1}"
-exit_status "Reread Partition Table in /dev/"${ssd1}""
+exit_status "Reread Partition Table in /dev/${ssd1}"
 entry_status "Rereading Partition Table"
 #partprobe /dev/"${hdd1}"
-exit_status "Reread Partition Table in /dev/"${hdd1}""
+exit_status "Reread Partition Table in /dev/${hdd1}"
 entry_status "Creating New Partition"
 #sgdisk --new=1:0:+1G --new=2:0:+4G --new=3:0:0 /dev/"${ssd1}" > /dev/null 2>&1
-exit_status "Created New Partition in /dev/"${ssd1}""
+exit_status "Created New Partition in /dev/${ssd1}"
 entry_status "Creating New Partition"
 #sgdisk --new=1:0:0 /dev/"${hdd1}" > /dev/null 2>&1
-exit_status "Created New Partition in /dev/"${hdd1}""
+exit_status "Created New Partition in /dev/${hdd1}"
 entry_status "Changing Partition Type Code"
 #sgdisk --typecode=1:EF00 --typecode=2:8200 --typecode=3:8300 /dev/"${ssd1}" > /dev/null 2>&1
-exit_status "Changed Partition Type Code in /dev/"${ssd1}""
+exit_status "Changed Partition Type Code in /dev/${ssd1}"
 entry_status "Changing Partition Type Code"
 #sgdisk --typecode=1:8300  /dev/"${hdd1}" > /dev/null 2>&1
-exit_status "Changed Partition Type Code in /dev/"${hdd1}""
+exit_status "Changed Partition Type Code in /dev/${hdd1}"
 entry_status "Changing GPT Name of Partition"
 #sgdisk --change-name=1:"EFI system partition" --change-name=2:"Linux swap" --change-name=3:"Linux filesystem" /dev/"${ssd1}" > /dev/null 2>&1
-exit_status "Changed GPT Name of Partition in /dev/"${ssd1}""
+exit_status "Changed GPT Name of Partition in /dev/${ssd1}"
 entry_status "Changing GPT Name of Partition"
 #sgdisk --change-name=1:"Linux filesystem" /dev/"${hdd1}" > /dev/null 2>&1
-exit_status "Changed GPT Name of Partition in /dev/"${hdd1}""
+exit_status "Changed GPT Name of Partition in /dev/${hdd1}"
 entry_status "Rereading Partition Table"
 #partprobe /dev/"${ssd1}"
-exit_status "Reread Partition Table in /dev/"${ssd1}""
+exit_status "Reread Partition Table in /dev/${ssd1}"
 entry_status "Rereading Partition Table"
 #partprobe /dev/"${hdd1}"
-exit_status "Reread Partition Table in /dev/"${hdd1}""
+exit_status "Reread Partition Table in /dev/${hdd1}"
 exit_status "Partitioned Disks"
 
 
@@ -139,16 +140,16 @@ swap_partition="${ssd1}2"
 efi_system_partition="${ssd1}1"
 entry_status "Creating Ext4 File System"
 #mkfs.ext4 -F /dev/"${root_partition}"
-exit_status "Created Ext4 File System in /dev/"${root_partition}""
+exit_status "Created Ext4 File System in /dev/${root_partition}"
 entry_status "Creating Ext4 File System"
 #mkfs.ext4 -F /dev/"${home_partition}"
-exit_status "Created Ext4 File System in /dev/"${home_partition}""
+exit_status "Created Ext4 File System in /dev/${home_partition}"
 entry_status "Initializing Linux Swap"
 #mkswap /dev/"${swap_partition}"
-exit_status "Initialized Linux Swap in /dev/"${swap_partition}""
+exit_status "Initialized Linux Swap in /dev/${swap_partition}"
 entry_status "Formatting EFI System Partition"
 #mkfs.fat -F 32 /dev/"${efi_system_partition}"
-exit_status "Formatted EFI System Partition in /dev/"${efi_system_partition}""
+exit_status "Formatted EFI System Partition in /dev/${efi_system_partition}"
 exit_status "Formatted Partitions"
 
 
