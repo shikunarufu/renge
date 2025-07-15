@@ -21,24 +21,24 @@ hdd1="sda"
 
 # Aesthetic
 entry_status() {
-  printf "\033[10G"
+  printf "\e[10G"
   if [[ $1 == *" "* ]]; then
     local subject=${1%% *}
     local predicate=${1#* }
-    printf "%s \033[1;37m%s\033[0m" "${subject}" "${predicate}"
+    printf "%s \e[1;37m%s\033[0m\n" "${subject}" "${predicate}"
     
   else
     printf "%s" "$1"
   fi
 }
 info_status() {
-  printf "\033[10G"
+  printf "\e[10G"
 }
 exit_status() {
   printf "["
-  printf "\033[1;32m"
+  printf "\e[0;32m"
   printf "  OK  "
-  printf "\033[0m"
+  printf "\e[0m"
   printf "]"
   entry_status
 }
