@@ -40,10 +40,10 @@ echo -e "${prefix2}Cleared "${white}"Terminal Screen"${color_off}""
 # Set the console keyboard layout and font
 echo -e "${prefix1}Setting "${white}"Console Keyboard Layout"${color_off}""
 loadkeys "${consolekeyboard}"
-echo -e "${prefix2}Set "${white}"Console Keyboard Layout"${color_off}""
+echo -e "${prefix2}Set "${white}"Console Keyboard Layout to "${consolekeyboard}""${color_off}""
 echo -e "${prefix1}Setting "${white}"Console Font"${color_off}""
 setfont "${consolefont}"
-echo -e "${prefix2}Set "${white}"Console Font"${color_off}""
+echo -e "${prefix2}Set "${white}"Console Font "${consolefont}""${color_off}""
 
 
 # Verify the boot mode
@@ -61,9 +61,9 @@ echo -e "${prefix2}Verified "${white}"Boot Mode"${color_off}""
 
 
 # Connect to the internet
-echo -e "${prefix1}Connecting To "${white}"Internet"${color_off}""
+echo -e "${prefix1}Connecting to "${white}"Internet"${color_off}""
 ping -c 5 archlinux.org > /dev/null 2>&1
-echo -e "${prefix2}Connected To "${white}"Internet"${color_off}""
+echo -e "${prefix2}Connected to "${white}"Internet"${color_off}""
 
 
 # Update the system clock
@@ -74,22 +74,38 @@ echo -e "${prefix2}Updated "${white}"System Clock"${color_off}""
 
 # Partition the disks
 echo -e "${prefix1}Partitioning "${white}"Disks"${color_off}""
+echo -e "${prefix1}Destroying "${white}"GPT and MBR Data Structures in /dev/"${ssd1}""${color_off}""
 sgdisk --zap-all /dev/"${ssd1}"
+echo -e "${prefix2}Destroyed "${white}"GPT and MBR Data Structures in /dev/"${ssd1}""${color_off}""
+echo -e "${prefix1}Destroying "${white}"GPT and MBR Data Structures in /dev/"${hdd1}""${color_off}""
 sgdisk --zap-all /dev/"${hdd1}"
+echo -e "${prefix2}Destroyed "${white}"GPT and MBR Data Structures in /dev/"${hdd1}""${color_off}""
+echo -e "${prefix1}Creating "${white}"New Partition in /dev/"${ssd1}""${color_off}""
 sgdisk --new=1:0:+1G --new=2:0:+4G --new=3:0:0 /dev/"${ssd1}"
+echo -e "${prefix2}Created "${white}"New Partition in /dev/"${ssd1}""${color_off}""
+echo -e "${prefix1}Creating "${white}"New Partition in /dev/"${hdd1}""${color_off}""
 sgdisk --new=1:0:0 /dev/"${hdd1}"
+echo -e "${prefix2}Created "${white}"New Partition in /dev/"${hdd1}""${color_off}""
+echo -e "${prefix1}Changing "${white}"Partition Type Code in /dev/"${ssd1}""${color_off}""
 sgdisk --typecode=1:EF00 --typecode=2:8200 --typecode=3:8300 /dev/"${ssd1}"
+echo -e "${prefix2}Changed "${white}"Partition Type Code in /dev/"${ssd1}""${color_off}""
+echo -e "${prefix1}Changing "${white}"Partition Type Code in /dev/"${hdd1}""${color_off}""
 sgdisk --typecode=1:8300  /dev/"${hdd1}"
+echo -e "${prefix2}Changed "${white}"Partition Type Code in /dev/"${hdd1}""${color_off}""
+echo -e "${prefix1}Changing "${white}"GPT Name of Partition in /dev/"${ssd1}""${color_off}""
 sgdisk --change-name=1:"EFI system partition" --change-name=2:"Linux swap" --change-name=3:"Linux filesystem" /dev/"${ssd1}"
+echo -e "${prefix2}Changed "${white}"GPT Name of Partition in /dev/"${ssd1}""${color_off}""
+echo -e "${prefix1}Changing "${white}"GPT Name of Partition in /dev/"${hdd1}""${color_off}""
 sgdisk --change-name=1:"Linux filesystem" /dev/"${hdd1}"
+echo -e "${prefix2}Changed "${white}"GPT Name of Partition in /dev/"${hdd1}""${color_off}""
 echo -e "${prefix2}Partitioned "${white}"Disks"${color_off}""
 
 
 # Reread the partition table
 echo -e "${prefix1}Rereading "${white}"Partition Table"${color_off}""
 sleep 2
-partprobe -s /dev/"${ssd1}"
-partprobe -s /dev/"${hdd1}"
+partprobe /dev/"${ssd1}"
+partprobe /dev/"${hdd1}"
 sleep 2
 echo -e "${prefix2}Reread "${white}"Partition Table"${color_off}""
 
@@ -100,8 +116,8 @@ root_partition="${ssd1}3"
 home_partition="${hdd1}1"
 swap_partition="${ssd1}2"
 efi_system_partition="${ssd1}1"
-mkfs.ext4 /dev/"${root_partition}"
-mkfs.ext4 /dev/"${home_partition}"
+mkfs.ext4 -F /dev/"${root_partition}"
+mkfs.ext4 -F /dev/"${home_partition}"
 mkswap /dev/"${swap_partition}"
 mkfs.fat -F 32 /dev/"${efi_system_partition}"
 echo -e "${prefix2}Formatted "${white}"Partitions"${color_off}""
@@ -136,14 +152,16 @@ genfstab -U /mnt >> /mnt/etc/fstab
 echo -e "${prefix2}Generated "${white}"Fstab File"${color_off}""
 
 
-# Scripts
-# mkdir /mnt/ALIS
-# cp 2-chroot.sh /mnt/ALIS
-# chmod +x /mnt/ALIS/2-chroot.sh
+# Copy scripts from github
+mkdir /mnt/ALIS
+cp 2-chroot.sh /mnt/ALIS/
 
 
 # Chroot
 echo -e ""${green}"Changing root into the new system"
 arch-chroot /mnt /bin/bash <<END
-echo "hello world"
+mkdir /ALIS
+mv /ALIS/2-chroot.sh /mnt/ALIS
+chmod +x /ALIS/2-chroot.sh
+./ALIS/2-chroot.sh
 END
