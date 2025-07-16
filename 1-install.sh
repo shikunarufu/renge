@@ -17,8 +17,8 @@ isolocale="en_GB ISO-8859-1"
 lang="en_GB.UTF-8"
 hostname="Renge"
 rpasswd="nyanpasu"
-#username="Shiku"
-#upasswd="narufu"
+username="Shiku"
+upasswd="narufu"
 
 # Aesthetics
 entry_status() {
@@ -42,6 +42,7 @@ exit_status() {
   printf "  OK  "
   printf "\e[0m"
   printf "]"
+  printf "\e[10G"
   if [[ $1 == *" "* ]]; then
     local subject=${1%% *}
     local predicate=${1#* }
@@ -140,13 +141,13 @@ home_partition="${hdd1}1"
 swap_partition="${ssd1}2"
 efi_system_partition="${ssd1}1"
 entry_status "Creating Ext4 File System"
-mkfs.ext4 -F /dev/"${root_partition}"
+mkfs.ext4 -F /dev/"${root_partition}" > /dev/null 2>&1
 exit_status "Created Ext4 File System in /dev/${root_partition}"
 entry_status "Creating Ext4 File System"
-mkfs.ext4 -F /dev/"${home_partition}"
+mkfs.ext4 -F /dev/"${home_partition}" > /dev/null 2>&1
 exit_status "Created Ext4 File System in /dev/${home_partition}"
 entry_status "Initializing Linux Swap"
-mkswap /dev/"${swap_partition}"
+mkswap /dev/"${swap_partition}" > /dev/null 2>&1
 exit_status "Initialized Linux Swap in /dev/${swap_partition}"
 entry_status "Formatting EFI System Partition"
 mkfs.fat -F 32 /dev/"${efi_system_partition}"
@@ -181,12 +182,12 @@ exit_status "Mounted File Systems"
 
 # Select the mirrors
 entry_status "Selecting Mirrors"
-reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose -f 20 -l 200 -p https,http
+reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose -f 20 -l 200 -p https,http > /dev/null 2>&1
 exit_status "Selected Mirrors"
 
 # Install essential packages
 entry_status "Installing Essential Packages"
-pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo > /dev/null 2>&1
+pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g  networkmanager neovim man-db man-pages texinfo > /dev/null 2>&1
 exit_status "Installed Essential Packages"
 
 #######################################
@@ -214,7 +215,7 @@ entry_status "Uncommenting ${isolocale}"
 arch-chroot /mnt sed --in-place 's/"#${isolocale}"/"${isolocale}"/' /etc/locale.gen
 exit_status "Uncommented ${isolocale} in /etc/locale.gen"
 entry_status "Generating Locales"
-arch-chroot /mnt locale-gen
+arch-chroot /mnt locale-gen > /dev/null 2>&1
 exit_status "Generated Locales"
 entry_status "Setting System Locale"
 arch-chroot /mnt echo "LANG="${lang}"" >> /etc/locale.conf
@@ -233,16 +234,52 @@ exit_status "Enabled NetworkManager.service"
 
 # Root password
 entry_status "Setting Root Password"
-printf "%s\n%s" "${rpasswd}" "${rpasswd}" | arch-chroot /mnt passwd
+printf "%s\n%s" "${rpasswd}" "${rpasswd}" | arch-chroot /mnt passwd > /dev/null 2>&1
 exit_status "Set Root Password"
 
 # Boot loader
 entry_status "Installing Boot Loader"
-arch-chroot /mnt pacman -S --noconfirm grub efibootmgr
+arch-chroot /mnt pacman -S --noconfirm grub efibootmgr > /dev/null 2>&1
 exit_status "Installed Boot Loader (GRUB)"
 entry_status "Installing GRUB"
-arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB > /dev/null 2>&1
 exit_status "Installed GRUB to /boot"
 entry_status "Generating Main Configuration File"
-arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
-entry_status "Generated Main Configuration File in /boot/grub/grub.cfg"
+arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg > /dev/null 2>&1
+exit_status "Generated Main Configuration File in /boot/grub/grub.cfg"
+
+#######################################
+# System Administration
+#######################################
+
+# Users and groups
+entry_status "Adding New User"
+arch-chroot /mnt useradd -m -G wheel "${username}"
+exit_status "Added User (${username})"
+entry_status "Setting ${username} Password"
+printf "%s\n%s" "${upasswd}" "${upasswd}" | arch-chroot /mnt passwd "${username}" > /dev/null 2>&1
+exit_status "Set ${username} Password"
+
+# Security
+entry_status "Allowing Members of Group Wheel Sudo Access"
+arch-chroot /mnt sed --in-place 's/# %wheel/%wheel/g' /etc/sudoers
+arch-chroot /mnt sed --in-place 's/%wheel ALL=(ALL) NOPASSWD: ALL/# %wheel ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers
+exit_status "Allowed Members of Group Wheel Sudo Access"
+entry_status "Disabling Password Prompt Timeout"
+arch-chroot /mnt echo "Defaults passwd_timeout=0" >> /etc/sudoers
+exit_status "Disabled Password Prompt Timeout"
+
+Install bash-completion
+
+#######################################
+# Package Management
+#######################################
+
+# Pacman
+entry_status "Enabling paccache.timer"
+arch-chroot /mnt systemctl enable paccache.timer
+exit_status "Enabled paccache.timer"
+
+# Repositories
+arch-chroot /mnt sed --in-place 's/"#[multilib]"/"[multilib]"/' /etc/pacman.conf
+arch-chroot /mnt sed --in-place 's|"#Include = /etc/pacman.d/mirrorlist"/"Include = /etc/pacman.d/mirrorlist"/' /etc/pacman.conf
