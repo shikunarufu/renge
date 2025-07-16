@@ -9,7 +9,7 @@
 # Configuration
 consolekeyboard="us"
 consolefont="Lat2-Terminus16"
-ssd1="sdb"
+ssd1="sda"
 hdd1="sda"
 timezone="Asia/Manila"
 utflocale="en_GB.UTF-8 UTF-8"
@@ -127,10 +127,10 @@ entry_status "Changing GPT Name of Partition"
 sgdisk --change-name=1:"Linux filesystem" /dev/"${hdd1}" > /dev/null 2>&1
 exit_status "Changed GPT Name of Partition in /dev/${hdd1}"
 entry_status "Rereading Partition Table"
-partprobe /dev/"${ssd1}"
+partprobe /dev/"${ssd1}" > /dev/null 2>&1
 exit_status "Reread Partition Table in /dev/${ssd1}"
 entry_status "Rereading Partition Table"
-partprobe /dev/"${hdd1}"
+partprobe /dev/"${hdd1}" > /dev/null 2>&1
 exit_status "Reread Partition Table in /dev/${hdd1}"
 exit_status "Partitioned Disks"
 
@@ -150,20 +150,20 @@ entry_status "Initializing Linux Swap"
 mkswap /dev/"${swap_partition}" > /dev/null 2>&1
 exit_status "Initialized Linux Swap in /dev/${swap_partition}"
 entry_status "Formatting EFI System Partition"
-mkfs.fat -F 32 /dev/"${efi_system_partition}"
+mkfs.fat -F 32 /dev/"${efi_system_partition}" > /dev/null 2>&1
 exit_status "Formatted EFI System Partition in /dev/${efi_system_partition}"
 exit_status "Formatted Partitions"
 
 # Mount the file systems
 entry_status "Mounting File Systems"
 entry_status "Mounting Root Volume"
-mount /dev/"${root_partition}" /mnt
+mount /dev/"${root_partition}" /mnt > /dev/null 2>&1
 exit_status "Mounted Root Volume in /mnt"
 entry_status "Creating Directory for EFI System Partition"
 mkdir /mnt/boot
 exit_status "Created Directory for EFI System Partition in /mnt/boot"
 entry_status "Mounting EFI System Partition"
-mount /dev/"${efi_system_partition}" /mnt/boot
+mount /dev/"${efi_system_partition}" /mnt/boot > /dev/null 2>&1
 exit_status "Mounted EFI System Partition in /mnt/boot"
 entry_status "Creating Directory for Home Partition"
 mkdir /mnt/home
@@ -172,7 +172,7 @@ entry_status "Mounting Home Partition"
 mount /dev/"${home_partition}" /mnt/home
 exit_status "Mounted Home Partition in /mnt/home"
 entry_status "Enabling Swap Partition"
-swapon /dev/"${swap_partition}"
+swapon /dev/"${swap_partition}" > /dev/null 2>&1
 exit_status "Enabling Swap Partition"
 exit_status "Mounted File Systems"
 
