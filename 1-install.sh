@@ -228,10 +228,10 @@ hwclock --systohc
 
 # Localization
 #entry_status "Uncommenting ${utflocale}"
-sed --in-place 's/"#${utflocale}"/"${utflocale}"/' /etc/locale.gen
+sed --in-place 's/#"${utflocale}"/"${utflocale}"/' /etc/locale.gen
 #exit_status "Uncommented ${utflocale} in /etc/locale.gen"
 #entry_status "Uncommenting ${isolocale}"
-sed --in-place 's/"#${isolocale}"/"${isolocale}"/' /etc/locale.gen
+sed --in-place 's/#"${isolocale}"/"${isolocale}"/' /etc/locale.gen
 #exit_status "Uncommented ${isolocale} in /etc/locale.gen"
 #entry_status "Generating Locales"
 locale-gen
@@ -282,7 +282,7 @@ printf "%s\n%s" "${upasswd}" "${upasswd}" | passwd "${username}"
 # Security
 #entry_status "Allowing Members of Group Wheel Sudo Access"
 sed --in-place 's/# %wheel/%wheel/g' /etc/sudoers
-sed --in-place 's/%wheel ALL=(ALL) NOPASSWD: ALL/# %wheel ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers
+sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 #exit_status "Allowed Members of Group Wheel Sudo Access"
 #entry_status "Disabling Password Prompt Timeout"
 echo "Defaults passwd_timeout=0" >> /etc/sudoers
