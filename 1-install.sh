@@ -2,8 +2,19 @@
 #
 # Shiku's Arch Linux Installation Script
 
+# This script automates the Arch Linux installation process
+# as per the official installation guide.
+
+# This script assumes you have already booted from an installation medium
+# made from an official installation image.
+
+# This script assumes a working internet connection is available.
+
+# It is recommended to install Arch Linux 
+# manually using the official installation guide.
+
 #######################################
-# Pre-Installation
+# Preparation
 #######################################
 
 # Configuration
@@ -11,6 +22,7 @@ consolekeyboard="us"
 consolefont="Lat2-Terminus16"
 ssd1="sda"
 hdd1="sda"
+
 timezone="Asia/Manila"
 utflocale="en_GB.UTF-8 UTF-8"
 isolocale="en_GB ISO-8859-1"
@@ -56,6 +68,10 @@ exit_status() {
 entry_status "Clearing Terminal Screen"
 clear
 exit_status "Cleared Terminal Screen"
+
+#######################################
+# Pre-Installation
+#######################################
 
 # Set the console keyboard layout and font
 entry_status "Setting Console Keyboard Layout"
@@ -194,6 +210,9 @@ exit_status "Installed Essential Packages"
 # Configure The System
 #######################################
 
+cat << EOF > /mnt/configure.sh
+#!/bin/bash
+
 # Fstab
 entry_status "Generating Fstab File"
 genfstab -U /mnt >> /mnt/etc/fstab
@@ -201,51 +220,51 @@ exit_status "Generated Fstab File in /mnt/etc/fstab"
 
 # Time
 entry_status "Setting Time Zone"
-arch-chroot /mnt ln -sf /usr/share/zoneinfo/"${timezone}" /etc/localtime
+ln -sf /usr/share/zoneinfo/"${timezone}" /etc/localtime
 exit_status "Set Time Zone to ${timezone}"
 entry_status "Generating /etc/adjtime"
-arch-chroot /mnt hwclock --systohc
+hwclock --systohc
 exit_status "Generated /etc/adjtime"
 
 # Localization
 entry_status "Uncommenting ${utflocale}"
-arch-chroot /mnt sed --in-place 's/"#${utflocale}"/"${utflocale}"/' /etc/locale.gen
+sed --in-place 's/"#${utflocale}"/"${utflocale}"/' /etc/locale.gen
 exit_status "Uncommented ${utflocale} in /etc/locale.gen"
 entry_status "Uncommenting ${isolocale}"
-arch-chroot /mnt sed --in-place 's/"#${isolocale}"/"${isolocale}"/' /etc/locale.gen
+sed --in-place 's/"#${isolocale}"/"${isolocale}"/' /etc/locale.gen
 exit_status "Uncommented ${isolocale} in /etc/locale.gen"
 entry_status "Generating Locales"
-arch-chroot /mnt locale-gen > /dev/null 2>&1
+locale-gen > /dev/null 2>&1
 exit_status "Generated Locales"
 entry_status "Setting System Locale"
-arch-chroot /mnt echo "LANG="${lang}"" >> /etc/locale.conf
+echo "LANG="${lang}"" >> /etc/locale.conf
 exit_status "Set System Locale in /etc/locale.conf"
 entry_status "Setting Console Keyboard Layout"
-arch-chroot /mnt echo "KEYMAP="${consolekeyboard}"" >> /etc/vconsole.conf
+echo "KEYMAP="${consolekeyboard}"" >> /etc/vconsole.conf
 exit_status "Set Console Keyboard Layout to ${consolekeyboard}"
 
 # Network configuration
 entry_status "Creating Hostname File"
-arch-chroot /mnt echo "${hostname}" >> /etc/hostname
+echo "${hostname}" >> /etc/hostname
 exit_status "Created Hostname (${hostname}) File in /etc/hostname"
 entry_status "Enabling NetworkManager.service"
-arch-chroot /mnt systemctl enable NetworkManager.service
+systemctl enable NetworkManager.service
 exit_status "Enabled NetworkManager.service"
 
 # Root password
 entry_status "Setting Root Password"
-printf "%s\n%s" "${rpasswd}" "${rpasswd}" | arch-chroot /mnt passwd > /dev/null 2>&1
+printf "%s\n%s" "${rpasswd}" "${rpasswd}" | passwd > /dev/null 2>&1
 exit_status "Set Root Password"
 
 # Boot loader
 entry_status "Installing Boot Loader"
-arch-chroot /mnt pacman -S --noconfirm grub efibootmgr > /dev/null 2>&1
+pacman -S --noconfirm grub efibootmgr > /dev/null 2>&1
 exit_status "Installed Boot Loader (GRUB)"
 entry_status "Installing GRUB"
-arch-chroot /mnt grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB > /dev/null 2>&1
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB > /dev/null 2>&1
 exit_status "Installed GRUB to /boot"
 entry_status "Generating Main Configuration File"
-arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg > /dev/null 2>&1
+grub-mkconfig -o /boot/grub/grub.cfg > /dev/null 2>&1
 exit_status "Generated Main Configuration File in /boot/grub/grub.cfg"
 
 #######################################
@@ -254,19 +273,19 @@ exit_status "Generated Main Configuration File in /boot/grub/grub.cfg"
 
 # Users and groups
 entry_status "Adding New User"
-arch-chroot /mnt useradd -m -G wheel "${username}"
+useradd -m -G wheel "${username}"
 exit_status "Added User (${username})"
 entry_status "Setting ${username} Password"
-printf "%s\n%s" "${upasswd}" "${upasswd}" | arch-chroot /mnt passwd "${username}" > /dev/null 2>&1
+printf "%s\n%s" "${upasswd}" "${upasswd}" | passwd "${username}" > /dev/null 2>&1
 exit_status "Set ${username} Password"
 
 # Security
 entry_status "Allowing Members of Group Wheel Sudo Access"
-arch-chroot /mnt sed --in-place 's/# %wheel/%wheel/g' /etc/sudoers
-arch-chroot /mnt sed --in-place 's/%wheel ALL=(ALL) NOPASSWD: ALL/# %wheel ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers
+sed --in-place 's/# %wheel/%wheel/g' /etc/sudoers
+sed --in-place 's/%wheel ALL=(ALL) NOPASSWD: ALL/# %wheel ALL=(ALL) NOPASSWD: ALL/g' /etc/sudoers
 exit_status "Allowed Members of Group Wheel Sudo Access"
 entry_status "Disabling Password Prompt Timeout"
-arch-chroot /mnt echo "Defaults passwd_timeout=0" >> /etc/sudoers
+echo "Defaults passwd_timeout=0" >> /etc/sudoers
 exit_status "Disabled Password Prompt Timeout"
 
 Install bash-completion
@@ -277,9 +296,13 @@ Install bash-completion
 
 # Pacman
 entry_status "Enabling paccache.timer"
-arch-chroot /mnt systemctl enable paccache.timer
+systemctl enable paccache.timer
 exit_status "Enabled paccache.timer"
 
 # Repositories
-arch-chroot /mnt sed --in-place 's/"#[multilib]"/"[multilib]"/' /etc/pacman.conf
-arch-chroot /mnt sed --in-place 's|"#Include = /etc/pacman.d/mirrorlist"/"Include = /etc/pacman.d/mirrorlist"/' /etc/pacman.conf
+sed --in-place 's/"#[multilib]"/"[multilib]"/' /etc/pacman.conf
+sed --in-place 's|"#Include = /etc/pacman.d/mirrorlist"/"Include = /etc/pacman.d/mirrorlist"/' /etc/pacman.conf
+EOF
+
+chmod +x /mnt/configure.sh
+arch-chroot /mnt /configure.sh
