@@ -184,13 +184,13 @@ pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-header
 # Configure The System
 #######################################
 
-cat << EOF > /mnt/configure.sh
-#!/bin/bash
-
 # Fstab
 #entry_status "Generating Fstab File"
 genfstab -U /mnt >> /mnt/etc/fstab
 #exit_status "Generated Fstab File in /mnt/etc/fstab"
+
+cat << EOF > /mnt/configure.sh
+#!/bin/bash
 
 # Time
 #entry_status "Setting Time Zone"
