@@ -85,12 +85,12 @@ setfont "${consolefont}"
 #entry_status "Verifying Boot Mode"
 bootmode="$(cat /sys/firmware/efi/fw_platform_size)"
 if [[ "${bootmode}" == "64" ]]; then
-  #info_status "System is booted in UEFI mode and has a 64-bit x64 UEFI"
+  echo "System is booted in UEFI mode and has a 64-bit x64 UEFI"
 elif [[ "${bootmode}" == "32" ]]; then
-  #info_status "System is booted in UEFI mode and has a 32-bit IA32 UEFI"
+  echo "System is booted in UEFI mode and has a 32-bit IA32 UEFI"
 else
-  #info_status "System may be booted in BIOS (or CSM) mode"
-  #info_status "Refer to your motherboard's manual"
+  echo "System may be booted in BIOS (or CSM) mode"
+  echo "Refer to your motherboard's manual"
 fi
 #exit_status "Verified Boot Mode"
 
