@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Shiku's Arch Linux Installation Script
-set -x
+
 # This script automates the Arch Linux installation process
 # as per the official installation guide.
 
@@ -10,8 +10,11 @@ set -x
 
 # This script assumes a working internet connection is available.
 
-# It is recommended to install Arch Linux 
+# It is HIGHLY recommended to install Arch Linux 
 # manually using the official installation guide.
+
+# Uncomment the line below for debugging.
+set -x
 
 #######################################
 # Preparation
@@ -197,12 +200,12 @@ swapon /dev/"${swap_partition}"
 
 # Select the mirrors
 #entry_status "Selecting Mirrors"
-reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose -f 10 -l 20 -p https,http
+reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose --fastest 10 --latest 20 --protocol https,http
 #exit_status "Selected Mirrors"
 
 # Install essential packages
 #entry_status "Installing Essential Packages"
-pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g  networkmanager neovim man-db man-pages texinfo
+pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo
 #exit_status "Installed Essential Packages"
 
 #######################################
@@ -211,6 +214,38 @@ pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-header
 
 cat << EOF > /mnt/configure.sh
 #!/bin/bash
+
+# Aesthetics
+entry_status() {
+  printf "\e[10G"
+  if [[ $1 == *" "* ]]; then
+    local subject=${1%% *}
+    local predicate=${1#* }
+    printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
+  else
+    printf "%s\n" "$1"
+  fi
+}
+info_status() {
+  printf "\e[10G"
+  local text="$1"
+  printf "%s\n" "$1"
+}
+exit_status() {
+  printf "["
+  printf "\e[0;32m"
+  printf "  OK  "
+  printf "\e[0m"
+  printf "]"
+  printf "\e[10G"
+  if [[ $1 == *" "* ]]; then
+    local subject=${1%% *}
+    local predicate=${1#* }
+    printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
+  else
+    printf "%s\n" "$1"
+  fi
+}
 
 # Fstab
 #entry_status "Generating Fstab File"
@@ -224,7 +259,9 @@ ln -sf /usr/share/zoneinfo/"${time_zone}" /etc/localtime
 #entry_status "Generating /etc/adjtime"
 hwclock --systohc
 #exit_status "Generated /etc/adjtime"
+#entry_status "Updating System Clock"
 timedatectl set-ntp true
+#exit_status "Updated System Clock"
 
 # Localization
 #entry_status "Uncommenting ${utf_locale}"
@@ -295,16 +332,48 @@ Install bash-completion
 #######################################
 
 # Pacman
+#entry_status "Installing Pacman Contrib"
 pacman -S --noconfirm pacman-contrib
-
+#exit_status "Installed Pacman Contrib"
 #entry_status "Enabling paccache.timer"
 systemctl enable paccache.timer
 #exit_status "Enabled paccache.timer"
 
 # Repositories
-sed --in-place 's/"#[multilib]"/"[multilib]"/' /etc/pacman.conf
-sed --in-place 's|"#Include = /etc/pacman.d/mirrorlist"/"Include = /etc/pacman.d/mirrorlist"/' /etc/pacman.conf
+#entry_status "Enabling Multilib Repository"
+sed --in-place 's|#[multilib]|[multilib]|g' /etc/pacman.conf
+sed --in-place 's|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
+#exit_status "Enabled Multilib Repository"
+
+# Mirrors
+#entry_status "Installing Reflector"
+pacman -S --noconfirm reflector
+#exit_status "Installed Reflector"
+
+# Arch Build System
+#entry_status "Installing Git"
+pacman -S --noconfirm git
+#exit_status "Installed Git"
+
+# Arch User Repository
+#entry_status "Installing Yay"
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si
+#exit_status "Installed Yay"
 EOF
 
+#######################################
+# Chroot
+#######################################
+
+#entry_status "Changing File Mode Bits"
 chmod +x /mnt/configure.sh
+#exit_status "Changed File Mode Bits"
+#entry_status "Changing Root Into New System"
 arch-chroot /mnt /configure.sh
+#exit_status "Changed Root Into New System"
+
+#######################################
+# Post-Installation
+#######################################
