@@ -18,19 +18,18 @@ set -x
 #######################################
 
 # Configuration
-consolekeyboard="us"
-consolefont="Lat2-Terminus16"
-ssd1="sda"
+console_keyboard="us"
+console_font="Lat2-Terminus16"
+ssd1="sdb"
 hdd1="sda"
-
-timezone="Asia/Manila"
-utflocale="en_GB.UTF-8 UTF-8"
-isolocale="en_GB ISO-8859-1"
-lang="en_GB.UTF-8"
+time_zone="Asia/Manila"
+utf_locale="en_GB.UTF-8 UTF-8"
+iso_locale="en_GB ISO-8859-1"
+language="en_GB.UTF-8"
 hostname="Renge"
-rpasswd="nyanpasu"
+root_passwd="nyanpasu"
 username="Shiku"
-upasswd="narufu"
+user_passwd="narufu"
 
 # Aesthetics
 entry_status() {
@@ -75,11 +74,11 @@ clear
 
 # Set the console keyboard layout and font
 #entry_status "Setting Console Keyboard Layout"
-loadkeys "${consolekeyboard}"
-#exit_status "Set Console Keyboard Layout to ${consolekeyboard}"
+loadkeys "${console_keyboard}"
+#exit_status "Set Console Keyboard Layout to ${console_keyboard}"
 #entry_status "Setting Console Font"
-setfont "${consolefont}"
-#exit_status "Set Console Font to ${consolefont}"
+setfont "${console_font}"
+#exit_status "Set Console Font to ${console_font}"
 
 # Verify the boot mode
 #entry_status "Verifying Boot Mode"
@@ -220,28 +219,29 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 # Time
 #entry_status "Setting Time Zone"
-ln -sf /usr/share/zoneinfo/"${timezone}" /etc/localtime
-#exit_status "Set Time Zone to ${timezone}"
+ln -sf /usr/share/zoneinfo/"${time_zone}" /etc/localtime
+#exit_status "Set Time Zone to ${time_zone}"
 #entry_status "Generating /etc/adjtime"
 hwclock --systohc
 #exit_status "Generated /etc/adjtime"
+timedatectl set-ntp true
 
 # Localization
-#entry_status "Uncommenting ${utflocale}"
-sed --in-place 's/#${utflocale}/${utflocale}/g' /etc/locale.gen
-#exit_status "Uncommented ${utflocale} in /etc/locale.gen"
-#entry_status "Uncommenting ${isolocale}"
-sed --in-place 's/#"${isolocale}"/"${isolocale}"/g' /etc/locale.gen
-#exit_status "Uncommented ${isolocale} in /etc/locale.gen"
+#entry_status "Uncommenting ${utf_locale}"
+sed --in-place 's/#${utf_locale}/${utf_locale}/g' /etc/locale.gen
+#exit_status "Uncommented ${utf_locale} in /etc/locale.gen"
+#entry_status "Uncommenting ${iso_locale}"
+sed --in-place 's/#${iso_locale}/${iso_locale}/g' /etc/locale.gen
+#exit_status "Uncommented ${iso_locale} in /etc/locale.gen"
 #entry_status "Generating Locales"
 locale-gen
 #exit_status "Generated Locales"
 #entry_status "Setting System Locale"
-echo "LANG="${lang}"" >> /etc/locale.conf
+echo "LANG="${language}"" >> /etc/locale.conf
 #exit_status "Set System Locale in /etc/locale.conf"
 #entry_status "Setting Console Keyboard Layout"
-echo "KEYMAP="${consolekeyboard}"" >> /etc/vconsole.conf
-#exit_status "Set Console Keyboard Layout to ${consolekeyboard}"
+echo "KEYMAP="${console_keyboard}"" >> /etc/vconsole.conf
+#exit_status "Set Console Keyboard Layout to ${console_keyboard}"
 
 # Network configuration
 #entry_status "Creating Hostname File"
@@ -253,7 +253,7 @@ systemctl enable NetworkManager.service
 
 # Root password
 #entry_status "Setting Root Password"
-printf "%s\n%s" "${rpasswd}" "${rpasswd}" | passwd
+printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd
 #exit_status "Set Root Password"
 
 # Boot loader
@@ -276,7 +276,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 useradd -m -G wheel "${username}"
 #exit_status "Added User (${username})"
 #entry_status "Setting ${username} Password"
-printf "%s\n%s" "${upasswd}" "${upasswd}" | passwd "${username}"
+printf "%s\n%s" "${user_passwd}" "${user_passwd}" | passwd "${username}"
 #exit_status "Set ${username} Password"
 
 # Security
