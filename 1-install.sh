@@ -228,10 +228,10 @@ hwclock --systohc
 
 # Localization
 #entry_status "Uncommenting ${utflocale}"
-sed --in-place 's/#"${utflocale}"/"${utflocale}"/' /etc/locale.gen
+sed --in-place 's/#${utflocale}/${utflocale}/g' /etc/locale.gen
 #exit_status "Uncommented ${utflocale} in /etc/locale.gen"
 #entry_status "Uncommenting ${isolocale}"
-sed --in-place 's/#"${isolocale}"/"${isolocale}"/' /etc/locale.gen
+sed --in-place 's/#"${isolocale}"/"${isolocale}"/g' /etc/locale.gen
 #exit_status "Uncommented ${isolocale} in /etc/locale.gen"
 #entry_status "Generating Locales"
 locale-gen
