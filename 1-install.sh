@@ -83,7 +83,7 @@ setfont "${consolefont}"
 
 # Verify the boot mode
 #entry_status "Verifying Boot Mode"
-bootmode=$(< /sys/firmware/efi/fw_platform_size)
+bootmode="$(cat /sys/firmware/efi/fw_platform_size)"
 if [[ "${bootmode}" == "64" ]]; then
   #info_status "System is booted in UEFI mode and has a 64-bit x64 UEFI"
 elif [[ "${bootmode}" == "32" ]]; then
