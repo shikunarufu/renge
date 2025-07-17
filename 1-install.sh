@@ -215,38 +215,6 @@ pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-header
 cat << EOF > /mnt/configure.sh
 #!/bin/bash
 
-# Aesthetics
-entry_status() {
-  printf "\e[10G"
-  if [[ $1 == *" "* ]]; then
-    local subject=${1%% *}
-    local predicate=${1#* }
-    printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
-  else
-    printf "%s\n" "$1"
-  fi
-}
-info_status() {
-  printf "\e[10G"
-  local text="$1"
-  printf "%s\n" "$1"
-}
-exit_status() {
-  printf "["
-  printf "\e[0;32m"
-  printf "  OK  "
-  printf "\e[0m"
-  printf "]"
-  printf "\e[10G"
-  if [[ $1 == *" "* ]]; then
-    local subject=${1%% *}
-    local predicate=${1#* }
-    printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
-  else
-    printf "%s\n" "$1"
-  fi
-}
-
 # Fstab
 #entry_status "Generating Fstab File"
 genfstab -U /mnt >> /mnt/etc/fstab
@@ -356,11 +324,11 @@ pacman -S --noconfirm git
 #exit_status "Installed Git"
 
 # Arch User Repository
-#entry_status "Installing Yay"
+entry_status "Installing Yay"
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si
-#exit_status "Installed Yay"
+exit_status "Installed Yay"
 EOF
 
 #######################################
