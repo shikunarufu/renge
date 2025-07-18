@@ -195,18 +195,18 @@ cat << EOF > /mnt/configure.sh
 # Aesthetics
 entry_status() {
   printf "\e[10G"
-  if [[ $1 == *" "* ]]; then
+  if [[ ${1} == *" "* ]]; then
     local subject=${1%% *}
     local predicate=${1#* }
     printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
   else
-    printf "%s\n" "$1"
+    printf "%s\n" "${1}"
   fi
 }
 info_status() {
   printf "\e[10G"
-  local text="$1"
-  printf "%s\n" "$1"
+  local text="${1}"
+  printf "%s\n" "${1}"
 }
 exit_status() {
   printf "["
@@ -215,12 +215,12 @@ exit_status() {
   printf "\e[0m"
   printf "]"
   printf "\e[10G"
-  if [[ $1 == *" "* ]]; then
+  if [[ ${1} == *" "* ]]; then
     local subject=${1%% *}
     local predicate=${1#* }
     printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
   else
-    printf "%s\n" "$1"
+    printf "%s\n" "${1}"
   fi
 }
 
