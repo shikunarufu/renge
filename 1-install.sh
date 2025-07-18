@@ -280,7 +280,7 @@ systemctl enable paccache.timer
 # Repositories
 #entry_status "Enabling Multilib Repository"
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
-sed --in-place 's|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
+sed --in-place '93s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 #exit_status "Enabled Multilib Repository"
 #entry_status "Upgrading System"
 pacman -Syu
