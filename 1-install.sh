@@ -199,8 +199,9 @@ ln -sf /usr/share/zoneinfo/"${time_zone}" /etc/localtime
 #entry_status "Generating /etc/adjtime"
 hwclock --systohc
 #exit_status "Generated /etc/adjtime"
-
+#entry_status "Enabling systemd-timesyncd.service"
 systemctl enable systemd-timesyncd.service
+#exit_status "Enabled systemd-timesyncd.service"
 
 # Localization
 #entry_status "Uncommenting ${utf_locale}"
@@ -264,13 +265,11 @@ sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPA
 echo "Defaults passwd_timeout=0" >> /etc/sudoers
 #exit_status "Disabled Password Prompt Timeout"
 
-Install bash-completion
-
 #######################################
 # Package Management
 #######################################
 
-# Pacman
+# pacman
 #entry_status "Installing Pacman Contrib"
 pacman -S --noconfirm pacman-contrib
 #exit_status "Installed Pacman Contrib"
@@ -295,11 +294,85 @@ pacman -S --noconfirm git
 #exit_status "Installed Git"
 
 # Arch User Repository
-entry_status "Installing Yay"
-git clone https://aur.archlinux.org/yay.git
-cd yay
-makepkg -si
-exit_status "Installed Yay"
+
+Install yay
+
+#######################################
+# Graphical User Interface
+#######################################
+
+# Display drivers
+#entry_status "Installing AMD Radeon Graphics Card Drivers"
+pacman -S --noconfirm mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon
+#exit_status "Installed AMD Radeon Graphics Card Drivers"
+
+# Window manager
+Install Hyprland
+
+# Display manager
+Install greetd
+Install greetd-tuigreet
+#systemctl enable greetd.service
+
+# User directories
+#entry_status "Creating User Directories"
+pacman -S --noconfirm xdg-user-dirs
+xdg-user-dirs-update
+#exit_status "Created User Directories"
+
+#######################################
+# Multimedia
+#######################################
+
+# Sound system
+#entry_status "Installing Sound Servers"
+pacman -S --noconfirm pipewire lib32-pipewire pipewire-docs wireplumber pipewire-audio pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack
+#exit_status "Installed Sound Servers"
+
+#######################################
+# Optimization
+#######################################
+
+# Solid state drives
+#entry_status "Enabling fstrim.timer"
+systemctl enable fstrim.timer
+#exit_status "Enabled fstrim.timer"
+
+#######################################
+# System Services
+#######################################
+
+# File index and search
+#entry_status "Installing Plocate"
+pacman -S --noconfirm plocate
+#exit_status "Installed Plocate"
+
+#######################################
+# Appearance
+#######################################
+
+# Fonts
+#entry_status "Installing Noto Fonts"
+pacman -S --noconfirm noto-fonts
+#exit_status "Installed Noto Fonts"
+
+#######################################
+# Console Improvements
+#######################################
+
+# Tab-completion enhancements
+#entry_status "Installing Bash Completion"
+pacman -S --noconfirm bash-completion
+#exit_status "Installed Bash Completion"
+
+# Aliases
+
+# Alternative shells
+
+# Compressed files
+#entry_status "Installing Archiving and Compression Tools"
+pacman -S --noconfirm 7zip tar zip unzip
+#exit_status "Installed Archiving and Compression Tools"
 EOF
 
 #######################################
@@ -316,3 +389,15 @@ arch-chroot /mnt /configure.sh
 #######################################
 # Post-Installation
 #######################################
+
+# Reboot
+#entry_status "Removing Temporary Configuration Script"
+rm /mnt/configure.sh
+#exit_status "Removed Temporary Configuration Script"
+#entry_status "Unmounting All Partitions"
+umount -R /mnt
+#exit_status "Unmounted All Partitions"
+info_status "Welcome to Arch Linux!"
+info_status "Restart the machine by typing "reboot""
+info_status "Remember to remove the installation medium"
+info_status "Login into the new system with the root account"
