@@ -189,24 +189,24 @@ entry_status "Generating Fstab File"
 genfstab -U /mnt >> /mnt/etc/fstab
 exit_status "Generated Fstab File in /mnt/etc/fstab"
 
-cat << 'EOF' > /mnt/configure.sh
+cat << EOF > /mnt/configure.sh
 #!/bin/bash
 
 # Aesthetics
 entry_status() {
   printf "\e[10G"
-  if [[ $1 == *" "* ]]; then
-    local subject=${1%% *}
-    local predicate=${1#* }
-    printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
+  if [[ \$1 == *" "* ]]; then
+    local subject=\${1%% *}
+    local predicate=\${1#* }
+    printf "%s \e[1;37m%s\e[0m\n" "\${subject}" "\${predicate}"
   else
-    printf "%s\n" "$1"
+    printf "%s\n" "\$1"
   fi
 }
 info_status() {
   printf "\e[10G"
-  local text="$1"
-  printf "%s\n" "$1"
+  local text="\$1"
+  printf "%s\n" "\$1"
 }
 exit_status() {
   printf "["
@@ -215,18 +215,15 @@ exit_status() {
   printf "\e[0m"
   printf "]"
   printf "\e[10G"
-  if [[ $1 == *" "* ]]; then
-    local subject=${1%% *}
-    local predicate=${1#* }
-    printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
+  if [[ \$1 == *" "* ]]; then
+    local subject=\${1%% *}
+    local predicate=\${1#* }
+    printf "%s \e[1;37m%s\e[0m\n" "\${subject}" "\${predicate}"
   else
-    printf "%s\n" "$1"
+    printf "%s\n" "\$1"
   fi
 }
 
-EOF
-
-cat << EOF >> /mnt/configure.sh
 # Time
 entry_status "Setting Time Zone"
 ln -sf /usr/share/zoneinfo/"${time_zone}" /etc/localtime
