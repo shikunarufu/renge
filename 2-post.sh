@@ -4,7 +4,7 @@
 
 # This script automates the post-installation process of Arch Linux.
 
-# This script assumes you have already booted 
+# This script assumes you have already booted
 # and logged in into the new system with the user account.
 
 # This script assumes a working internet connection is available.
@@ -62,7 +62,7 @@ clear
 
 # Yay
 #entry_status "Installing Yay"
-printf "%s\n%s" "${user_passwd}" | sudo pacman -S --noconfirm --needed git base-devel
+printf "%s\n%s" "${user_passwd}" | sudo --stdin pacman -S --noconfirm --needed git base-devel
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si --noconfirm
@@ -84,7 +84,7 @@ yay -S --noconfirm ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keys
 #entry_status "Installing Hyprland"
 git clone --recursive https://github.com/hyprwm/Hyprland
 cd Hyprland
-make all && printf "%s\n%s" "${user_passwd}" | sudo make install
+make all && printf "%s\n%s" "${user_passwd}" | sudo --stdin make install
 #exit_status "Installed Hyprland"
 
 # Display manager
