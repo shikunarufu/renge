@@ -76,7 +76,7 @@ makepkg -si --noconfirm
 yay --yay --gendb
 #exit_status "Generated Development Package Database"
 #entry_status "Updating Development Package"
-yay -Syu --devel
+yay -Syu --devel --answerupgrade None
 #exit_status "Updated Development Package"
 #entry_status "Enabling Development Package Updates"
 yay --yay --devel --save
@@ -96,6 +96,10 @@ make all && make install
 Install greetd
 Install greetd-tuigreet
 #systemctl enable greetd.service
+
+#######################################
+# Post-Installation
+#######################################
 
 # Allow members of group wheel sudo access with a password
 #entry_status "Allowing Sudo Access With Password"
