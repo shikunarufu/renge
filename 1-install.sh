@@ -224,6 +224,9 @@ exit_status() {
   fi
 }
 
+EOF
+
+cat << EOF >> /mnt/configure.sh
 # Time
 entry_status "Setting Time Zone"
 ln -sf /usr/share/zoneinfo/"${time_zone}" /etc/localtime
