@@ -17,8 +17,7 @@ set -x
 #######################################
 
 # Configuration
-user_passwd="narufu"
-username="Shiku"
+sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
 # Aesthetics
 entry_status() {
@@ -63,10 +62,10 @@ clear
 
 # Yay
 #entry_status "Installing Yay"
-printf "%s\n%s" "${user_passwd}" | sudo --stdin pacman -S --noconfirm --needed git base-devel
+pacman -S --noconfirm --needed git base-devel
 git clone https://aur.archlinux.org/yay.git
 cd yay
-echo "${user_passwd}" | sudo -l -U "${username}" makepkg -si
+makepkg -si
 #exit_status "Installed Yay"
 #entry_status "Generating Development Package Database"
 yay --yay --gendb --noconfirm
@@ -85,13 +84,15 @@ yay -S --noconfirm ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keys
 #entry_status "Installing Hyprland"
 git clone --recursive https://github.com/hyprwm/Hyprland
 cd Hyprland
-make all && printf "%s\n%s" "${user_passwd}" | sudo --stdin make install
+make all && make install
 #exit_status "Installed Hyprland"
 
 # Display manager
 Install greetd
 Install greetd-tuigreet
 #systemctl enable greetd.service
+
+sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
 # TODO
 # bypass sudo on script
