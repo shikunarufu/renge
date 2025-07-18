@@ -18,7 +18,7 @@ set -x
 
 # Configuration
 user_passwd="narufu"
-sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+printf "%s\n%s" "${user_passwd}" | sudo --stdin sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
 # Aesthetics
 entry_status() {
@@ -63,10 +63,10 @@ clear
 
 # Yay
 #entry_status "Installing Yay"
-printf "%s\n%s" "${user_passwd}" | sudo --stdin pacman -S --noconfirm --needed git base-devel
+sudo pacman -S --noconfirm --needed git base-devel
 git clone https://aur.archlinux.org/yay.git
 cd yay
-printf "%s\n%s" "${user_passwd}" | sudo --stdin makepkg -si
+sudo makepkg -si
 #exit_status "Installed Yay"
 #entry_status "Generating Development Package Database"
 yay --yay --gendb --noconfirm
@@ -93,7 +93,7 @@ Install greetd
 Install greetd-tuigreet
 #systemctl enable greetd.service
 
-sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
 # TODO
 # bypass sudo on script
