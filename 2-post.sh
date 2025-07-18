@@ -76,7 +76,7 @@ makepkg -si --noconfirm
 yay --yay --gendb
 #exit_status "Generated Development Package Database"
 #entry_status "Updating Development Package"
-yay -Syu --devel --answerupgrade None
+yay -Syu --devel --answerupgrade None --noconfirm
 #exit_status "Updated Development Package"
 #entry_status "Enabling Development Package Updates"
 yay --yay --devel --save
@@ -84,7 +84,7 @@ yay --yay --devel --save
 
 # Hyprland
 #entry_status "Installing Hyprland Dependencies"
-yay -S ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils
+yay -S ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils --answerclean All --answerdiff None --noconfirm
 #exit_status "Installed Hyprland Dependencies"
 #entry_status "Installing Hyprland"
 git clone --recursive https://github.com/hyprwm/Hyprland
