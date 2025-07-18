@@ -66,7 +66,7 @@ clear
 printf "%s\n%s" "${user_passwd}" | sudo --stdin pacman -S --noconfirm --needed git base-devel
 git clone https://aur.archlinux.org/yay.git
 cd yay
-printf "%s\n%s" "${user_passwd}" | sudo --stdin makepkg -si
+printf "%s\n%s" "${user_passwd}" | sudo -u "${username}" makepkg -si
 #exit_status "Installed Yay"
 #entry_status "Generating Development Package Database"
 yay --yay --gendb --noconfirm
