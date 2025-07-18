@@ -12,6 +12,13 @@
 # Uncomment the line below to show command outputs.
 set -x
 
+#######################################
+# Preparation
+#######################################
+
+# Configuration
+user_passwd="narufu"
+
 # Aesthetics
 entry_status() {
   printf "\e[10G"
@@ -49,9 +56,13 @@ exit_status() {
 clear
 #exit_status "Cleared Terminal Screen"
 
+#######################################
+# Installation
+#######################################
+
 # Yay
 #entry_status "Installing Yay"
-sudo pacman -S --noconfirm --needed git base-devel
+printf "%s\n%s" "${user_passwd}" | sudo pacman -S --noconfirm --needed git base-devel
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si --noconfirm
@@ -73,7 +84,7 @@ yay -S --noconfirm ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keys
 #entry_status "Installing Hyprland"
 git clone --recursive https://github.com/hyprwm/Hyprland
 cd Hyprland
-make all && sudo make install
+make all && printf "%s\n%s" "${user_passwd}" | sudo make install
 #exit_status "Installed Hyprland"
 
 # Display manager
