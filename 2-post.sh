@@ -17,6 +17,7 @@ set -x
 #######################################
 
 # Configuration
+user_passwd="narufu"
 sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
 # Aesthetics
