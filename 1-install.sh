@@ -78,10 +78,10 @@ exit_status "Cleared Terminal Screen"
 # Set the console keyboard layout and font
 entry_status "Setting Console Keyboard Layout"
 loadkeys "${console_keyboard}"
-#exit_status "Set Console Keyboard Layout to ${console_keyboard}"
+exit_status "Set Console Keyboard Layout to ${console_keyboard}"
 entry_status "Setting Console Font"
 setfont "${console_font}"
-#exit_status "Set Console Font to ${console_font}"
+exit_status "Set Console Font to ${console_font}"
 
 # Verify the boot mode
 entry_status "Verifying Boot Mode"
@@ -98,7 +98,7 @@ exit_status "Verified Boot Mode"
 
 # Connect to the internet
 entry_status "Connecting to Internet"
-ping -c 5 archlinux.org
+ping -c 5 archlinux.org  > /dev/null 2>&1
 exit_status "Connected to Internet"
 
 # Update the system clock
@@ -109,18 +109,18 @@ exit_status "Updated System Clock"
 # Partition the disks
 entry_status "Partitioning Disks"
 entry_status "Destroying GPT and MBR Data Structures"
-sgdisk --zap-all /dev/"${ssd1}"
+sgdisk --zap-all /dev/"${ssd1}" > /dev/null 2>&1
 exit_status "Destroyed GPT and MBR Data Structures in /dev/${ssd1}"
 entry_status "Destroying GPT and MBR Data Structures"
-sgdisk --zap-all /dev/"${hdd1}"
+sgdisk --zap-all /dev/"${hdd1}" > /dev/null 2>&1
 exit_status "Destroyed GPT and MBR Data Structures in /dev/${hdd1}"
 entry_status "Creating New Partition"
-sgdisk --new=1:0:+1G --typecode=1:EF00 --change-name=1:"EFI system partition" /dev/"${ssd1}"
-sgdisk --new=2:0:+4G --typecode=2:8200 --change-name=2:"Linux swap" /dev/"${ssd1}"
-sgdisk --new=3:0:0 --typecode=3:8300 --change-name=3:"Linux filesystem" /dev/"${ssd1}"
+sgdisk --new=1:0:+1G --typecode=1:EF00 --change-name=1:"EFI system partition" /dev/"${ssd1}" > /dev/null 2>&1
+sgdisk --new=2:0:+4G --typecode=2:8200 --change-name=2:"Linux swap" /dev/"${ssd1}" > /dev/null 2>&1
+sgdisk --new=3:0:0 --typecode=3:8300 --change-name=3:"Linux filesystem" /dev/"${ssd1}" > /dev/null 2>&1
 exit_status "Created New Partition in /dev/${ssd1}"
 entry_status "Creating New Partition"
-sgdisk --new=1:0:0 --typecode=1:8300 --change-name=1:"Linux filesystem" /dev/"${hdd1}"
+sgdisk --new=1:0:0 --typecode=1:8300 --change-name=1:"Linux filesystem" /dev/"${hdd1}" > /dev/null 2>&1
 exit_status "Created New Partition in /dev/${hdd1}"
 exit_status "Partitioned Disks"
 
@@ -131,16 +131,16 @@ home_partition="${hdd1}1"
 swap_partition="${ssd1}2"
 efi_system_partition="${ssd1}1"
 entry_status "Creating Ext4 File System"
-mkfs.ext4 -F /dev/"${root_partition}"
+mkfs.ext4 -F /dev/"${root_partition}" > /dev/null 2>&1
 exit_status "Created Ext4 File System in /dev/${root_partition}"
 entry_status "Creating Ext4 File System"
-mkfs.ext4 -F /dev/"${home_partition}"
+mkfs.ext4 -F /dev/"${home_partition}" > /dev/null 2>&1
 exit_status "Created Ext4 File System in /dev/${home_partition}"
 entry_status "Initializing Linux Swap"
-mkswap /dev/"${swap_partition}"
+mkswap /dev/"${swap_partition}" > /dev/null 2>&1
 exit_status "Initialized Linux Swap in /dev/${swap_partition}"
 entry_status "Formatting EFI System Partition"
-mkfs.fat -F 32 /dev/"${efi_system_partition}"
+mkfs.fat -F 32 /dev/"${efi_system_partition}" > /dev/null 2>&1
 exit_status "Formatted EFI System Partition in /dev/${efi_system_partition}"
 exit_status "Formatted Partitions"
 
@@ -172,12 +172,12 @@ exit_status "Mounted File Systems"
 
 # Select the mirrors
 entry_status "Selecting Mirrors"
-reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose --fastest 10 --latest 20 --protocol https,http
+reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose --fastest 10 --latest 20 --protocol https,http > /dev/null 2>&1
 exit_status "Selected Mirrors"
 
 # Install essential packages
 entry_status "Installing Essential Packages"
-pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo
+pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo > /dev/null 2>&1
 exit_status "Installed Essential Packages"
 
 #######################################
@@ -192,7 +192,37 @@ exit_status "Generated Fstab File in /mnt/etc/fstab"
 cat << EOF > /mnt/configure.sh
 #!/bin/bash
 
-source /1-install.sh
+# Aesthetics
+entry_status() {
+  printf "\e[10G"
+  if [[ $1 == *" "* ]]; then
+    local subject=${1%% *}
+    local predicate=${1#* }
+    printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
+  else
+    printf "%s\n" "$1"
+  fi
+}
+info_status() {
+  printf "\e[10G"
+  local text="$1"
+  printf "%s\n" "$1"
+}
+exit_status() {
+  printf "["
+  printf "\e[0;32m"
+  printf "  OK  "
+  printf "\e[0m"
+  printf "]"
+  printf "\e[10G"
+  if [[ $1 == *" "* ]]; then
+    local subject=${1%% *}
+    local predicate=${1#* }
+    printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
+  else
+    printf "%s\n" "$1"
+  fi
+}
 
 # Time
 entry_status "Setting Time Zone"
@@ -202,7 +232,7 @@ entry_status "Generating /etc/adjtime"
 hwclock --systohc
 exit_status "Generated /etc/adjtime"
 entry_status "Enabling systemd-timesyncd.service"
-systemctl enable systemd-timesyncd.service
+systemctl enable systemd-timesyncd.service > /dev/null 2>&1
 exit_status "Enabled systemd-timesyncd.service"
 
 # Localization
@@ -213,7 +243,7 @@ entry_status "Uncommenting ${iso_locale}"
 sed --in-place 's/#${iso_locale}/${iso_locale}/g' /etc/locale.gen
 exit_status "Uncommented ${iso_locale} in /etc/locale.gen"
 entry_status "Generating Locales"
-locale-gen
+locale-gen > /dev/null 2>&1
 exit_status "Generated Locales"
 entry_status "Setting System Locale"
 echo "LANG="${language}"" >> /etc/locale.conf
@@ -227,23 +257,23 @@ entry_status "Creating Hostname File"
 echo "${hostname}" >> /etc/hostname
 exit_status "Created Hostname (${hostname}) File in /etc/hostname"
 entry_status "Enabling NetworkManager.service"
-systemctl enable NetworkManager.service
+systemctl enable NetworkManager.service > /dev/null 2>&1
 exit_status "Enabled NetworkManager.service"
 
 # Root password
 entry_status "Setting Root Password"
-printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd
+printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd > /dev/null 2>&1
 exit_status "Set Root Password"
 
 # Boot loader
 entry_status "Installing Boot Loader"
-pacman -S --noconfirm grub efibootmgr
+pacman -S --noconfirm grub efibootmgr > /dev/null 2>&1
 exit_status "Installed Boot Loader (GRUB)"
 entry_status "Installing GRUB"
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB > /dev/null 2>&1
 exit_status "Installed GRUB to /boot"
 entry_status "Generating Main Configuration File"
-grub-mkconfig -o /boot/grub/grub.cfg
+grub-mkconfig -o /boot/grub/grub.cfg  > /dev/null 2>&1
 exit_status "Generated Main Configuration File in /boot/grub/grub.cfg"
 
 #######################################
@@ -255,7 +285,7 @@ entry_status "Adding New User"
 useradd --create-home --groups wheel "${username}"
 exit_status "Added User (${username})"
 entry_status "Setting ${username} Password"
-printf "%s\n%s" "${user_passwd}" "${user_passwd}" | passwd "${username}"
+printf "%s\n%s" "${user_passwd}" "${user_passwd}" | passwd "${username}" > /dev/null 2>&1
 exit_status "Set ${username} Password"
 
 # Security
@@ -273,10 +303,10 @@ exit_status "Disabled Password Prompt Timeout"
 
 # pacman
 entry_status "Installing Pacman Contrib"
-pacman -S --noconfirm pacman-contrib
+pacman -S --noconfirm pacman-contrib > /dev/null 2>&1
 exit_status "Installed Pacman Contrib"
 entry_status "Enabling paccache.timer"
-systemctl enable paccache.timer
+systemctl enable paccache.timer > /dev/null 2>&1
 exit_status "Enabled paccache.timer"
 
 # Repositories
@@ -285,17 +315,17 @@ sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
 sed --in-place '93s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 exit_status "Enabled Multilib Repository"
 entry_status "Upgrading System"
-pacman -Syu
+pacman -Syu --noconfirm > /dev/null 2>&1
 exit_status "Upgraded System"
 
 # Mirrors
 entry_status "Installing Reflector"
-pacman -S --noconfirm reflector
+pacman -S --noconfirm reflector > /dev/null 2>&1
 exit_status "Installed Reflector"
 
 # Arch Build System
 entry_status "Installing Git"
-pacman -S --noconfirm git
+pacman -S --noconfirm git > /dev/null 2>&1
 exit_status "Installed Git"
 
 #######################################
@@ -304,12 +334,12 @@ exit_status "Installed Git"
 
 # Display drivers
 entry_status "Installing AMD Radeon Graphics Card Drivers"
-pacman -S --noconfirm mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon
+pacman -S --noconfirm mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon > /dev/null 2>&1
 exit_status "Installed AMD Radeon Graphics Card Drivers"
 
 # User directories
 entry_status "Creating User Directories"
-pacman -S --noconfirm xdg-user-dirs
+pacman -S --noconfirm xdg-user-dirs > /dev/null 2>&1
 xdg-user-dirs-update
 exit_status "Created User Directories"
 
@@ -319,7 +349,7 @@ exit_status "Created User Directories"
 
 # Sound system
 entry_status "Installing Sound Servers"
-pacman -S --noconfirm pipewire lib32-pipewire pipewire-docs wireplumber pipewire-audio pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack
+pacman -S --noconfirm pipewire lib32-pipewire pipewire-docs wireplumber pipewire-audio pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack > /dev/null 2>&1
 exit_status "Installed Sound Servers"
 
 #######################################
@@ -328,7 +358,7 @@ exit_status "Installed Sound Servers"
 
 # Solid state drives
 entry_status "Enabling fstrim.timer"
-systemctl enable fstrim.timer
+systemctl enable fstrim.timer > /dev/null 2>&1
 exit_status "Enabled fstrim.timer"
 
 #######################################
@@ -337,7 +367,7 @@ exit_status "Enabled fstrim.timer"
 
 # File index and search
 entry_status "Installing Plocate"
-pacman -S --noconfirm plocate
+pacman -S --noconfirm plocate > /dev/null 2>&1
 exit_status "Installed Plocate"
 
 #######################################
@@ -346,7 +376,7 @@ exit_status "Installed Plocate"
 
 # Fonts
 entry_status "Installing Noto Fonts"
-pacman -S --noconfirm noto-fonts
+pacman -S --noconfirm noto-fonts > /dev/null 2>&1
 exit_status "Installed Noto Fonts"
 
 #######################################
@@ -355,7 +385,7 @@ exit_status "Installed Noto Fonts"
 
 # Tab-completion enhancements
 entry_status "Installing Bash Completion"
-pacman -S --noconfirm bash-completion
+pacman -S --noconfirm bash-completion > /dev/null 2>&1
 exit_status "Installed Bash Completion"
 
 # Aliases
@@ -364,7 +394,7 @@ exit_status "Installed Bash Completion"
 
 # Compressed files
 entry_status "Installing Archiving and Compression Tools"
-pacman -S --noconfirm 7zip tar zip unzip
+pacman -S --noconfirm 7zip tar zip unzip > /dev/null 2>&1
 exit_status "Installed Archiving and Compression Tools"
 EOF
 
