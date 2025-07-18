@@ -199,9 +199,8 @@ ln -sf /usr/share/zoneinfo/"${time_zone}" /etc/localtime
 #entry_status "Generating /etc/adjtime"
 hwclock --systohc
 #exit_status "Generated /etc/adjtime"
-#entry_status "Updating System Clock"
-timedatectl set-ntp true
-#exit_status "Updated System Clock"
+
+systemctl enable systemd-timesyncd.service
 
 # Localization
 #entry_status "Uncommenting ${utf_locale}"
