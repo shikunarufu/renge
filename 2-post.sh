@@ -54,21 +54,21 @@ clear
 sudo pacman -S --noconfirm --needed git base-devel
 git clone https://aur.archlinux.org/yay.git
 cd yay
-makepkg -si
+makepkg -si --noconfirm
 #exit_status "Installed Yay"
 #entry_status "Generating Development Package Database"
-yay --yay --gendb
+yay --yay --gendb --noconfirm
 #exit_status "Generated Development Package Database"
 #entry_status "Updating Development Package"
-yay -Syu --devel
+yay -Syu --devel --noconfirm
 #exit_status "Updated Development Package"
 #entry_status "Enabling Development Package Updates"
-yay --yay --devel --save
+yay --yay --devel --save --noconfirm
 #exit_status "Enabled Development Package Updates"
 
 # Hyprland
 #entry_status "Installing Hyprland Dependencies"
-yay -S ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils
+yay -S --noconfirm ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils
 #exit_status "Installed Hyprland Dependencies"
 #entry_status "Installing Hyprland"
 git clone --recursive https://github.com/hyprwm/Hyprland
@@ -80,3 +80,10 @@ make all && sudo make install
 Install greetd
 Install greetd-tuigreet
 #systemctl enable greetd.service
+
+# TODO
+# bypass sudo on script
+# bypass confirm on makepkg
+# bypass confirm yay
+# packages to cleanbuild? all
+# diffs to show? none
