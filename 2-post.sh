@@ -98,7 +98,7 @@ sudo pacman -S --noconfirm foot foot-terminfo libnotify xdg-utils
 #exit_status "Installed Foot"
 #entry_status "Configuring Foot"
 sudo mkdir $XDG_CONFIG_HOME/foot
-sudo cat << EOF > $XDG_CONFIG_HOME/foot/foot.ini
+sudo bash -c "cat << EOF > $XDG_CONFIG_HOME/foot/foot.ini
 -*- conf -*-
 
 shell=fish
@@ -129,7 +129,7 @@ search-start=Control+Shift+f
 cancel=Escape
 find-prev=Shift+F3
 find-next=F3 Control+G
-EOF
+EOF"
 #entry_status "Configured Foot"
 
 # Display manager
