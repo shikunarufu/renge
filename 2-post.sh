@@ -89,7 +89,7 @@ yay -S ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixe
 #entry_status "Installing Hyprland"
 git clone --recursive https://github.com/hyprwm/Hyprland
 cd Hyprland
-make all && make install
+make all && sudo make install
 #exit_status "Installed Hyprland"
 
 # Display manager
