@@ -17,6 +17,7 @@ set -x
 #######################################
 
 # Configuration
+username="Shiku"
 user_passwd="narufu"
 
 # Aesthetics
@@ -92,8 +93,8 @@ cd Hyprland
 make all && sudo make install
 #exit_status "Installed Hyprland"
 
-sudo mkdir $XDG_CONFIG_HOME/hypr
-sudo bash -c "cat > $XDG_CONFIG_HOME/hypr/hyprland.conf" << EOF
+sudo mkdir /home/"${username}"/hypr
+sudo bash -c "cat > /home/"${username}"/hypr/hyprland.conf" << EOF
 ################
 ### MONITORS ###
 ################
@@ -106,6 +107,14 @@ $terminal = foot
 $fileManager = dolphin
 $menu = wofi --show drun
 
+###################
+### KEYBINDINGS ###
+###################
+bind = $mainMod, Q, exec, $terminal
+bind = $mainMod, C, killactive,
+bind = $mainMod, M, exit,
+bind = $mainMod, E, exec, $fileManager
+bind = $mainMod, R, exec, $menu
 EOF
 
 # Foot
@@ -113,8 +122,8 @@ EOF
 sudo pacman -S --noconfirm foot foot-terminfo libnotify xdg-utils
 #exit_status "Installed Foot"
 #entry_status "Configuring Foot"
-sudo mkdir $XDG_CONFIG_HOME/foot
-sudo bash -c "cat > $XDG_CONFIG_HOME/foot/foot.ini" << EOF
+sudo mkdir /home/"${username}"/foot
+sudo bash -c "cat > /home/"${username}"/foot/foot.ini" << EOF
 -*- conf -*-
 
 shell=fish
@@ -164,5 +173,5 @@ sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL)
 
 # Launch Hyprland
 #entry_status "Launching Hyprland"
-Hyprland --config $XDG_CONFIG_HOME/hypr/hyprland.conf
+Hyprland
 #exit_status "Launched Hyprland"
