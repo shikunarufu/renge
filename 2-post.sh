@@ -97,7 +97,7 @@ make all && sudo make install
 sudo pacman -S --noconfirm foot foot-terminfo libnotify xdg-utils
 #exit_status "Installed Foot"
 #entry_status "Configuring Foot"
-#sudo mkdir $XDG_CONFIG_HOME/foot
+sudo mkdir $XDG_CONFIG_HOME/foot
 sudo cat << EOF > $XDG_CONFIG_HOME/foot/foot.ini
 -*- conf -*-
 
@@ -145,3 +145,8 @@ Install greetd-tuigreet
 #entry_status "Allowing Sudo Access With Password"
 sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 #exit_status "Allowed Sudo Access Without Password"
+
+# Launch Hyprland
+#entry_status "Launching Hyprland"
+#Hyprland
+#exit_status "Launched Hyprland"
