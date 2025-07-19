@@ -93,22 +93,27 @@ cd Hyprland
 make all && sudo make install
 #exit_status "Installed Hyprland"
 
-# Foot
-#entry_status "Installing Foot"
-sudo pacman -S --noconfirm foot foot-terminfo libnotify xdg-utils
-#exit_status "Installed Foot"
-#entry_status "Configuring Foot"
-
-# Quickshell
-#entry_status "Installing Quickshell"
-yay -S quickshell-git --answerclean All --answerdiff None --noconfirm
-sudo pacman -S --noconfirm  qt5-svg qt6-imageformats qt6-multimedia qt6-5compat
-#exit_status "Installed Quickshell"
+# Fish
+#entry_status "Installing Fish"
+sudo pacman -S fish --noconfirm
+#exit_status "Installed Fish"
 
 # Display manager
-Install greetd
-Install greetd-tuigreet
-#systemctl enable greetd.service
+#entry_status "Installing Greetd"
+sudo pacman -S greetd greetd-tuigreet --noconfirm
+#exit_status "Installed Greetd"
+#entry_status "Configuring Greetd"
+sudo sed --in-place 's/command = "tuigreet --cmd sway"/command = "tuigreet --cmd Hyprland"/g' /etc/greetd/config.toml
+#exit_status "Configured Greetd"
+#entry_status "Enabling Greetd"
+sudo systemctl enable greetd.service
+#exit_status "Enabled Greetd"
+
+# Caelestia
+#entry_status "Installing Caelestia"
+fish -c "git clone https://github.com/caelestia-dots/caelestia.git ~/.local/share/caelestia"
+fish -c "~/.local/share/caelestia/install.fish --noconfirm --spotify --vscode=[codium] --discord --zen"
+#exit_status "Installed Caelestia"
 
 #######################################
 # Post-Installation
