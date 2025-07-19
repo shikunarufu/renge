@@ -94,7 +94,7 @@ make all && sudo make install
 #exit_status "Installed Hyprland"
 
 sudo mkdir /home/"${username}"/.config/hypr
-sudo bash -c "cat > /home/${username}/hypr/hyprland.conf" << EOF
+sudo bash -c "cat > /home/${username}/.config/hypr/hyprland.conf" << EOF
 ################
 ### MONITORS ###
 ################
