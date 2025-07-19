@@ -97,7 +97,8 @@ make all && sudo make install
 sudo pacman -S --noconfirm foot foot-terminfo libnotify xdg-utils
 #exit_status "Installed Foot"
 #entry_status "Configuring Foot"
-cat << EOF > $HOME/.config/foot/foot.ini
+
+cat << EOF >> $HOME/.config/foot/foot.ini
 -*- conf -*-
 
 shell=fish
