@@ -172,7 +172,7 @@ exit_status "Mounted File Systems"
 
 # Select the mirrors
 entry_status "Selecting Mirrors"
-reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose --fastest 10 --latest 20 --protocol https,http > /dev/null 2>&1
+reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose --fastest 20 --latest 200 --protocol https,http > /dev/null 2>&1
 exit_status "Selected Mirrors"
 
 # Install essential packages
