@@ -92,13 +92,22 @@ cd Hyprland
 make all && sudo make install
 #exit_status "Installed Hyprland"
 
+sudo mkdir $XDG_CONFIG_HOME/hypr
+sudo bash -c "cat > $XDG_CONFIG_HOME/hypr/hyprland.conf" << EOF
+################
+### MONITORS ###
+################
+monitor = , 1920x1080@180, 0x0, 1
+
+EOF
+
 # Foot
 #entry_status "Installing Foot"
 sudo pacman -S --noconfirm foot foot-terminfo libnotify xdg-utils
 #exit_status "Installed Foot"
 #entry_status "Configuring Foot"
 sudo mkdir $XDG_CONFIG_HOME/foot
-sudo bash -c "cat << EOF > $XDG_CONFIG_HOME/foot/foot.ini
+sudo bash -c "cat > $XDG_CONFIG_HOME/foot/foot.ini" << EOF
 -*- conf -*-
 
 shell=fish
@@ -129,7 +138,7 @@ search-start=Control+Shift+f
 cancel=Escape
 find-prev=Shift+F3
 find-next=F3 Control+G
-EOF"
+EOF
 #entry_status "Configured Foot"
 
 # Display manager
