@@ -92,7 +92,7 @@ git clone --recursive https://github.com/hyprwm/Hyprland
 cd Hyprland
 make all && sudo make install
 #exit_status "Installed Hyprland"
-
+#entry_status "Configuring Hyprland"
 sudo mkdir /home/"${username}"/.config/hypr
 sudo bash -c "cat > /home/${username}/.config/hypr/hyprland.conf" << EOF
 ################
@@ -116,6 +116,7 @@ bind = $mainMod, M, exit,
 bind = $mainMod, E, exec, $fileManager
 bind = $mainMod, R, exec, $menu
 EOF
+#exit_status "Configured Hyprland"
 
 # Foot
 #entry_status "Installing Foot"
@@ -155,7 +156,12 @@ cancel=Escape
 find-prev=Shift+F3
 find-next=F3 Control+G
 EOF
-#entry_status "Configured Foot"
+#exit_status "Configured Foot"
+
+# Quickshell
+#entry_status "Installing Quickshell"
+yay -S quickshell-git --answerclean All --answerdiff None --noconfirm
+#exit_status "Installed Quickshell"
 
 # Display manager
 Install greetd
@@ -173,5 +179,5 @@ sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL)
 
 # Launch Hyprland
 #entry_status "Launching Hyprland"
-Hyprland --config /home/"${username}"/.config/hypr/hyprland.conf
+Hyprland
 #exit_status "Launched Hyprland"
