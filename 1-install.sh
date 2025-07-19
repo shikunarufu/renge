@@ -163,7 +163,7 @@ mount /dev/"${home_partition}" /mnt/home
 exit_status "Mounted Home Partition in /mnt/home"
 entry_status "Enabling Swap Partition"
 swapon /dev/"${swap_partition}"
-exit_status "Enabling Swap Partition"
+exit_status "Enabled Swap Partition"
 exit_status "Mounted File Systems"
 
 #######################################
