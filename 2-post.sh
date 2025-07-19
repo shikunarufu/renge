@@ -92,6 +92,45 @@ cd Hyprland
 make all && sudo make install
 #exit_status "Installed Hyprland"
 
+# Foot
+#entry_status "Installing Foot"
+sudo pacman -S --noconfirm foot foot-terminfo libnotify xdg-utils
+#exit_status "Installed Foot"
+#entry_status "Configuring Foot"
+cat << EOF > $HOME/.config/foot/foot.ini
+-*- conf -*-
+
+shell=fish
+title=foot
+font=JetBrains Mono Nerd Font:size=12
+letter-spacing=0
+dpi-aware=no
+gamma-correct-blending=no
+pad=25x25
+bold-text-in-bright=no
+
+[scrollback]
+lines=10000
+
+[cursor]
+style=beam
+beam-thickness=1.5
+
+[colors]
+alpha=0.78
+
+[key-bindings]
+scrollback-up-page=Page_Up
+scrollback-down-page=Page_Down
+search-start=Control+Shift+f
+
+[search-bindings]
+cancel=Escape
+find-prev=Shift+F3
+find-next=F3 Control+G
+EOF
+#entry_status "Configured Foot"
+
 # Display manager
 Install greetd
 Install greetd-tuigreet
