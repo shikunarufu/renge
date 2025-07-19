@@ -103,7 +103,7 @@ sudo pacman -S fish --noconfirm
 sudo pacman -S greetd greetd-tuigreet --noconfirm
 #exit_status "Installed Greetd"
 #entry_status "Configuring Greetd"
-sudo sed --in-place 's/command = "agreety --cmd /bin/sh"/command = "tuigreet --cmd Hyprland"/g' /etc/greetd/config.toml
+sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland"|g' /etc/greetd/config.toml
 #exit_status "Configured Greetd"
 #entry_status "Enabling Greetd"
 sudo systemctl enable greetd.service
@@ -112,7 +112,7 @@ sudo systemctl enable greetd.service
 # Caelestia
 #entry_status "Installing Caelestia"
 fish -c "git clone https://github.com/caelestia-dots/caelestia.git ~/.local/share/caelestia"
-fish -c "~/.local/share/caelestia/install.fish --noconfirm --spotify --vscode=[codium] --discord --zen"
+fish -c "~/.local/share/caelestia/install.fish --noconfirm --spotify --vscode=codium --discord --zen"
 #exit_status "Installed Caelestia"
 
 #######################################
