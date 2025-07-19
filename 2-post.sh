@@ -97,7 +97,7 @@ make all && sudo make install
 sudo pacman -S --noconfirm foot foot-terminfo libnotify xdg-utils
 #exit_status "Installed Foot"
 #entry_status "Configuring Foot"
-mkdir $XDG_CONFIG_HOME/foot
+sudo mkdir $XDG_CONFIG_HOME/foot
 cat << EOF > $XDG_CONFIG_HOME/foot/foot.ini
 -*- conf -*-
 
