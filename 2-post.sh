@@ -99,6 +99,13 @@ sudo bash -c "cat > $XDG_CONFIG_HOME/hypr/hyprland.conf" << EOF
 ################
 monitor = , 1920x1080@180, 0x0, 1
 
+###################
+### MY PROGRAMS ###
+###################
+$terminal = foot
+$fileManager = dolphin
+$menu = wofi --show drun
+
 EOF
 
 # Foot
@@ -157,5 +164,5 @@ sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL)
 
 # Launch Hyprland
 #entry_status "Launching Hyprland"
-#Hyprland
+Hyprland --config $XDG_CONFIG_HOME/hypr/hyprland.conf
 #exit_status "Launched Hyprland"
