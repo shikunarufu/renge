@@ -103,7 +103,7 @@ sudo pacman -S fish --noconfirm
 sudo pacman -S greetd greetd-tuigreet --noconfirm
 #exit_status "Installed Greetd"
 #entry_status "Configuring Greetd"
-sudo sed --in-place 's/command = "tuigreet --cmd sway"/command = "tuigreet --cmd Hyprland"/g' /etc/greetd/config.toml
+sudo sed --in-place 's/command = "agreety --cmd /bin/sh"/command = "tuigreet --cmd Hyprland"/g' /etc/greetd/config.toml
 #exit_status "Configured Greetd"
 #entry_status "Enabling Greetd"
 sudo systemctl enable greetd.service
@@ -126,5 +126,5 @@ sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL)
 
 # Launch Hyprland
 #entry_status "Launching Hyprland"
-Hyprland
+#Hyprland
 #exit_status "Launched Hyprland"
