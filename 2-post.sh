@@ -1,37 +1,22 @@
 #!/bin/bash
 #
-# Shiku's Arch Linux Installation Script
+# Shiku's Post Arch Linux Installation Script
 
-# This script automates the Arch Linux installation process
-# as per the official installation guide.
+# This script automates the post-installation process of Arch Linux.
 
-# This script assumes you have already booted from an installation medium
-# made from an official installation image.
+# This script assumes you have already booted
+# and logged in into the new system with the user account.
 
 # This script assumes a working internet connection is available.
 
-# It is HIGHLY recommended to install Arch Linux 
-# manually using the official installation guide.
-
 # Uncomment the line below to show command outputs.
-# set -x
+set -x
 
 #######################################
 # Preparation
 #######################################
 
 # Configuration
-console_keyboard="us"
-console_font="Lat2-Terminus16"
-ssd1="sdb"
-hdd1="sda"
-time_zone="Asia/Manila"
-utf_locale="en_GB.UTF-8 UTF-8"
-iso_locale="en_GB ISO-8859-1"
-language="en_GB.UTF-8"
-hostname="Renge"
-root_passwd="nyanpasu"
-username="Shiku"
 user_passwd="narufu"
 
 # Aesthetics
@@ -67,360 +52,95 @@ exit_status() {
 }
 
 # Clear the terminal screen
-entry_status "Clearing Terminal Screen"
+#entry_status "Clearing Terminal Screen"
 clear
-exit_status "Cleared Terminal Screen"
+#exit_status "Cleared Terminal Screen"
 
-#######################################
-# Pre-Installation
-#######################################
-
-# Set the console keyboard layout and font
-entry_status "Setting Console Keyboard Layout"
-loadkeys "${console_keyboard}"
-exit_status "Set Console Keyboard Layout to ${console_keyboard}"
-entry_status "Setting Console Font"
-setfont "${console_font}"
-exit_status "Set Console Font to ${console_font}"
-
-# Verify the boot mode
-entry_status "Verifying Boot Mode"
-bootmode="$(cat /sys/firmware/efi/fw_platform_size)"
-if [[ "${bootmode}" == "64" ]]; then
-  info_status "System is booted in UEFI mode and has a 64-bit x64 UEFI"
-elif [[ "${bootmode}" == "32" ]]; then
-  info_status "System is booted in UEFI mode and has a 32-bit IA32 UEFI"
-else
-  info_status "System may be booted in BIOS (or CSM) mode"
-  info_status "Refer to your motherboard's manual"
-fi
-exit_status "Verified Boot Mode"
-
-# Connect to the internet
-entry_status "Connecting to Internet"
-ping -c 5 archlinux.org  > /dev/null 2>&1
-exit_status "Connected to Internet"
-
-# Update the system clock
-entry_status "Updating System Clock"
-timedatectl set-ntp true
-exit_status "Updated System Clock"
-
-# Partition the disks
-entry_status "Partitioning Disks"
-entry_status "Destroying GPT and MBR Data Structures"
-sgdisk --zap-all /dev/"${ssd1}" > /dev/null 2>&1
-exit_status "Destroyed GPT and MBR Data Structures in /dev/${ssd1}"
-entry_status "Destroying GPT and MBR Data Structures"
-sgdisk --zap-all /dev/"${hdd1}" > /dev/null 2>&1
-exit_status "Destroyed GPT and MBR Data Structures in /dev/${hdd1}"
-entry_status "Creating New Partition"
-sgdisk --new=1:0:+1G --typecode=1:EF00 --change-name=1:"EFI system partition" /dev/"${ssd1}" > /dev/null 2>&1
-sgdisk --new=2:0:+4G --typecode=2:8200 --change-name=2:"Linux swap" /dev/"${ssd1}" > /dev/null 2>&1
-sgdisk --new=3:0:0 --typecode=3:8300 --change-name=3:"Linux filesystem" /dev/"${ssd1}" > /dev/null 2>&1
-exit_status "Created New Partition in /dev/${ssd1}"
-entry_status "Creating New Partition"
-sgdisk --new=1:0:0 --typecode=1:8300 --change-name=1:"Linux filesystem" /dev/"${hdd1}" > /dev/null 2>&1
-exit_status "Created New Partition in /dev/${hdd1}"
-exit_status "Partitioned Disks"
-
-# Format the partitions
-entry_status "Formatting Partitions"
-root_partition="${ssd1}3"
-home_partition="${hdd1}1"
-swap_partition="${ssd1}2"
-efi_system_partition="${ssd1}1"
-entry_status "Creating Ext4 File System"
-mkfs.ext4 -F /dev/"${root_partition}" > /dev/null 2>&1
-exit_status "Created Ext4 File System in /dev/${root_partition}"
-entry_status "Creating Ext4 File System"
-mkfs.ext4 -F /dev/"${home_partition}" > /dev/null 2>&1
-exit_status "Created Ext4 File System in /dev/${home_partition}"
-entry_status "Initializing Linux Swap"
-mkswap /dev/"${swap_partition}" > /dev/null 2>&1
-exit_status "Initialized Linux Swap in /dev/${swap_partition}"
-entry_status "Formatting EFI System Partition"
-mkfs.fat -F 32 /dev/"${efi_system_partition}" > /dev/null 2>&1
-exit_status "Formatted EFI System Partition in /dev/${efi_system_partition}"
-exit_status "Formatted Partitions"
-
-# Mount the file systems
-entry_status "Mounting File Systems"
-entry_status "Mounting Root Volume"
-mount /dev/"${root_partition}" /mnt
-exit_status "Mounted Root Volume in /mnt"
-entry_status "Creating Directory for EFI System Partition"
-mkdir /mnt/boot
-exit_status "Created Directory for EFI System Partition in /mnt/boot"
-entry_status "Mounting EFI System Partition"
-mount /dev/"${efi_system_partition}" /mnt/boot
-exit_status "Mounted EFI System Partition in /mnt/boot"
-entry_status "Creating Directory for Home Partition"
-mkdir /mnt/home
-exit_status "Created Directory for Home Partition in /mnt/boot"
-entry_status "Mounting Home Partition"
-mount /dev/"${home_partition}" /mnt/home
-exit_status "Mounted Home Partition in /mnt/home"
-entry_status "Enabling Swap Partition"
-swapon /dev/"${swap_partition}"
-exit_status "Enabled Swap Partition"
-exit_status "Mounted File Systems"
+# Allow members of group wheel sudo access without a password
+#entry_status "Allowing Sudo Access Without Password"
+printf "%s\n%s" "${user_passwd}" | sudo --stdin sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+#exit_status "Allowed Sudo Access Without Password"
 
 #######################################
 # Installation
 #######################################
 
-# Select the mirrors
-entry_status "Selecting Mirrors"
-reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose --fastest 20 --latest 200 --protocol https,http > /dev/null 2>&1
-exit_status "Selected Mirrors"
+# Yay
+#entry_status "Installing Yay"
+sudo pacman -S --noconfirm --needed git base-devel
+git clone https://aur.archlinux.org/yay.git
+cd yay
+makepkg -si --noconfirm
+#exit_status "Installed Yay"
+#entry_status "Generating Development Package Database"
+yay --yay --gendb
+#exit_status "Generated Development Package Database"
+#entry_status "Updating Development Package"
+yay -Syu --devel --answerupgrade None --noconfirm
+#exit_status "Updated Development Package"
+#entry_status "Enabling Development Package Updates"
+yay --yay --devel --save
+#exit_status "Enabled Development Package Updates"
 
-# Install essential packages
-entry_status "Installing Essential Packages"
-pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo > /dev/null 2>&1
-exit_status "Installed Essential Packages"
+# Hyprland
+#entry_status "Installing Hyprland Dependencies"
+yay -S ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils --answerclean All --answerdiff None --noconfirm
+#exit_status "Installed Hyprland Dependencies"
+#entry_status "Installing Hyprland"
+git clone --recursive https://github.com/hyprwm/Hyprland
+cd Hyprland
+make all && sudo make install
+#exit_status "Installed Hyprland"
 
-#######################################
-# Configure The System
-#######################################
+# Foot
+#entry_status "Installing Foot"
+sudo pacman -S --noconfirm foot foot-terminfo libnotify xdg-utils
+#exit_status "Installed Foot"
+#entry_status "Configuring Foot"
+cat << EOF > $HOME/.config/foot/foot.ini
+-*- conf -*-
 
-# Fstab
-entry_status "Generating Fstab File"
-genfstab -U /mnt >> /mnt/etc/fstab
-exit_status "Generated Fstab File in /mnt/etc/fstab"
+shell=fish
+title=foot
+font=JetBrains Mono Nerd Font:size=12
+letter-spacing=0
+dpi-aware=no
+gamma-correct-blending=no
+pad=25x25
+bold-text-in-bright=no
 
-cat << EOF > /mnt/configure.sh
-#!/bin/bash
+[scrollback]
+lines=10000
 
-# Aesthetics
-entry_status() {
-  printf "\e[10G"
-  if [[ \$1 == *" "* ]]; then
-    local subject=\${1%% *}
-    local predicate=\${1#* }
-    printf "%s \e[1;37m%s\e[0m\n" "\${subject}" "\${predicate}"
-  else
-    printf "%s\n" "\$1"
-  fi
-}
-info_status() {
-  printf "\e[10G"
-  local text="\$1"
-  printf "%s\n" "\$1"
-}
-exit_status() {
-  printf "["
-  printf "\e[0;32m"
-  printf "  OK  "
-  printf "\e[0m"
-  printf "]"
-  printf "\e[10G"
-  if [[ \$1 == *" "* ]]; then
-    local subject=\${1%% *}
-    local predicate=\${1#* }
-    printf "%s \e[1;37m%s\e[0m\n" "\${subject}" "\${predicate}"
-  else
-    printf "%s\n" "\$1"
-  fi
-}
+[cursor]
+style=beam
+beam-thickness=1.5
 
-# Time
-entry_status "Setting Time Zone"
-ln -sf /usr/share/zoneinfo/"${time_zone}" /etc/localtime
-exit_status "Set Time Zone to ${time_zone}"
-entry_status "Generating /etc/adjtime"
-hwclock --systohc
-exit_status "Generated /etc/adjtime"
-entry_status "Enabling systemd-timesyncd.service"
-systemctl enable systemd-timesyncd.service > /dev/null 2>&1
-exit_status "Enabled systemd-timesyncd.service"
+[colors]
+alpha=0.78
 
-# Localization
-entry_status "Uncommenting ${utf_locale}"
-sed --in-place 's/#${utf_locale}/${utf_locale}/g' /etc/locale.gen
-exit_status "Uncommented ${utf_locale} in /etc/locale.gen"
-entry_status "Uncommenting ${iso_locale}"
-sed --in-place 's/#${iso_locale}/${iso_locale}/g' /etc/locale.gen
-exit_status "Uncommented ${iso_locale} in /etc/locale.gen"
-entry_status "Generating Locales"
-locale-gen > /dev/null 2>&1
-exit_status "Generated Locales"
-entry_status "Setting System Locale"
-echo "LANG="${language}"" >> /etc/locale.conf
-exit_status "Set System Locale in /etc/locale.conf"
-entry_status "Setting Console Keyboard Layout"
-echo "KEYMAP="${console_keyboard}"" >> /etc/vconsole.conf
-exit_status "Set Console Keyboard Layout to ${console_keyboard}"
+[key-bindings]
+scrollback-up-page=Page_Up
+scrollback-down-page=Page_Down
+search-start=Control+Shift+f
 
-# Network configuration
-entry_status "Creating Hostname File"
-echo "${hostname}" >> /etc/hostname
-exit_status "Created Hostname (${hostname}) File in /etc/hostname"
-entry_status "Enabling NetworkManager.service"
-systemctl enable NetworkManager.service > /dev/null 2>&1
-exit_status "Enabled NetworkManager.service"
-
-# Root password
-entry_status "Setting Root Password"
-printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd > /dev/null 2>&1
-exit_status "Set Root Password"
-
-# Boot loader
-entry_status "Installing Boot Loader"
-pacman -S --noconfirm grub efibootmgr > /dev/null 2>&1
-exit_status "Installed Boot Loader (GRUB)"
-entry_status "Installing GRUB"
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB > /dev/null 2>&1
-exit_status "Installed GRUB to /boot"
-entry_status "Generating Main Configuration File"
-grub-mkconfig -o /boot/grub/grub.cfg  > /dev/null 2>&1
-exit_status "Generated Main Configuration File in /boot/grub/grub.cfg"
-
-#######################################
-# System Administration
-#######################################
-
-# Users and groups
-entry_status "Adding New User"
-useradd --create-home --groups wheel "${username}"
-exit_status "Added User (${username})"
-entry_status "Setting ${username} Password"
-printf "%s\n%s" "${user_passwd}" "${user_passwd}" | passwd "${username}" > /dev/null 2>&1
-exit_status "Set ${username} Password"
-
-# Security
-entry_status "Allowing Members of Group Wheel Sudo Access"
-sed --in-place 's/# %wheel/%wheel/g' /etc/sudoers
-sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-exit_status "Allowed Members of Group Wheel Sudo Access"
-entry_status "Disabling Password Prompt Timeout"
-echo "Defaults passwd_timeout=0" >> /etc/sudoers
-exit_status "Disabled Password Prompt Timeout"
-
-#######################################
-# Package Management
-#######################################
-
-# pacman
-entry_status "Installing Pacman Contrib"
-pacman -S --noconfirm pacman-contrib > /dev/null 2>&1
-exit_status "Installed Pacman Contrib"
-entry_status "Enabling paccache.timer"
-systemctl enable paccache.timer > /dev/null 2>&1
-exit_status "Enabled paccache.timer"
-
-# Repositories
-entry_status "Enabling Multilib Repository"
-sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
-sed --in-place '93s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
-exit_status "Enabled Multilib Repository"
-entry_status "Upgrading System"
-pacman -Syu --noconfirm > /dev/null 2>&1
-exit_status "Upgraded System"
-
-# Mirrors
-entry_status "Installing Reflector"
-pacman -S --noconfirm reflector > /dev/null 2>&1
-exit_status "Installed Reflector"
-
-# Arch Build System
-entry_status "Installing Git"
-pacman -S --noconfirm git > /dev/null 2>&1
-exit_status "Installed Git"
-
-#######################################
-# Graphical User Interface
-#######################################
-
-# Display drivers
-entry_status "Installing AMD Radeon Graphics Card Drivers"
-pacman -S --noconfirm mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon > /dev/null 2>&1
-exit_status "Installed AMD Radeon Graphics Card Drivers"
-
-# User directories
-entry_status "Creating User Directories"
-pacman -S --noconfirm xdg-user-dirs > /dev/null 2>&1
-xdg-user-dirs-update
-exit_status "Created User Directories"
-
-#######################################
-# Multimedia
-#######################################
-
-# Sound system
-entry_status "Installing Sound Servers"
-pacman -S --noconfirm pipewire lib32-pipewire pipewire-docs wireplumber pipewire-audio pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack > /dev/null 2>&1
-exit_status "Installed Sound Servers"
-
-#######################################
-# Optimization
-#######################################
-
-# Solid state drives
-entry_status "Enabling fstrim.timer"
-systemctl enable fstrim.timer > /dev/null 2>&1
-exit_status "Enabled fstrim.timer"
-
-#######################################
-# System Services
-#######################################
-
-# File index and search
-entry_status "Installing Plocate"
-pacman -S --noconfirm plocate > /dev/null 2>&1
-exit_status "Installed Plocate"
-
-#######################################
-# Appearance
-#######################################
-
-# Fonts
-entry_status "Installing Noto Fonts"
-pacman -S --noconfirm noto-fonts > /dev/null 2>&1
-exit_status "Installed Noto Fonts"
-
-#######################################
-# Console Improvements
-#######################################
-
-# Tab-completion enhancements
-entry_status "Installing Bash Completion"
-pacman -S --noconfirm bash-completion > /dev/null 2>&1
-exit_status "Installed Bash Completion"
-
-# Aliases
-
-# Alternative shells
-
-# Compressed files
-entry_status "Installing Archiving and Compression Tools"
-pacman -S --noconfirm 7zip tar zip unzip > /dev/null 2>&1
-exit_status "Installed Archiving and Compression Tools"
+[search-bindings]
+cancel=Escape
+find-prev=Shift+F3
+find-next=F3 Control+G
 EOF
+#entry_status "Configured Foot"
 
-#######################################
-# Chroot
-#######################################
-
-entry_status "Changing File Mode Bits"
-chmod +x /mnt/configure.sh
-exit_status "Changed File Mode Bits"
-entry_status "Changing Root Into New System"
-arch-chroot /mnt /configure.sh
-exit_status "Changed Root Into New System"
+# Display manager
+Install greetd
+Install greetd-tuigreet
+#systemctl enable greetd.service
 
 #######################################
 # Post-Installation
 #######################################
 
-# Reboot
-entry_status "Removing Temporary Configuration Script"
-rm /mnt/configure.sh
-exit_status "Removed Temporary Configuration Script"
-entry_status "Unmounting All Partitions"
-umount -R /mnt
-exit_status "Unmounted All Partitions"
-info_status "Welcome to Arch Linux!"
-info_status "Restart the machine by typing "reboot""
-info_status "Remember to remove the installation medium"
-info_status "Login into the new system with the root account"
+# Allow members of group wheel sudo access with a password
+#entry_status "Allowing Sudo Access With Password"
+sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+#exit_status "Allowed Sudo Access Without Password"
