@@ -93,7 +93,7 @@ cd Hyprland
 make all && sudo make install
 #exit_status "Installed Hyprland"
 
-sudo mkdir /home/"${username}"/hypr
+sudo mkdir /home/"${username}"/.config/hypr
 sudo bash -c "cat > /home/"${username}"/hypr/hyprland.conf" << EOF
 ################
 ### MONITORS ###
@@ -122,8 +122,8 @@ EOF
 sudo pacman -S --noconfirm foot foot-terminfo libnotify xdg-utils
 #exit_status "Installed Foot"
 #entry_status "Configuring Foot"
-sudo mkdir /home/"${username}"/foot
-sudo bash -c "cat > /home/"${username}"/foot/foot.ini" << EOF
+sudo mkdir /home/"${username}"/.config/foot
+sudo bash -c "cat > /home/"${username}"/.config/foot/foot.ini" << EOF
 -*- conf -*-
 
 shell=fish
