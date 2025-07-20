@@ -103,63 +103,37 @@ cat > /home/"${username}"/.config/hypr/hyprland.conf << 'EOF'
 monitor = , 1920x1080@180, 0x0, 1
 #monitor = , preferred, auto, auto
 
-###################
-### MY PROGRAMS ###
-###################
-
+# Programs
 # See https://wiki.hypr.land/Configuring/Keywords/
-
 # Set programs that you use
 $terminal = foot
 $fileManager = dolphin
-$menu = rofi -show drun
+$menu = rofi -show drun -show-icons
 
-
-#################
-### AUTOSTART ###
-#################
-
+# Autostart
 # Autostart necessary processes (like notifications daemons, status bars, etc.)
 # Or execute your favorite apps at launch like this:
-
 # exec-once = $terminal
 # exec-once = nm-applet &
 # exec-once = waybar & hyprpaper & firefox
 
-
-#############################
-### ENVIRONMENT VARIABLES ###
-#############################
-
+# Environment Variables
 # See https://wiki.hypr.land/Configuring/Environment-variables/
-
 env = XCURSOR_SIZE,24
 env = HYPRCURSOR_SIZE,24
 
-
-###################
-### PERMISSIONS ###
-###################
-
+# Permissions
 # See https://wiki.hypr.land/Configuring/Permissions/
-# Please note permission changes here require a Hyprland restart and are not applied on-the-fly
-# for security reasons
-
+# Please note permission changes here require a Hyprland restart and are not applied on-the-fly for security reasons
 # ecosystem {
 #   enforce_permissions = 1
 # }
-
 # permission = /usr/(bin|local/bin)/grim, screencopy, allow
 # permission = /usr/(lib|libexec|lib64)/xdg-desktop-portal-hyprland, screencopy, allow
 # permission = /usr/(bin|local/bin)/hyprpm, plugin, allow
 
-
-#####################
-### LOOK AND FEEL ###
-#####################
-
+# Look And Feel
 # Refer to https://wiki.hypr.land/Configuring/Variables/
-
 # https://wiki.hypr.land/Configuring/Variables/#general
 general {
     gaps_in = 5
@@ -179,7 +153,6 @@ general {
 
     layout = dwindle
 }
-
 # https://wiki.hypr.land/Configuring/Variables/#decoration
 decoration {
     rounding = 10
@@ -205,7 +178,6 @@ decoration {
         vibrancy = 0.1696
     }
 }
-
 # https://wiki.hypr.land/Configuring/Variables/#animations
 animations {
     enabled = yes, please :)
@@ -236,7 +208,6 @@ animations {
     animation = workspacesOut, 1, 1.94, almostLinear, fade
     animation = zoomFactor, 1, 7, quick
 }
-
 # Ref https://wiki.hypr.land/Configuring/Workspace-Rules/
 # "Smart gaps" / "No gaps when only"
 # uncomment all if you wish to use that.
@@ -246,29 +217,22 @@ animations {
 # windowrule = rounding 0, floating:0, onworkspace:w[tv1]
 # windowrule = bordersize 0, floating:0, onworkspace:f[1]
 # windowrule = rounding 0, floating:0, onworkspace:f[1]
-
 # See https://wiki.hypr.land/Configuring/Dwindle-Layout/ for more
 dwindle {
     pseudotile = true # Master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
     preserve_split = true # You probably want this
 }
-
 # See https://wiki.hypr.land/Configuring/Master-Layout/ for more
 master {
     new_status = master
 }
-
 # https://wiki.hypr.land/Configuring/Variables/#misc
 misc {
     force_default_wallpaper = -1 # Set to 0 or 1 to disable the anime mascot wallpapers
     disable_hyprland_logo = false # If true disables the random hyprland logo / anime girl background. :(
 }
 
-
-#############
-### INPUT ###
-#############
-
+# Input
 # https://wiki.hypr.land/Configuring/Variables/#input
 input {
     kb_layout = us
@@ -285,12 +249,10 @@ input {
         natural_scroll = false
     }
 }
-
 # https://wiki.hypr.land/Configuring/Variables/#gestures
 gestures {
     workspace_swipe = false
 }
-
 # Example per-device config
 # See https://wiki.hypr.land/Configuring/Keywords/#per-device-input-configs for more
 device {
@@ -298,14 +260,9 @@ device {
     sensitivity = -0.5
 }
 
-
-###################
-### KEYBINDINGS ###
-###################
-
+# Keybindings
 # See https://wiki.hypr.land/Configuring/Keywords/
 $mainMod = SUPER # Sets "Windows" key as main modifier
-
 # Example binds, see https://wiki.hypr.land/Configuring/Binds/ for more
 bind = $mainMod, Q, exec, $terminal
 bind = $mainMod, C, killactive,
@@ -315,13 +272,11 @@ bind = $mainMod, V, togglefloating,
 bind = $mainMod, R, exec, $menu
 bind = $mainMod, P, pseudo, # dwindle
 bind = $mainMod, J, togglesplit, # dwindle
-
 # Move focus with mainMod + arrow keys
 bind = $mainMod, left, movefocus, l
 bind = $mainMod, right, movefocus, r
 bind = $mainMod, up, movefocus, u
 bind = $mainMod, down, movefocus, d
-
 # Switch workspaces with mainMod + [0-9]
 bind = $mainMod, 1, workspace, 1
 bind = $mainMod, 2, workspace, 2
@@ -333,7 +288,6 @@ bind = $mainMod, 7, workspace, 7
 bind = $mainMod, 8, workspace, 8
 bind = $mainMod, 9, workspace, 9
 bind = $mainMod, 0, workspace, 10
-
 # Move active window to a workspace with mainMod + SHIFT + [0-9]
 bind = $mainMod SHIFT, 1, movetoworkspace, 1
 bind = $mainMod SHIFT, 2, movetoworkspace, 2
@@ -345,19 +299,15 @@ bind = $mainMod SHIFT, 7, movetoworkspace, 7
 bind = $mainMod SHIFT, 8, movetoworkspace, 8
 bind = $mainMod SHIFT, 9, movetoworkspace, 9
 bind = $mainMod SHIFT, 0, movetoworkspace, 10
-
 # Example special workspace (scratchpad)
 bind = $mainMod, S, togglespecialworkspace, magic
 bind = $mainMod SHIFT, S, movetoworkspace, special:magic
-
 # Scroll through existing workspaces with mainMod + scroll
 bind = $mainMod, mouse_down, workspace, e+1
 bind = $mainMod, mouse_up, workspace, e-1
-
 # Move/resize windows with mainMod + LMB/RMB and dragging
 bindm = $mainMod, mouse:272, movewindow
 bindm = $mainMod, mouse:273, resizewindow
-
 # Laptop multimedia keys for volume and LCD brightness
 bindel = ,XF86AudioRaiseVolume, exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+
 bindel = ,XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
@@ -365,30 +315,26 @@ bindel = ,XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 bindel = ,XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
 bindel = ,XF86MonBrightnessUp, exec, brightnessctl -e4 -n2 set 5%+
 bindel = ,XF86MonBrightnessDown, exec, brightnessctl -e4 -n2 set 5%-
-
 # Requires playerctl
 bindl = , XF86AudioNext, exec, playerctl next
 bindl = , XF86AudioPause, exec, playerctl play-pause
 bindl = , XF86AudioPlay, exec, playerctl play-pause
 bindl = , XF86AudioPrev, exec, playerctl previous
 
-##############################
-### WINDOWS AND WORKSPACES ###
-##############################
-
+# Windows And Workspaces
 # See https://wiki.hypr.land/Configuring/Window-Rules/ for more
 # See https://wiki.hypr.land/Configuring/Workspace-Rules/ for workspace rules
-
 # Example windowrule
 # windowrule = float,class:^(kitty)$,title:^(kitty)$
-
 # Ignore maximize requests from apps. You'll probably like this.
 windowrule = suppressevent maximize, class:.*
-
 # Fix some dragging issues with XWayland
 windowrule = nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 EOF
 #exit_status "Configured Hyprland"
+#entry_status "Installing Hyprpaper"
+sudo pacman -S hyprpaper --noconfirm
+#exit_status "Installed Hyprpaper"
 
 # Foot
 #entry_status "Installing Foot"
