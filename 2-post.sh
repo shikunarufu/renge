@@ -93,6 +93,7 @@ cd Hyprland
 make all && sudo make install
 #exit_status "Installed Hyprland"
 #entry_status "Configuring Hyprland"
+mkdir /home/"${username}"/.config/hypr
 cat > /home/"${username}"/.config/hypr/hyprland.conf << 'EOF'
 # Hyprland Config File
 # Refer to the wiki for more information.
