@@ -137,10 +137,10 @@ env = HYPRCURSOR_SIZE,24
 # Refer to https://wiki.hypr.land/Configuring/Variables/
 # https://wiki.hypr.land/Configuring/Variables/#general
 general {
-    gaps_in = 5
-    gaps_out = 20
+    gaps_in = 2.5
+    gaps_out = 5
 
-    border_size = 2
+    border_size = 0
 
     # https://wiki.hypr.land/Configuring/Variables/#variable-types for info about colors
     col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
@@ -356,59 +356,58 @@ yay -S material-symbols-git --answerclean All --answerdiff None --noconfirm
 #exit_status "Installed Waybar"
 mkdir /home/"${username}"/.config/waybar
 cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
-// -*- mode: jsonc -*-
+// Waybar Configuration File
 {
-    // "layer": "top", // Waybar at top layer
-    // "position": "bottom", // Waybar position (top|bottom|left|right)
-    "height": 30, // Waybar height (to be removed for auto height)
-    // "width": 1280, // Waybar width
-    "spacing": 4, // Gaps between modules (4px)
-    // Choose the order of the modules
+    // Bar Configuration
+    "layer": "bottom",
+    "output": "array",
+    "position": "top",
+    "height": "30",
+    "width": "",
     "modules-left": [
         "clock",
         "custom/media",
     ],
     "modules-center": [
-        "hyprland/workspaces"
+        "hyprland/workspaces",
     ],
     "modules-right": [
         "wireplumber",
         "network",
-        "custom/power"
+        "custom/power",
     ],
-    // Modules configuration
+    "margin-top": "5",
+    "margin-left": "",
+    "margin-bottom": "",
+    "margin-right": "",
+    "spacing": "5",
+
+    // Module Configuration
     "clock": {
-        // "timezone": "America/New_York",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "format-alt": "{:%Y-%m-%d}"
-    "network": {
-        // "interface": "wlp2*", // (Optional) To force the use of this interface
-        "format-wifi": "{essid} ({signalStrength}%) ",
-        "format-ethernet": "{ipaddr}/{cidr} ",
-        "tooltip-format": "{ifname} via {gwaddr} ",
-        "format-linked": "{ifname} (No IP) ",
-        "format-disconnected": "Disconnected ⚠",
-        "format-alt": "{ifname}: {ipaddr}/{cidr}"
+        "interval": "60",
+        "format": "{:%H:%M}",
     },
-    "pulseaudio": {
-        // "scroll-step": 1, // %, can be a float
-        "format": "{volume}% {icon} {format_source}",
-        "format-bluetooth": "{volume}% {icon} {format_source}",
-        "format-bluetooth-muted": " {icon} {format_source}",
-        "format-muted": " {format_source}",
-        "format-source": "{volume}% ",
-        "format-source-muted": "",
+    "hyprland/workspaces": {
+        "active-only": "false",
+        "hide-active": "false",
+        "all-outputs": "false",
         "format-icons": {
-            "headphone": "",
-            "hands-free": "",
-            "headset": "",
-            "phone": "",
-            "portable": "",
-            "car": "",
-            "default": ["", "", ""]
+            "active": "",
         },
-        "on-click": "pavucontrol"
     },
+    "network": {
+        "interval": "60",
+        "family": "ipv4_6",
+        "format-ethernet": "Hammer Head",
+        "format-linked": "Hammer Head (No IP)",
+        "format-disconnected": "Disconnected",
+    },
+    "wireplumber": {
+    "format": "{volume}% {icon}",
+    "format-muted": "",
+    "on-click": "helvum",
+    "format-icons": ["", "", ""]
+    }
     "custom/media": {
         "format": "{icon} {text}",
         "return-type": "json",
