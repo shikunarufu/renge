@@ -437,7 +437,7 @@ EOF
 cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
 * {
     /* `otf-font-awesome` is required to be installed for icons */
-    font-family: FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Iosevka Nerd Font", sans-serif;
     font-size: 13px;
 }
 
