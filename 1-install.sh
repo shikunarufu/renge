@@ -376,7 +376,7 @@ exit_status "Installed Plocate"
 
 # Fonts
 entry_status "Installing Noto Fonts"
-pacman -S --noconfirm noto-fonts > /dev/null 2>&1
+pacman -S --noconfirm noto-fonts noto-fonts-cjk ttf-iosevka-nerd > /dev/null 2>&1
 exit_status "Installed Noto Fonts"
 
 #######################################
