@@ -93,6 +93,29 @@ cd Hyprland
 make all && sudo make install
 #exit_status "Installed Hyprland"
 
+# Foot
+#entry_status "Installing Foot"
+sudo pacman -S foot foot-terminfo libnotify xdg-utils --noconfirm
+#exit_status "Installed Foot"
+
+# Waybar
+#entry_status "Installing Waybar"
+sudo pacman -S waybar --noconfirm
+#exit_status "Installed Waybar"
+
+# Rofi
+#entry_status "Installing Rofi"
+sudo pacman -S rofi-wayland --noconfirm
+#exit_status "Installed Rofi"
+
+# Dolphin
+#entry_status "Installing Dolphin"
+sudo pacman -S dolphin audiocd-kio baloo dolphin-plugins kio-admin kio-gdrive kompare konsole ffmpegthumbs icoutils kdegraphics-thumbnailers kdesdk-thumbnailers kimageformats libheif libappimage qt6-imageformats taglib --noconfirm
+#exit_status "Installed Dolphin"
+#entry_status "Installing Dolphin Dependencies"
+yay -S kde-thumbnailer-apk raw-thumbnailer resvg --answerclean All --answerdiff None --noconfirm
+#exit_status "Installed Dolphin Dependencies"
+
 # Fish
 #entry_status "Installing Fish"
 sudo pacman -S fish --noconfirm
@@ -109,12 +132,6 @@ sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --c
 sudo systemctl enable greetd.service
 #exit_status "Enabled Greetd"
 
-# Caelestia
-#entry_status "Installing Caelestia"
-fish -c "git clone https://github.com/caelestia-dots/caelestia.git ~/.local/share/caelestia"
-fish -c "~/.local/share/caelestia/install.fish --noconfirm --spotify --vscode=codium --discord --zen"
-#exit_status "Installed Caelestia"
-
 #######################################
 # Post-Installation
 #######################################
@@ -126,5 +143,5 @@ sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL)
 
 # Launch Hyprland
 #entry_status "Launching Hyprland"
-Hyprland --config /home/"${username}"/.local/share/caelestia/hypr/hyprland.conf
+#Hyprland
 #exit_status "Launched Hyprland"
