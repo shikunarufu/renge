@@ -354,8 +354,8 @@ sudo pacman -S foot foot-terminfo libnotify xdg-utils --noconfirm
 sudo pacman -S waybar --noconfirm
 yay -S material-symbols-git --answerclean All --answerdiff None --noconfirm
 #exit_status "Installed Waybar"
-
-cat > /etc/xdg/waybar/config.jsonc << 'EOF'
+mkdir /home/"${username}"/.config/waybar
+cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
 // -*- mode: jsonc -*-
 {
     // "layer": "top", // Waybar at top layer
@@ -435,7 +435,7 @@ cat > /etc/xdg/waybar/config.jsonc << 'EOF'
     }
 }
 EOF
-cat > /etc/xdg/waybar/style.css << 'EOF'
+cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
 * {
     /* `otf-font-awesome` is required to be installed for icons */
     font-family: FontAwesome, Roboto, Helvetica, Arial, sans-serif;
