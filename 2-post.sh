@@ -335,6 +335,13 @@ EOF
 #entry_status "Installing Hyprpaper"
 sudo pacman -S hyprpaper --noconfirm
 #exit_status "Installed Hyprpaper"
+#entry_status "Configuring Hyprpaper"
+mkdir /home/"${username}"/Pictures/Wallpapers
+cat > /home/"${username}"/.config/hypr/hyprpaper.conf << EOF
+preload = /home/"${username}"/Pictures/Wallpapers/Desktop.png
+wallpaper = /home/"${username}"/Pictures/Wallpapers/Desktop.png
+EOF
+#exit_status "Configured Hyprpaper"
 
 # Foot
 #entry_status "Installing Foot"
