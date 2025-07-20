@@ -361,7 +361,6 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
 {
     // Bar Configuration
     "layer": "bottom",
-    "output": "array",
     "position": "top",
     "height": "30",
     "width": "",
