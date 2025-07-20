@@ -100,8 +100,8 @@ cat > /home/"${username}"/.config/hypr/hyprland.conf << 'EOF'
 # https://wiki.hypr.land/Configuring/
 
 # Monitors
-#monitor = , resolution, position, scale
-monitor = , preferred, auto, auto
+monitor = , 1920x1080@180, 0x0, 1
+#monitor = , preferred, auto, auto
 
 ###################
 ### MY PROGRAMS ###
