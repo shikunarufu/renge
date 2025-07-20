@@ -126,7 +126,7 @@ sudo pacman -S fish --noconfirm
 sudo pacman -S greetd greetd-tuigreet --noconfirm
 #exit_status "Installed Greetd"
 #entry_status "Configuring Greetd"
-sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland --config /home/"${username}"/.local/share/caelestia/hypr/hyprland.conf"|g' /etc/greetd/config.toml
+sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland"|g' /etc/greetd/config.toml
 #exit_status "Configured Greetd"
 #entry_status "Enabling Greetd"
 sudo systemctl enable greetd.service
