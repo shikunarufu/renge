@@ -116,7 +116,8 @@ $menu = rofi -show drun -show-icons
 # exec-once = $terminal
 # exec-once = nm-applet &
 # exec-once = waybar & hyprpaper & firefox
-exec-once = hyprpaper
+#exec-once = hyprpaper
+exec-once = waybar
 
 # Environment Variables
 # See https://wiki.hypr.land/Configuring/Environment-variables/
@@ -403,10 +404,10 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
         "format-disconnected": "Disconnected",
     },
     "wireplumber": {
-    "format": "{volume}% {icon}",
-    "format-muted": "",
-    "on-click": "helvum",
-    "format-icons": ["", "", ""]
+        "format": "{volume}% {icon}",
+        "format-muted": "",
+        "on-click": "helvum",
+        "format-icons": ["", "", ""]
     },
     "custom/media": {
         "format": "{icon} {text}",
