@@ -407,7 +407,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "format-muted": "",
     "on-click": "helvum",
     "format-icons": ["", "", ""]
-    }
+    },
     "custom/media": {
         "format": "{icon} {text}",
         "return-type": "json",
