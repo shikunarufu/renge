@@ -362,10 +362,10 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     // Bar Configuration
     "layer": "bottom",
     "position": "top",
-    "height": "30",
-    "width": "",
+    "height": 30,
     "modules-left": [
         "clock",
+        "clock#date",
         "custom/media",
     ],
     "modules-center": [
@@ -376,16 +376,19 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
         "network",
         "custom/power",
     ],
-    "margin-top": "5",
-    "margin-left": "",
-    "margin-bottom": "",
-    "margin-right": "",
-    "spacing": "5",
+    "margin-top": 5,
+    "margin-left": 5,
+    "margin-right": 5,
+    "spacing": 5,
 
     // Module Configuration
     "clock": {
         "interval": "60",
         "format": "{:%H:%M}",
+    },
+    "clock#date": {
+        "interval": "60",
+        "format": "{:%a %b %d}",
     },
     "hyprland/workspaces": {
         "active-only": "false",
