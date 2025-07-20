@@ -116,6 +116,7 @@ $menu = rofi -show drun -show-icons
 # exec-once = $terminal
 # exec-once = nm-applet &
 # exec-once = waybar & hyprpaper & firefox
+exec-once = hyprpaper
 
 # Environment Variables
 # See https://wiki.hypr.land/Configuring/Environment-variables/
@@ -394,5 +395,5 @@ sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL)
 
 # Launch Hyprland
 #entry_status "Launching Hyprland"
-Hyprland --config /home/"${username}"/.config/hypr/hyprland.conf
+Hyprland
 #exit_status "Launched Hyprland"
