@@ -157,7 +157,7 @@ mount /dev/"${efi_system_partition}" /mnt/boot
 exit_status "Mounted EFI System Partition in /mnt/boot"
 entry_status "Creating Directory for Home Partition"
 mkdir /mnt/home
-exit_status "Created Directory for Home Partition in /mnt/boot"
+exit_status "Created Directory for Home Partition in /mnt/home"
 entry_status "Mounting Home Partition"
 mount /dev/"${home_partition}" /mnt/home
 exit_status "Mounted Home Partition in /mnt/home"
@@ -376,7 +376,7 @@ exit_status "Installed Plocate"
 
 # Fonts
 entry_status "Installing Fonts"
-pacman -S --noconfirm noto-fonts noto-fonts-cjk ttf-iosevka-nerd > /dev/null 2>&1
+pacman -S --noconfirm noto-fonts noto-fonts-cjk ttf-jetbrains-mono-nerd otf-geist-mono-nerd > /dev/null 2>&1
 exit_status "Installed Fonts"
 
 #######################################
