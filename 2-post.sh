@@ -116,7 +116,7 @@ $menu = rofi -show drun -show-icons
 # exec-once = $terminal
 # exec-once = nm-applet &
 # exec-once = waybar & hyprpaper & firefox
-#exec-once = hyprpaper
+exec-once = hyprpaper
 exec-once = waybar
 
 # Environment Variables
@@ -456,21 +456,20 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
 EOF
 cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
 * {
-    font-family: "JetBrainsMono Nerd Font Propo";
-    font-size: 13px;
-    font-weight: bold;
-    border-radius: 6px;
+  font-family: "JetBrainsMono Nerd Font Propo";
+  font-size: 13px;
+  font-weight: bold;
+  border-radius: 6px;
 }
 window#waybar {
-    background-color: transparent;
-    color: #ffffff;
-    transition-property: background-color;
-    transition-duration: .5s;
+  background-color: transparent;
+  color: #ffffff;
+  transition-property: background-color;
+  transition-duration: .5s;
 }
 window#waybar.hidden {
-    opacity: 0.2;
+  opacity: 0.2;
 }
-
 #clock,
 #network,
 #pulseaudio,
@@ -480,50 +479,48 @@ window#waybar.hidden {
     padding: 0 11px;
     color: #ffffff;
 }
-
 #window,
 #workspaces {
-    margin: 0 4px;
+  margin: 0 4px;
 }
-
 #clock {
-    background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
 }
-
+#custom-power {
+  background: rgba(0, 0, 0, 0.5);
+}
+#custom-weather {
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4px 11px 0 11px;
+}
 #network {
-    background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
 }
-
 #network.disconnected {
-    background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
 }
-
 #pulseaudio {
-    background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
 }
-
 #pulseaudio.muted {
-    background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5);
 }
 EOF
 mkdir /home/"${username}"/.config/waybar/scripts
 cat > /home/"${username}"/.config/waybar/scripts/get_weather.sh << 'EOF'
 #!/usr/bin/env bash
-for i in {1..5}
-do
-    text=$(curl -s "https://wttr.in/$1?format=1")
-    if [[ $? == 0 ]]
-    then
-        text=$(echo "$text" | sed -E "s/\s+/ /g")
-        tooltip=$(curl -s "https://wttr.in/$1?format=4")
-        if [[ $? == 0 ]]
-        then
-            tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
-            echo "{\"text\":\"$text\", \"tooltip\":\"$tooltip\"}"
-            exit
-        fi
+for i in {1..5}; do
+  text=$(curl -s "https://wttr.in/$1?format=%l:+%c+%t\n")
+  if [[ $? == 0 ]]; then
+    text=$(echo "$text" | sed -E "s/\s+/ /g")
+    tooltip=$(curl -s "https://wttr.in/$1?format=%l\n%C+%c\nPrecipitation:+%p\nWind:+%w\nUVI:+%u\nFeels+Like:+%f\n")
+    if [[ $? == 0 ]]; then
+      tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
+      echo "{\"text\":\"$text\", \"tooltip\":\"$tooltip\"}"
+      exit
     fi
-    sleep 2
+  fi
+  sleep 2
 done
 echo "{\"text\":\"error\", \"tooltip\":\"error\"}"
 EOF
