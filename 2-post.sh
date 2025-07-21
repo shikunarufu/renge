@@ -372,7 +372,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
         "hyprland/workspaces",
     ],
     "modules-right": [
-        "wireplumber",
+        "pulseaudio",
         "network",
         "custom/power",
     ],
@@ -385,31 +385,48 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "clock": {
         "interval": "60",
         "format": " {:%H:%M}",
+        "tooltip": false,
     },
     "clock#date": {
         "interval": "60",
         "format": " {:%a %b %d}",
+        "tooltip": false,
     },
     "hyprland/workspaces": {
         "active-only": "false",
         "hide-active": "false",
         "all-outputs": "false",
         "format-icons": {
-            "active": "",
+            "active": "",
+            "default": "",
         },
     },
     "network": {
         "interval": "60",
         "family": "ipv4_6",
-        "format-ethernet": "󰈀Hammer Head",
-        "format-linked": "Hammer Head (No IP)",
-        "format-disconnected": "Disconnected",
+        "format-ethernet": "󰛳 Ethernet",
+        "format-linked": "󰛵 No IP Address",
+        "format-disconnected": "󰲛 Disconnected",
     },
-    "wireplumber": {
+    "pulseaudio": {
         "format": "{volume}% {icon}",
+        "format-bluetooth": "{volume}% {icon}",
         "format-muted": "",
-        "on-click": "helvum",
-        "format-icons": ["", "", ""]
+        "format-icons": {
+            "alsa_output.pci-0000_00_1f.3.analog-stereo": "",
+            "alsa_output.pci-0000_00_1f.3.analog-stereo-muted": "",
+            "headphone": "",
+            "hands-free": "",
+            "headset": "",
+            "phone": "",
+            "phone-muted": "",
+            "portable": "",
+            "car": "",
+            "default": ["", ""]
+        },
+        "scroll-step": 1,
+        "on-click": "pavucontrol",
+        "ignored-sinks": ["Easy Effects Sink"]
     },
     "custom/media": {
         "format": "{icon} {text}",
@@ -424,7 +441,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
         // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
     },
     "custom/power": {
-        "format" : "⏻ ",
+        "format" : "󰣇",
 		"tooltip": false,
 		"menu": "on-click",
 		"menu-file": "$HOME/.config/waybar/power_menu.xml", // Menu file in resources folder
@@ -442,6 +459,7 @@ cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
     /* `otf-font-awesome` is required to be installed for icons */
     font-family: "JetBrainsMono Nerd Font Propo";
     font-size: 13px;
+    font-weight: bold;
     border-radius: 6px;
 }
 
@@ -538,7 +556,7 @@ button:hover {
 }
 
 #clock {
-    background-color: #64727D;
+    background: rgba(0, 0, 0, 0.5);
 }
 
 #battery {
@@ -610,11 +628,11 @@ label:focus {
 }
 
 #network {
-    background-color: #2980b9;
+    background: rgba(0, 0, 0, 0.2);
 }
 
 #network.disconnected {
-    background-color: #f53c3c;
+    background: rgba(0, 0, 0, 0.2);
 }
 
 #pulseaudio {
