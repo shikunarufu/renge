@@ -384,11 +384,11 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     // Module Configuration
     "clock": {
         "interval": "60",
-        "format": "{ :%H:%M}",
+        "format": "{:%H:%M}",
     },
     "clock#date": {
         "interval": "60",
-        "format": "{:%a %b %d}",
+        "format": "{:%a %b %d}",
     },
     "hyprland/workspaces": {
         "active-only": "false",
@@ -401,7 +401,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "network": {
         "interval": "60",
         "family": "ipv4_6",
-        "format-ethernet": "Hammer Head",
+        "format-ethernet": "󰈀Hammer Head",
         "format-linked": "Hammer Head (No IP)",
         "format-disconnected": "Disconnected",
     },
