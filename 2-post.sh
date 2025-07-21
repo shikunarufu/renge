@@ -19,7 +19,6 @@ set -x
 # Configuration
 username="Shiku"
 user_passwd="narufu"
-location="Dasmariñas"
 
 # Aesthetics
 entry_status() {
@@ -394,7 +393,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << EOF
     "tooltip": false,
   },
   "custom/weather": {
-    "exec": "/home/"${username}"/.config/waybar/scripts/get_weather.sh",
+    "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Dasmariñas",
     "return-type": "json",
     "format": "{}",
     "tooltip": true,
@@ -509,19 +508,22 @@ window#waybar.hidden {
 EOF
 mkdir /home/"${username}"/.config/waybar/scripts
 cat > /home/"${username}"/.config/waybar/scripts/get_weather.sh << EOF
-#!/bin/bash
-for i in {1..5}; do
-  text=$(curl -s "https://wttr.in/${location}?format=%l:+%c+%t\n")
-  if [[ $? == 0 ]]; then
-    text=$(echo "\$text" | sed -E "s/\s+/ /g")
-    tooltip=$(curl -s "https://wttr.in/${location}?format=%l\n%C+%c\nPrecipitation:+%p\nWind:+%w\nUVI:+%u\nFeels+Like:+%f\n")
-    if [[ $? == 0 ]]; then
-      tooltip=$(echo "\$tooltip" | sed -E "s/\s+/ /g")
-      echo "{\"text\":\"\$text\", \"tooltip\":\"\$tooltip\"}"
-      exit
+#!/usr/bin/env bash
+for i in {1..5}
+do
+    text=$(curl -s "https://wttr.in/$1?format=1")
+    if [[ $? == 0 ]]
+    then
+        text=$(echo "$text" | sed -E "s/\s+/ /g")
+        tooltip=$(curl -s "https://wttr.in/$1?format=%l\n%C+%c\nPrecipitation:+%p\nWind:+%w\nUVI:+%u\nFeels+Like:+%f\n")
+        if [[ $? == 0 ]]
+        then
+            tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
+            echo "{\"text\":\"$text\", \"tooltip\":\"$tooltip\"}"
+            exit
+        fi
     fi
-  fi
-  sleep 2
+    sleep 2
 done
 echo "{\"text\":\"error\", \"tooltip\":\"error\"}"
 EOF
