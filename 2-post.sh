@@ -384,11 +384,11 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     // Module Configuration
     "clock": {
         "interval": "60",
-        "format": "{:%H:%M}",
+        "format": " {:%H:%M}",
     },
     "clock#date": {
         "interval": "60",
-        "format": "{:%a %b %d}",
+        "format": " {:%a %b %d}",
     },
     "hyprland/workspaces": {
         "active-only": "false",
