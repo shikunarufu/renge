@@ -359,98 +359,99 @@ mkdir /home/"${username}"/.config/waybar
 cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
 // Waybar Configuration File
 {
-    // Bar Configuration
-    "layer": "bottom",
-    "position": "top",
-    "height": 24,
-    "modules-left": [
-        "clock",
-        "clock#date",
-        "custom/weather",
-        "custom/media",
-    ],
-    "modules-center": [
-        "hyprland/workspaces",
-    ],
-    "modules-right": [
-        "pulseaudio",
-        "network",
-        "custom/power",
-    ],
-    "margin-top": 6,
-    "margin-left": 6,
-    "margin-right": 6,
-    "spacing": 6,
-
-    // Module Configuration
-    "clock": {
-        "interval": "60",
-        "format": " {:%H:%M}",
-        "tooltip": false,
+  // Bar Configuration
+  "layer": "bottom",
+  "position": "top",
+  "height": 24,
+  "modules-left": [
+    "clock",
+    "clock#date",
+    "custom/weather",
+    "custom/media",
+  ],
+  "modules-center": [
+    "hyprland/workspaces",
+  ],
+  "modules-right": [
+    "pulseaudio",
+    "network",
+    "custom/power",
+  ],
+  "margin-top": 6,
+  "margin-left": 6,
+  "margin-right": 6,
+  "spacing": 6,
+  // Module Configuration
+  "clock": {
+    "interval": "60",
+    "format": " {:%H:%M}",
+    "tooltip": false,
+  },
+  "clock#date": {
+    "interval": "60",
+    "format": " {:%a %b %d}",
+    "tooltip": false,
+  },
+  "custom/weather": {
+    "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Dasmariñas+Philippines",
+    "return-type": "json",
+    "format": "{}",
+    "tooltip": true,
+    "interval": 3600
+  },
+  "hyprland/workspaces": {
+    "active-only": false,
+    "hide-active": false,
+    "all-outputs": false,
+    "format": "{icon}",
+    "format-icons": {
+      "active": "",
+      "default": "",
     },
-    "clock#date": {
-        "interval": "60",
-        "format": " {:%a %b %d}",
-        "tooltip": false,
+  },
+  "network": {
+    "interval": "60",
+    "family": "ipv4_6",
+    "format-ethernet": "󰛳",
+    "format-linked": "󰛵",
+    "format-disconnected": "󰲛",
+    "tooltip": true,
+    "tooltip-format-ethernet": "Connected",
+    "tooltip-format-disconnected": "Disconnected",
+  },
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": "",
+    "format-icons": {
+      "default": ["", "", ""]
     },
-    "custom/weather": {
-        "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Dasmariñas+Philippines",
-        "return-type": "json",
-        "format": "{}",
-        "tooltip": true,
-        "interval": 3600
+    "scroll-step": 1,
+    "tooltip": false,
+  },
+  "custom/media": {
+    "format": "{icon} {text}",
+    "return-type": "json",
+    "max-length": 40,
+    "format-icons": {
+      "spotify": "",
+      "default": "🎜"
     },
-    "hyprland/workspaces": {
-        "active-only": false,
-        "hide-active": false,
-        "all-outputs": false,
-        "format": "{icon}",
-        "format-icons": {
-            "active": "",
-            "default": "",
-        },
-    },
-    "network": {
-        "interval": "60",
-        "family": "ipv4_6",
-        "format-ethernet": "󰛳",
-        "format-linked": "󰛵",
-        "format-disconnected": "󰲛",
-        "tooltip": false,
-    },
-    "pulseaudio": {
-        "format": "{icon} {volume}%",
-        "format-muted": "",
-        "format-icons": {
-            "default": ["", "", ""]
-        },
-        "scroll-step": 1,
-        "tooltip": false,
-    },
-    "custom/media": {
-        "format": "{icon} {text}",
-        "return-type": "json",
-        "max-length": 40,
-        "format-icons": {
-            "spotify": "",
-            "default": "🎜"
-        },
-        "escape": true,
-        "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null" // Script in resources folder
-        // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
-    },
-    "custom/power": {
-        "format" : "󰣇",
-		"tooltip": false,
-		"menu": "on-click",
-		"menu-file": "$HOME/.config/waybar/power_menu.xml", // Menu file in resources folder
-		"menu-actions": {
-			"shutdown": "shutdown",
-			"reboot": "reboot",
-			"suspend": "systemctl suspend",
-			"hibernate": "systemctl hibernate"
-		}
-    }
+    "escape": true,
+    "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null" // Script in resources folder
+    // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
+  },
+  "custom/power": {
+    "format" : "󰣇",
+	"tooltip": false,
+	"menu": "on-click",
+	"menu-file": "$HOME/.config/waybar/power_menu.xml", // Menu file in resources folder
+	"menu-actions": {
+	  "shutdown": "shutdown",
+	  "reboot": "reboot",
+	  "suspend": "systemctl suspend",
+	  "hibernate": "systemctl hibernate"
+	}
+  }
 }
 EOF
 cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
@@ -470,70 +471,12 @@ window#waybar.hidden {
     opacity: 0.2;
 }
 
-
-
-button {
-    /* Use box-shadow instead of border so the text isn't offset */
-    box-shadow: inset 0 -3px transparent;
-    /* Avoid rounded borders under each button name */
-    border: none;
-    border-radius: 0;
-}
-
-/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
-button:hover {
-    background: inherit;
-    box-shadow: inset 0 -3px #ffffff;
-}
-
-/* you can set a style on hover for any module like this */
-#pulseaudio:hover {
-    background-color: #a37800;
-}
-
-#workspaces button {
-    padding: 0 5px;
-    background-color: transparent;
-    color: #ffffff;
-}
-
-#workspaces button:hover {
-    background: rgba(0, 0, 0, 0.2);
-}
-
-#workspaces button.focused {
-    background-color: #64727D;
-    box-shadow: inset 0 -3px #ffffff;
-}
-
-#workspaces button.urgent {
-    background-color: #eb4d4b;
-}
-
-#mode {
-    background-color: #64727D;
-    box-shadow: inset 0 -3px #ffffff;
-}
-
 #clock,
-#battery,
-#cpu,
-#memory,
-#disk,
-#temperature,
-#backlight,
 #network,
 #pulseaudio,
-#wireplumber,
 #custom-media,
 #custom-power,
-#custom-weather,
-#tray,
-#mode,
-#idle_inhibitor,
-#scratchpad,
-#power-profiles-daemon,
-#mpd {
+#custom-weather {
     padding: 0 11px;
     color: #ffffff;
 }
@@ -543,86 +486,8 @@ button:hover {
     margin: 0 4px;
 }
 
-/* If workspaces is the leftmost module, omit left margin */
-.modules-left > widget:first-child > #workspaces {
-    margin-left: 0;
-}
-
-/* If workspaces is the rightmost module, omit right margin */
-.modules-right > widget:last-child > #workspaces {
-    margin-right: 0;
-}
-
 #clock {
     background: rgba(0, 0, 0, 0.5);
-}
-
-#battery {
-    background-color: #ffffff;
-    color: #000000;
-}
-
-#battery.charging, #battery.plugged {
-    color: #ffffff;
-    background-color: #26A65B;
-}
-
-@keyframes blink {
-    to {
-        background-color: #ffffff;
-        color: #000000;
-    }
-}
-
-/* Using steps() instead of linear as a timing function to limit cpu usage */
-#battery.critical:not(.charging) {
-    background-color: #f53c3c;
-    color: #ffffff;
-    animation-name: blink;
-    animation-duration: 0.5s;
-    animation-timing-function: steps(12);
-    animation-iteration-count: infinite;
-    animation-direction: alternate;
-}
-
-#power-profiles-daemon {
-    padding-right: 15px;
-}
-
-#power-profiles-daemon.performance {
-    background-color: #f53c3c;
-    color: #ffffff;
-}
-
-#power-profiles-daemon.balanced {
-    background-color: #2980b9;
-    color: #ffffff;
-}
-
-#power-profiles-daemon.power-saver {
-    background-color: #2ecc71;
-    color: #000000;
-}
-
-label:focus {
-    background-color: #000000;
-}
-
-#cpu {
-    background-color: #2ecc71;
-    color: #000000;
-}
-
-#memory {
-    background-color: #9b59b6;
-}
-
-#disk {
-    background-color: #964B00;
-}
-
-#backlight {
-    background-color: #90b1b1;
 }
 
 #network {
@@ -639,129 +504,6 @@ label:focus {
 
 #pulseaudio.muted {
     background: rgba(0, 0, 0, 0.5);
-}
-
-#wireplumber {
-    background-color: #fff0f5;
-    color: #000000;
-}
-
-#wireplumber.muted {
-    background-color: #f53c3c;
-}
-
-#custom-media {
-    background-color: #66cc99;
-    color: #2a5c45;
-    min-width: 100px;
-}
-
-#custom-media.custom-spotify {
-    background-color: #66cc99;
-}
-
-#custom-media.custom-vlc {
-    background-color: #ffa000;
-}
-
-#temperature {
-    background-color: #f0932b;
-}
-
-#temperature.critical {
-    background-color: #eb4d4b;
-}
-
-#tray {
-    background-color: #2980b9;
-}
-
-#tray > .passive {
-    -gtk-icon-effect: dim;
-}
-
-#tray > .needs-attention {
-    -gtk-icon-effect: highlight;
-    background-color: #eb4d4b;
-}
-
-#idle_inhibitor {
-    background-color: #2d3436;
-}
-
-#idle_inhibitor.activated {
-    background-color: #ecf0f1;
-    color: #2d3436;
-}
-
-#mpd {
-    background-color: #66cc99;
-    color: #2a5c45;
-}
-
-#mpd.disconnected {
-    background-color: #f53c3c;
-}
-
-#mpd.stopped {
-    background-color: #90b1b1;
-}
-
-#mpd.paused {
-    background-color: #51a37a;
-}
-
-#language {
-    background: #00b093;
-    color: #740864;
-    padding: 0 5px;
-    margin: 0 5px;
-    min-width: 16px;
-}
-
-#keyboard-state {
-    background: #97e1ad;
-    color: #000000;
-    padding: 0 0px;
-    margin: 0 5px;
-    min-width: 16px;
-}
-
-#keyboard-state > label {
-    padding: 0 5px;
-}
-
-#keyboard-state > label.locked {
-    background: rgba(0, 0, 0, 0.2);
-}
-
-#scratchpad {
-    background: rgba(0, 0, 0, 0.2);
-}
-
-#scratchpad.empty {
-	background-color: transparent;
-}
-
-#privacy {
-    padding: 0;
-}
-
-#privacy-item {
-    padding: 0 5px;
-    color: white;
-}
-
-#privacy-item.screenshare {
-    background-color: #cf5700;
-}
-
-#privacy-item.audio-in {
-    background-color: #1ca000;
-}
-
-#privacy-item.audio-out {
-    background-color: #0069d4;
 }
 EOF
 mkdir /home/"${username}"/.config/waybar/scripts
@@ -785,6 +527,7 @@ do
 done
 echo "{\"text\":\"error\", \"tooltip\":\"error\"}"
 EOF
+chmod +x /home/"${username}"/.config/waybar/scripts/get_weather.sh
 
 # Rofi
 #entry_status "Installing Rofi"
