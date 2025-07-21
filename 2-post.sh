@@ -19,6 +19,7 @@ set -x
 # Configuration
 username="Shiku"
 user_passwd="narufu"
+location="Dasmariñas"
 
 # Aesthetics
 entry_status() {
@@ -356,7 +357,7 @@ sudo pacman -S waybar --noconfirm
 yay -S material-symbols-git --answerclean All --answerdiff None --noconfirm
 #exit_status "Installed Waybar"
 mkdir /home/"${username}"/.config/waybar
-cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
+cat > /home/"${username}"/.config/waybar/config.jsonc << EOF
 // Waybar Configuration File
 {
   // Bar Configuration
@@ -393,7 +394,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "tooltip": false,
   },
   "custom/weather": {
-    "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Dasmariñas+Philippines",
+    "exec": "/home/"${username}"/.config/waybar/scripts/get_weather.sh",
     "return-type": "json",
     "format": "{}",
     "tooltip": true,
@@ -507,16 +508,16 @@ window#waybar.hidden {
 }
 EOF
 mkdir /home/"${username}"/.config/waybar/scripts
-cat > /home/"${username}"/.config/waybar/scripts/get_weather.sh << 'EOF'
-#!/usr/bin/env bash
+cat > /home/"${username}"/.config/waybar/scripts/get_weather.sh << EOF
+#!/bin/bash
 for i in {1..5}; do
-  text=$(curl -s "https://wttr.in/$1?format=%l:+%c+%t\n")
+  text=$(curl -s "https://wttr.in/${location}?format=%l:+%c+%t\n")
   if [[ $? == 0 ]]; then
-    text=$(echo "$text" | sed -E "s/\s+/ /g")
-    tooltip=$(curl -s "https://wttr.in/$1?format=%l\n%C+%c\nPrecipitation:+%p\nWind:+%w\nUVI:+%u\nFeels+Like:+%f\n")
+    text=$(echo "\$text" | sed -E "s/\s+/ /g")
+    tooltip=$(curl -s "https://wttr.in/${location}?format=%l\n%C+%c\nPrecipitation:+%p\nWind:+%w\nUVI:+%u\nFeels+Like:+%f\n")
     if [[ $? == 0 ]]; then
-      tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
-      echo "{\"text\":\"$text\", \"tooltip\":\"$tooltip\"}"
+      tooltip=$(echo "\$tooltip" | sed -E "s/\s+/ /g")
+      echo "{\"text\":\"\$text\", \"tooltip\":\"\$tooltip\"}"
       exit
     fi
   fi
