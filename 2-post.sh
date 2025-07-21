@@ -366,6 +366,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "modules-left": [
         "clock",
         "clock#date",
+        "custom/weather",
         "custom/media",
     ],
     "modules-center": [
@@ -392,10 +393,18 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
         "format": " {:%a %b %d}",
         "tooltip": false,
     },
+    "custom/weather": {
+        "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Dasmariñas+Philippines",
+        "return-type": "json",
+        "format": "{}",
+        "tooltip": true,
+        "interval": 3600
+    },
     "hyprland/workspaces": {
-        "active-only": "false",
-        "hide-active": "false",
-        "all-outputs": "false",
+        "active-only": false,
+        "hide-active": false,
+        "all-outputs": false,
+        "format": "{icon}",
         "format-icons": {
             "active": "",
             "default": "",
@@ -404,29 +413,19 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "network": {
         "interval": "60",
         "family": "ipv4_6",
-        "format-ethernet": "󰛳 Ethernet",
-        "format-linked": "󰛵 No IP Address",
-        "format-disconnected": "󰲛 Disconnected",
+        "format-ethernet": "󰛳",
+        "format-linked": "󰛵",
+        "format-disconnected": "󰲛",
+        "tooltip": false,
     },
     "pulseaudio": {
-        "format": "{volume}% {icon}",
-        "format-bluetooth": "{volume}% {icon}",
-        "format-muted": "",
+        "format": "{icon} {volume}%",
+        "format-muted": "",
         "format-icons": {
-            "alsa_output.pci-0000_00_1f.3.analog-stereo": "",
-            "alsa_output.pci-0000_00_1f.3.analog-stereo-muted": "",
-            "headphone": "",
-            "hands-free": "",
-            "headset": "",
-            "phone": "",
-            "phone-muted": "",
-            "portable": "",
-            "car": "",
-            "default": ["", ""]
+            "default": ["", "", ""]
         },
         "scroll-step": 1,
-        "on-click": "pavucontrol",
-        "ignored-sinks": ["Easy Effects Sink"]
+        "tooltip": false,
     },
     "custom/media": {
         "format": "{icon} {text}",
@@ -456,20 +455,17 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
 EOF
 cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
 * {
-    /* `otf-font-awesome` is required to be installed for icons */
     font-family: "JetBrainsMono Nerd Font Propo";
     font-size: 13px;
     font-weight: bold;
     border-radius: 6px;
 }
-
 window#waybar {
     background-color: transparent;
     color: #ffffff;
     transition-property: background-color;
     transition-duration: .5s;
 }
-
 window#waybar.hidden {
     opacity: 0.2;
 }
@@ -530,6 +526,8 @@ button:hover {
 #pulseaudio,
 #wireplumber,
 #custom-media,
+#custom-power,
+#custom-weather,
 #tray,
 #mode,
 #idle_inhibitor,
@@ -628,21 +626,19 @@ label:focus {
 }
 
 #network {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.5);
 }
 
 #network.disconnected {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.5);
 }
 
 #pulseaudio {
-    background-color: #f1c40f;
-    color: #000000;
+    background: rgba(0, 0, 0, 0.5);
 }
 
 #pulseaudio.muted {
-    background-color: #90b1b1;
-    color: #2a5c45;
+    background: rgba(0, 0, 0, 0.5);
 }
 
 #wireplumber {
@@ -767,6 +763,27 @@ label:focus {
 #privacy-item.audio-out {
     background-color: #0069d4;
 }
+EOF
+mkdir /home/"${username}"/.config/waybar/scripts
+cat > /home/"${username}"/.config/waybar/scripts/get_weather.sh << 'EOF'
+#!/usr/bin/env bash
+for i in {1..5}
+do
+    text=$(curl -s "https://wttr.in/$1?format=1")
+    if [[ $? == 0 ]]
+    then
+        text=$(echo "$text" | sed -E "s/\s+/ /g")
+        tooltip=$(curl -s "https://wttr.in/$1?format=4")
+        if [[ $? == 0 ]]
+        then
+            tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
+            echo "{\"text\":\"$text\", \"tooltip\":\"$tooltip\"}"
+            exit
+        fi
+    fi
+    sleep 2
+done
+echo "{\"text\":\"error\", \"tooltip\":\"error\"}"
 EOF
 
 # Rofi
