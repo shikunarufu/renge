@@ -138,8 +138,8 @@ env = HYPRCURSOR_SIZE,24
 # Refer to https://wiki.hypr.land/Configuring/Variables/
 # https://wiki.hypr.land/Configuring/Variables/#general
 general {
-    gaps_in = 2.5
-    gaps_out = 5
+    gaps_in = 3
+    gaps_out = 6
 
     border_size = 0
 
@@ -362,7 +362,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     // Bar Configuration
     "layer": "bottom",
     "position": "top",
-    "height": 30,
+    "height": 24,
     "modules-left": [
         "clock",
         "clock#date",
@@ -376,15 +376,15 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
         "network",
         "custom/power",
     ],
-    "margin-top": 5,
-    "margin-left": 5,
-    "margin-right": 5,
-    "spacing": 5,
+    "margin-top": 6,
+    "margin-left": 6,
+    "margin-right": 6,
+    "spacing": 6,
 
     // Module Configuration
     "clock": {
         "interval": "60",
-        "format": "{:%H:%M}",
+        "format": "{ :%H:%M}",
     },
     "clock#date": {
         "interval": "60",
@@ -440,13 +440,13 @@ EOF
 cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
 * {
     /* `otf-font-awesome` is required to be installed for icons */
-    font-family: "Iosevka Nerd Font", sans-serif;
+    font-family: "JetBrainsMono Nerd Font Propo";
     font-size: 13px;
+    border-radius: 6px;
 }
 
 window#waybar {
-    background-color: rgba(43, 48, 59, 0.5);
-    border-bottom: 3px solid rgba(100, 114, 125, 0.5);
+    background-color: transparent;
     color: #ffffff;
     transition-property: background-color;
     transition-duration: .5s;
@@ -456,23 +456,7 @@ window#waybar.hidden {
     opacity: 0.2;
 }
 
-/*
-window#waybar.empty {
-    background-color: transparent;
-}
-window#waybar.solo {
-    background-color: #FFFFFF;
-}
-*/
 
-window#waybar.termite {
-    background-color: #3F3F3F;
-}
-
-window#waybar.chromium {
-    background-color: #000000;
-    border: none;
-}
 
 button {
     /* Use box-shadow instead of border so the text isn't offset */
@@ -534,7 +518,7 @@ button:hover {
 #scratchpad,
 #power-profiles-daemon,
 #mpd {
-    padding: 0 10px;
+    padding: 0 11px;
     color: #ffffff;
 }
 
