@@ -138,8 +138,8 @@ env = HYPRCURSOR_SIZE,24
 # Refer to https://wiki.hypr.land/Configuring/Variables/
 # https://wiki.hypr.land/Configuring/Variables/#general
 general {
-    gaps_in = 3
-    gaps_out = 6
+    gaps_in = 4
+    gaps_out = 8
 
     border_size = 0
 
@@ -377,20 +377,22 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "network",
     "custom/power",
   ],
-  "margin-top": 6,
-  "margin-left": 6,
-  "margin-right": 6,
-  "spacing": 6,
+  "margin-top": 8,
+  "margin-left": 8,
+  "margin-right": 8,
+  "spacing": 8,
   // Module Configuration
   "clock": {
     "interval": "60",
     "format": " {:%H:%M}",
-    "tooltip": false,
+    "tooltip": true,
+    "tooltip-format": "{:%I:%M %p}",
   },
   "clock#date": {
     "interval": "60",
     "format": " {:%a %b %d}",
-    "tooltip": false,
+    "tooltip": true,
+    "tooltip-format": "{:%A, %d %B %Y}",
   },
   "custom/weather": {
     "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Dasmariñas",
@@ -416,8 +418,8 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "format-linked": "󰛵",
     "format-disconnected": "󰲛",
     "tooltip": true,
-    "tooltip-format-ethernet": "Connected",
-    "tooltip-format-disconnected": "Disconnected",
+    "tooltip-format-ethernet": "Network Connected",
+    "tooltip-format-disconnected": "Network Disconnected",
   },
   "pulseaudio": {
     "format": "{icon} {volume}%",
@@ -459,7 +461,7 @@ cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
   font-family: "JetBrainsMono Nerd Font Propo";
   font-size: 13px;
   font-weight: bold;
-  border-radius: 6px;
+  border-radius: 8.5px;
 }
 window#waybar {
   background-color: transparent;
@@ -476,7 +478,7 @@ window#waybar.hidden {
 #custom-media,
 #custom-power,
 #custom-weather {
-    padding: 0 11px;
+    padding: 0 10.5px 0 10.5px;
     color: #ffffff;
 }
 #window,
@@ -491,7 +493,7 @@ window#waybar.hidden {
 }
 #custom-weather {
   background: rgba(0, 0, 0, 0.5);
-  padding: 4px 11px 0 11px;
+  padding: 4px 10.5px 0 10.5px;
 }
 #network {
   background: rgba(0, 0, 0, 0.5);
