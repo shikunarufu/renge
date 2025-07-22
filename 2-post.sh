@@ -510,10 +510,10 @@ mkdir /home/"${username}"/.config/waybar/scripts
 cat > /home/"${username}"/.config/waybar/scripts/get_weather.sh << 'EOF'
 #!/usr/bin/env bash
 for i in {1..5}; do
-  text=$(curl -s "https://wttr.in/$1?format=1")
+  text=$(curl -s "https://wttr.in/$1?format=%c+%f\n")
   if [[ $? == 0 ]]; then
     text=$(echo "$text" | sed -E "s/\s+/ /g")
-    tooltip=$(curl -s "https://wttr.in/$1?format==%25l%5Cn%25C+%25c%5CnPrecipitation:+%25p%5CnWind:+%25w%5CnUVI:+%25u%5CnFeels+Like:+%25f%5Cn")
+    tooltip=$(curl -s "https://wttr.in/$1?format=%l\n")
     if [[ $? == 0 ]]; then
       tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
       echo "{\"text\":\"$text\", \"tooltip\":\"$tooltip\"}"
