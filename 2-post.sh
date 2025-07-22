@@ -356,7 +356,7 @@ sudo pacman -S waybar --noconfirm
 yay -S material-symbols-git --answerclean All --answerdiff None --noconfirm
 #exit_status "Installed Waybar"
 mkdir /home/"${username}"/.config/waybar
-cat > /home/"${username}"/.config/waybar/config.jsonc << EOF
+cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
 // Waybar Configuration File
 {
   // Bar Configuration
