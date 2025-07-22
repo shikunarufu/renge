@@ -513,7 +513,7 @@ for i in {1..5}; do
   text=$(curl -s "https://wttr.in/$1?format=%c+%t\n")
   if [[ $? == 0 ]]; then
     text=$(echo "$text" | sed -E "s/\s+/ /g")
-    tooltip=$(curl -s "https://wttr.in/$1?format=%l\nPrecip:+%p\n")
+    tooltip=$(curl -s "https://wttr.in/$1?format=%C,+Feels+Like+%f\n")
     if [[ $? == 0 ]]; then
       tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
       echo "{\"text\":\"$text\", \"tooltip\":\"$tooltip\"}"
