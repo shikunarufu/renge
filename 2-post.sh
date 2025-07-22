@@ -393,7 +393,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "tooltip": false,
   },
   "custom/weather": {
-    "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Dasmariñas",
+    "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Berlin+Germany",
     "return-type": "json",
     "format": "{}",
     "tooltip": true,
@@ -515,7 +515,7 @@ do
     if [[ $? == 0 ]]
     then
         text=$(echo "$text" | sed -E "s/\s+/ /g")
-        tooltip=$(curl -s "https://wttr.in/$1?format=%l\n%C+%c\nPrecipitation:+%p\nWind:+%w\nUVI:+%u\nFeels+Like:+%f\n")
+        tooltip=$(curl -s "https://wttr.in/$1?format=4")
         if [[ $? == 0 ]]
         then
             tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
