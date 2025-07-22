@@ -393,7 +393,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "tooltip": false,
   },
   "custom/weather": {
-    "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Berlin+Germany",
+    "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Dasmariñas",
     "return-type": "json",
     "format": "{}",
     "tooltip": true,
@@ -509,21 +509,18 @@ EOF
 mkdir /home/"${username}"/.config/waybar/scripts
 cat > /home/"${username}"/.config/waybar/scripts/get_weather.sh << 'EOF'
 #!/usr/bin/env bash
-for i in {1..5}
-do
-    text=$(curl -s "https://wttr.in/$1?format=1")
-    if [[ $? == 0 ]]
-    then
-        text=$(echo "$text" | sed -E "s/\s+/ /g")
-        tooltip=$(curl -s "https://wttr.in/$1?format=4")
-        if [[ $? == 0 ]]
-        then
-            tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
-            echo "{\"text\":\"$text\", \"tooltip\":\"$tooltip\"}"
-            exit
-        fi
+for i in {1..5}; do
+  text=$(curl -s "https://wttr.in/$1?format=1")
+  if [[ $? == 0 ]]; then
+    text=$(echo "$text" | sed -E "s/\s+/ /g")
+    tooltip=$(curl -s "https://wttr.in/$1?format=4")
+    if [[ $? == 0 ]]; then
+      tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
+      echo "{\"text\":\"$text\", \"tooltip\":\"$tooltip\"}"
+      exit
     fi
-    sleep 2
+  fi
+  sleep 2
 done
 echo "{\"text\":\"error\", \"tooltip\":\"error\"}"
 EOF
