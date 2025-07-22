@@ -511,7 +511,15 @@ cat > /home/"${username}"/.config/waybar/scripts/get_weather.sh << 'EOF'
 #!/usr/bin/env bash
 for i in {1..5}; do
   text=$(curl -s "https://wttr.in/$1?format=1")
-  echo "$text"
+  if [[ $? == 0 ]]; then
+    text=$(echo "$text" | sed -E "s/\s+/ /g")
+    tooltip=$(curl -s "https://wttr.in/$1?format==%25l%5Cn%25C+%25c%5CnPrecipitation:+%25p%5CnWind:+%25w%5CnUVI:+%25u%5CnFeels+Like:+%25f%5Cn")
+    if [[ $? == 0 ]]; then
+      tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
+      echo "{\"text\":\"$text\", \"tooltip\":\"$tooltip\"}"
+      exit
+    fi
+  fi
   sleep 2
 done
 echo "{\"text\":\"error\", \"tooltip\":\"error\"}"
