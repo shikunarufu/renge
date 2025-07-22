@@ -472,6 +472,14 @@ window#waybar {
 window#waybar.hidden {
   opacity: 0.2;
 }
+#workspaces button {
+    padding: 0 5px;
+    background-color: transparent;
+    color: #ffffff;
+}
+#workspaces button:hover {
+    background: rgba(0, 0, 0, 0.2);
+}
 #clock,
 #network,
 #pulseaudio,
@@ -483,6 +491,7 @@ window#waybar.hidden {
 }
 #window,
 #workspaces {
+  background: rgba(0, 0, 0, 0.5);
   margin: 0 4px;
 }
 #clock {
