@@ -362,7 +362,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << EOF
   // Bar Configuration
   "layer": "bottom",
   "position": "top",
-  "height": 24,
+  "height": 34,
   "modules-left": [
     "clock",
     "clock#date",
@@ -507,7 +507,7 @@ window#waybar.hidden {
 }
 EOF
 mkdir /home/"${username}"/.config/waybar/scripts
-cat > /home/"${username}"/.config/waybar/scripts/get_weather.sh << EOF
+cat > /home/"${username}"/.config/waybar/scripts/get_weather.sh << 'EOF'
 #!/usr/bin/env bash
 for i in {1..5}
 do
