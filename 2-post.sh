@@ -366,16 +366,16 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
   "modules-left": [
     "clock",
     "clock#date",
-    "custom/weather",
+    "custom/weather"
   ],
   "modules-center": [
-    "hyprland/workspaces",
+    "hyprland/workspaces"
   ],
   "modules-right": [
+    "custom/media",
     "pulseaudio",
     "network",
-    "custom/power",
-    "custom/media",
+    "group/group-power"
   ],
   "margin-top": 7,
   "margin-left": 7,
@@ -386,13 +386,41 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "interval": "60",
     "format": " {:%H:%M}",
     "tooltip": true,
-    "tooltip-format": "{:%I:%M %p}",
+    "tooltip-format": "{:%I:%M %p}"
   },
   "clock#date": {
     "interval": "60",
     "format": " {:%a %b %d}",
     "tooltip": true,
-    "tooltip-format": "{:%A, %d %B %Y}",
+    "tooltip-format": "{:%A, %d %B %Y}"
+  },
+  "custom/arch": {
+    "format": "󰣇",
+    "tooltip": false
+  },
+  "custom/lock": {
+    "format": "",
+    "on-click": "exit",
+    "tooltip": true,
+    "tooltip-format": "Lock"
+  },
+  "custom/restart": {
+    "format": "",
+    "on-click": "reboot",
+    "tooltip": true,
+    "tooltip-format": "Restart"
+  },
+  "custom/shutdown": {
+    "format": "",
+    "on-click": "shutdown now",
+    "tooltip": true,
+    "tooltip-format": "Shut Down"
+  },
+  "custom/sleep": {
+    "format": "󰤄",
+    "on-click": "exit",
+    "tooltip": true,
+    "tooltip-format": "Sleep"
   },
   "custom/weather": {
     "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Dasmariñas",
@@ -400,6 +428,21 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "format": "{}",
     "tooltip": true,
     "interval": 3600
+  },
+  "group/group-power": {
+    "orientation": "horizontal",
+    "modules": [
+      "custom/arch",
+      "custom/lock",
+      "custom/sleep",
+      "custom/restart",
+      "custom/shutdown"
+    ],
+    "drawer": {
+      "transition-duration": 500,
+      "children-class": "not-power",
+      "transition-left-to-right": false,
+    }
   },
   "hyprland/workspaces": {
     "active-only": false,
@@ -409,8 +452,8 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "format-icons": {
       "active": "",
       "default": "",
-      "urgent": "",
-    },
+      "urgent": ""
+    }
   },
   "network": {
     "interval": "60",
@@ -420,7 +463,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "format-disconnected": "󰲛",
     "tooltip": true,
     "tooltip-format-ethernet": "Network Connected",
-    "tooltip-format-disconnected": "Network Disconnected",
+    "tooltip-format-disconnected": "Network Disconnected"
   },
   "pulseaudio": {
     "format": "{icon} {volume}%",
@@ -431,31 +474,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "scroll-step": 1,
     "tooltip": false,
   },
-  "custom/media": {
-    "format": "{icon} {text}",
-    "return-type": "json",
-    "max-length": 40,
-    "format-icons": {
-      "spotify": "",
-      "default": "🎜"
-    },
-    "escape": true,
-    "exec": "$HOME/.config/waybar/mediaplayer.py 2> /dev/null" // Script in resources folder
-    // "exec": "$HOME/.config/waybar/mediaplayer.py --player spotify 2> /dev/null" // Filter player based on name
-  },
-  "custom/power": {
-    "format" : "󰣇",
-	"tooltip": false,
-	"menu": "on-click",
-	"menu-file": "$HOME/.config/waybar/power_menu.xml", // Menu file in resources folder
-	"menu-actions": {
-	  "shutdown": "shutdown",
-	  "reboot": "reboot",
-	  "suspend": "systemctl suspend",
-	  "hibernate": "systemctl hibernate"
-	}
-  }
-}
+},
 EOF
 cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
 * {
@@ -495,11 +514,13 @@ window#waybar {
   color: #14191C;
 }
 #clock,
+#custom-lock,
+#custom-restart,
+#custom-shutdown,
+#custom-sleep,
+#custom-weather,
 #network,
-#pulseaudio,
-#custom-media,
-#custom-power,
-#custom-weather {
+#pulseaudio {
   padding: 0px 7.5px 0px 7.5px;
   background: #14191C;
   color: #CFDFE2;
