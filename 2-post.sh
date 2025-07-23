@@ -164,6 +164,11 @@ decoration {
 }
 animations {
   enabled = true
+  bezier = easeOutQuint,0.23,1,0.32,1
+  bezier = easeInOutCubic,0.65,0.05,0.36,1
+  bezier = linear,0,0,1,1
+  bezier = almostLinear,0.5,0.5,0.75,1.0
+  bezier = quick,0.15,0,0.1,1
   animation = global, 1, 10, default
   animation = border, 1, 5.39, easeOutQuint
   animation = windows, 1, 4.79, easeOutQuint
@@ -181,11 +186,6 @@ animations {
   animation = workspacesIn, 1, 1.21, almostLinear, fade
   animation = workspacesOut, 1, 1.94, almostLinear, fade
   animation = zoomFactor, 1, 7, quick
-  bezier = easeOutQuint,0.23,1,0.32,1
-  bezier = easeInOutCubic,0.65,0.05,0.36,1
-  bezier = linear,0,0,1,1
-  bezier = almostLinear,0.5,0.5,0.75,1.0
-  bezier = quick,0.15,0,0.1,1
 }
 # Ref https://wiki.hypr.land/Configuring/Workspace-Rules/
 # "Smart gaps" / "No gaps when only"
