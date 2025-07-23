@@ -138,8 +138,8 @@ env = HYPRCURSOR_SIZE,24
 # Refer to https://wiki.hypr.land/Configuring/Variables/
 # https://wiki.hypr.land/Configuring/Variables/#general
 general {
-    gaps_in = 4
-    gaps_out = 8
+    gaps_in = 3.5
+    gaps_out = 7
 
     border_size = 0
 
@@ -362,12 +362,11 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
   // Bar Configuration
   "layer": "bottom",
   "position": "top",
-  "height": 34,
+  "height": 28,
   "modules-left": [
     "clock",
     "clock#date",
     "custom/weather",
-    "custom/media",
   ],
   "modules-center": [
     "hyprland/workspaces",
@@ -376,11 +375,12 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "pulseaudio",
     "network",
     "custom/power",
+    "custom/media",
   ],
-  "margin-top": 8,
-  "margin-left": 8,
-  "margin-right": 8,
-  "spacing": 8,
+  "margin-top": 7,
+  "margin-left": 7,
+  "margin-right": 7,
+  "spacing": 7,
   // Module Configuration
   "clock": {
     "interval": "60",
@@ -409,6 +409,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "format-icons": {
       "active": "",
       "default": "",
+      "urgent": "",
     },
   },
   "network": {
@@ -458,27 +459,40 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
 EOF
 cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
 * {
+  border: none;
+  border-radius: 7px;
   font-family: "JetBrainsMono Nerd Font Propo";
   font-size: 13px;
   font-weight: bold;
-  border-radius: 8.5px;
+  min-height: 0;
+  padding: 0;
 }
 window#waybar {
-  background-color: transparent;
-  color: #ffffff;
-  transition-property: background-color;
-  transition-duration: .5s;
+  background: transparent;
+  color: transparent;
 }
-window#waybar.hidden {
-  opacity: 0.2;
+#workspaces {
+  background: #14191C;
+  color: #CFDFE2;
 }
 #workspaces button {
-    padding: 0 5px;
-    background-color: transparent;
-    color: #ffffff;
+  padding: 0px 7.5px 0px 7.5px;
+  background: #14191C;
+  color: #CFDFE2;
 }
 #workspaces button:hover {
-    background: rgba(0, 0, 0, 0.2);
+  background: #14191C;
+  color: #D2AF95;
+  box-shadow: inherit;
+  text-shadow: inherit;
+}
+#workspaces button.active {
+  background: #14191C;
+  color: #CFDFE2;
+}
+#workspaces button.urgent {
+  background: #CFDFE2;
+  color: #14191C;
 }
 #clock,
 #network,
@@ -486,35 +500,18 @@ window#waybar.hidden {
 #custom-media,
 #custom-power,
 #custom-weather {
-    padding: 0 10.5px 0 10.5px;
-    color: #ffffff;
-}
-#window,
-#workspaces {
-  background: rgba(0, 0, 0, 0.5);
-  margin: 0 4px;
-}
-#clock {
-  background: rgba(0, 0, 0, 0.5);
-}
-#custom-power {
-  background: rgba(0, 0, 0, 0.5);
+  padding: 0px 7.5px 0px 7.5px;
+  background: #14191C;
+  color: #CFDFE2;
 }
 #custom-weather {
-  background: rgba(0, 0, 0, 0.5);
-  padding: 4px 10.5px 0 10.5px;
+  padding: 4px 7.5px 0px 7.5px;
 }
-#network {
-  background: rgba(0, 0, 0, 0.5);
+tooltip {
+  background: #14191C;
 }
-#network.disconnected {
-  background: rgba(0, 0, 0, 0.5);
-}
-#pulseaudio {
-  background: rgba(0, 0, 0, 0.5);
-}
-#pulseaudio.muted {
-  background: rgba(0, 0, 0, 0.5);
+tooltip label {
+  color: #CFDFE2;
 }
 EOF
 mkdir /home/"${username}"/.config/waybar/scripts
