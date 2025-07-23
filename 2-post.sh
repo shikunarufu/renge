@@ -96,8 +96,6 @@ make all && sudo make install
 mkdir /home/"${username}"/.config/hypr
 cat > /home/"${username}"/.config/hypr/hyprland.conf << 'EOF'
 # Hyprland Config File
-# Refer to the wiki for more information.
-# https://wiki.hypr.land/Configuring/
 
 # Monitors
 monitor = , 1920x1080@180, 0x0, 1
@@ -116,8 +114,8 @@ $menu = rofi -show drun -show-icons
 # exec-once = $terminal
 # exec-once = nm-applet &
 # exec-once = waybar & hyprpaper & firefox
-exec-once = hyprpaper
 exec-once = waybar
+exec-once = hyprpaper
 
 # Environment Variables
 # See https://wiki.hypr.land/Configuring/Environment-variables/
@@ -135,80 +133,59 @@ env = HYPRCURSOR_SIZE,24
 # permission = /usr/(bin|local/bin)/hyprpm, plugin, allow
 
 # Look And Feel
-# Refer to https://wiki.hypr.land/Configuring/Variables/
-# https://wiki.hypr.land/Configuring/Variables/#general
 general {
-    gaps_in = 3.5
-    gaps_out = 7
-
-    border_size = 0
-
-    # https://wiki.hypr.land/Configuring/Variables/#variable-types for info about colors
-    col.active_border = rgba(33ccffee) rgba(00ff99ee) 45deg
-    col.inactive_border = rgba(595959aa)
-
-    # Set to true enable resizing windows by clicking and dragging on borders and gaps
-    resize_on_border = false
-
-    # Please see https://wiki.hypr.land/Configuring/Tearing/ before you turn this on
-    allow_tearing = false
-
-    layout = dwindle
+  border_size = 0
+  gaps_in = 3.5
+  gaps_out = 7
+  layout = dwindle
+  resize_on_border = false
+  allow_tearing = false
 }
-# https://wiki.hypr.land/Configuring/Variables/#decoration
 decoration {
-    rounding = 10
-    rounding_power = 2
-
-    # Change transparency of focused and unfocused windows
-    active_opacity = 1.0
-    inactive_opacity = 1.0
-
-    shadow {
-        enabled = true
-        range = 4
-        render_power = 3
-        color = rgba(1a1a1aee)
-    }
-
-    # https://wiki.hypr.land/Configuring/Variables/#blur
-    blur {
-        enabled = true
-        size = 3
-        passes = 1
-
-        vibrancy = 0.1696
-    }
+  rounding = 7
+  rounding_power = 2
+  active_opacity = 1.0
+  inactive_opacity = 1.0
+  dim_inactive = true
+  dim_strength = 0.2
+  dim_around = 0.4
+  blur {
+    enabled = true
+    size = 3
+    passes = 1
+    vibrancy = 0.1696
+  }
+  shadow {
+    enabled = false
+    range = 4
+    render_power = 3
+    color = rgba(1a1a1aee)
+  }
 }
-# https://wiki.hypr.land/Configuring/Variables/#animations
 animations {
-    enabled = yes, please :)
-
-    # Default animations, see https://wiki.hypr.land/Configuring/Animations/ for more
-
-    bezier = easeOutQuint,0.23,1,0.32,1
-    bezier = easeInOutCubic,0.65,0.05,0.36,1
-    bezier = linear,0,0,1,1
-    bezier = almostLinear,0.5,0.5,0.75,1.0
-    bezier = quick,0.15,0,0.1,1
-
-    animation = global, 1, 10, default
-    animation = border, 1, 5.39, easeOutQuint
-    animation = windows, 1, 4.79, easeOutQuint
-    animation = windowsIn, 1, 4.1, easeOutQuint, popin 87%
-    animation = windowsOut, 1, 1.49, linear, popin 87%
-    animation = fadeIn, 1, 1.73, almostLinear
-    animation = fadeOut, 1, 1.46, almostLinear
-    animation = fade, 1, 3.03, quick
-    animation = layers, 1, 3.81, easeOutQuint
-    animation = layersIn, 1, 4, easeOutQuint, fade
-    animation = layersOut, 1, 1.5, linear, fade
-    animation = fadeLayersIn, 1, 1.79, almostLinear
-    animation = fadeLayersOut, 1, 1.39, almostLinear
-    animation = workspaces, 1, 1.94, almostLinear, fade
-    animation = workspacesIn, 1, 1.21, almostLinear, fade
-    animation = workspacesOut, 1, 1.94, almostLinear, fade
-    animation = zoomFactor, 1, 7, quick
+  enabled = true
+  animation = global, 1, 10, default
+  animation = border, 1, 5.39, easeOutQuint
+  animation = windows, 1, 4.79, easeOutQuint
+  animation = windowsIn, 1, 4.1, easeOutQuint, popin 87%
+  animation = windowsOut, 1, 1.49, linear, popin 87%
+  animation = fadeIn, 1, 1.73, almostLinear
+  animation = fadeOut, 1, 1.46, almostLinear
+  animation = fade, 1, 3.03, quick
+  animation = layers, 1, 3.81, easeOutQuint
+  animation = layersIn, 1, 4, easeOutQuint, fade
+  animation = layersOut, 1, 1.5, linear, fade
+  animation = fadeLayersIn, 1, 1.79, almostLinear
+  animation = fadeLayersOut, 1, 1.39, almostLinear
+  animation = workspaces, 1, 1.94, almostLinear, fade
+  animation = workspacesIn, 1, 1.21, almostLinear, fade
+  animation = workspacesOut, 1, 1.94, almostLinear, fade
+  animation = zoomFactor, 1, 7, quick
+  bezier = easeOutQuint,0.23,1,0.32,1
+  bezier = easeInOutCubic,0.65,0.05,0.36,1
+  bezier = linear,0,0,1,1
+  bezier = almostLinear,0.5,0.5,0.75,1.0
+  bezier = quick,0.15,0,0.1,1
 }
 # Ref https://wiki.hypr.land/Configuring/Workspace-Rules/
 # "Smart gaps" / "No gaps when only"
