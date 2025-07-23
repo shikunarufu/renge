@@ -200,36 +200,21 @@ master {
 }
 # https://wiki.hypr.land/Configuring/Variables/#misc
 misc {
+    disable_hyprland_logo = false
+    disable_splash_rendering = false
     force_default_wallpaper = -1 # Set to 0 or 1 to disable the anime mascot wallpapers
-    disable_hyprland_logo = false # If true disables the random hyprland logo / anime girl background. :(
+
 }
 
 # Input
-# https://wiki.hypr.land/Configuring/Variables/#input
 input {
-    kb_layout = us
-    kb_variant =
-    kb_model =
-    kb_options =
-    kb_rules =
-
-    follow_mouse = 1
-
-    sensitivity = 0 # -1.0 - 1.0, 0 means no modification.
-
-    touchpad {
-        natural_scroll = false
-    }
-}
-# https://wiki.hypr.land/Configuring/Variables/#gestures
-gestures {
-    workspace_swipe = false
-}
-# Example per-device config
-# See https://wiki.hypr.land/Configuring/Keywords/#per-device-input-configs for more
-device {
-    name = epic-mouse-v1
-    sensitivity = -0.5
+  kb_layout = us
+  kb_variant =
+  kb_model =
+  kb_options =
+  kb_rules =
+  sensitivity = 0
+  follow_mouse = 1
 }
 
 # Keybindings
@@ -311,7 +296,7 @@ sudo pacman -S hyprpaper --noconfirm
 mkdir /home/"${username}"/Pictures/Wallpapers
 cat > /home/"${username}"/.config/hypr/hyprpaper.conf << EOF
 preload = /home/"${username}"/Pictures/Wallpapers/Desktop.png
-wallpaper = /home/"${username}"/Pictures/Wallpapers/Desktop.png
+wallpaper = , /home/"${username}"/Pictures/Wallpapers/Desktop.png
 EOF
 #exit_status "Configured Hyprpaper"
 
