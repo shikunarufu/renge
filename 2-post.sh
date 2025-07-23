@@ -439,9 +439,8 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
       "custom/shutdown"
     ],
     "drawer": {
-      "transition-duration": 500,
-      "children-class": "not-power",
-      "transition-left-to-right": false,
+      "transition-duration": 250,
+      "transition-left-to-right": true
     }
   },
   "hyprland/workspaces": {
@@ -472,8 +471,8 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
       "default": ["", "", ""]
     },
     "scroll-step": 1,
-    "tooltip": false,
-  },
+    "tooltip": false
+  }
 },
 EOF
 cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
@@ -514,8 +513,8 @@ window#waybar {
   color: #14191C;
 }
 #clock,
-#custom-lock,
 #custom-arch,
+#custom-lock,
 #custom-restart,
 #custom-shutdown,
 #custom-sleep,
@@ -529,6 +528,11 @@ window#waybar {
 }
 #custom-weather {
   padding: 4px 7.5px 0px 7.5px;
+}
+#group-power {
+  padding: 0px 3.75px 0px 3.75px;
+  background: #14191C;
+  color: #CFDFE2;
 }
 tooltip {
   background: #14191C;
