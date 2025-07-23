@@ -515,10 +515,12 @@ window#waybar {
 }
 #clock,
 #custom-lock,
+#custom-arch,
 #custom-restart,
 #custom-shutdown,
 #custom-sleep,
 #custom-weather,
+#group-power,
 #network,
 #pulseaudio {
   padding: 0px 7.5px 0px 7.5px;
