@@ -440,7 +440,8 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     ],
     "drawer": {
       "transition-duration": 250,
-      "transition-left-to-right": true
+      "transition-left-to-right": true,
+      "transition-timing-function": "ease-in-out"
     }
   },
   "hyprland/workspaces": {
