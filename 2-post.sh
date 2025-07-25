@@ -115,7 +115,7 @@ $menu = rofi -show drun -show-icons
 # exec-once = nm-applet &
 # exec-once = waybar & hyprpaper & firefox
 exec-once = waybar
-exec-once = hyprpaper
+exec-once = swww-daemon
 
 # Environment Variables
 # See https://wiki.hypr.land/Configuring/Environment-variables/
@@ -289,16 +289,12 @@ windowrule = suppressevent maximize, class:.*
 windowrule = nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 EOF
 #exit_status "Configured Hyprland"
-#entry_status "Installing Hyprpaper"
-sudo pacman -S hyprpaper --noconfirm
-#exit_status "Installed Hyprpaper"
-#entry_status "Configuring Hyprpaper"
+#entry_status "Installing SWWW"
+yay -S swww --answerclean All --answerdiff None --noconfirm
+#exit_status "Installed SWWW"
+#entry_status "Configuring SWWW"
 mkdir /home/"${username}"/Pictures/Wallpapers
-cat > /home/"${username}"/.config/hypr/hyprpaper.conf << EOF
-preload = /home/"${username}"/Pictures/Wallpapers/Desktop.png
-wallpaper = , /home/"${username}"/Pictures/Wallpapers/Desktop.png
-EOF
-#exit_status "Configured Hyprpaper"
+#exit_status "Configured SWWW"
 
 # Foot
 #entry_status "Installing Foot"
