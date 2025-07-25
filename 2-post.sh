@@ -109,18 +109,15 @@ $fileManager = dolphin
 $menu = rofi -show drun -show-icons
 
 # Autostart
-# Autostart necessary processes (like notifications daemons, status bars, etc.)
-# Or execute your favorite apps at launch like this:
-# exec-once = $terminal
-# exec-once = nm-applet &
-# exec-once = waybar & hyprpaper & firefox
 exec-once = waybar
 exec-once = swww-daemon
 
 # Environment Variables
-# See https://wiki.hypr.land/Configuring/Environment-variables/
 env = XCURSOR_SIZE,24
 env = HYPRCURSOR_SIZE,24
+env = SWWW_TRANSITION,wipe
+env = SWWW_TRANSITION_FPS,180
+env = SWWW_TRANSITION_STEP,1
 
 # Permissions
 # See https://wiki.hypr.land/Configuring/Permissions/
@@ -198,12 +195,12 @@ dwindle {
 master {
     new_status = master
 }
-# https://wiki.hypr.land/Configuring/Variables/#misc
-misc {
-    disable_hyprland_logo = false
-    disable_splash_rendering = false
-    force_default_wallpaper = -1 # Set to 0 or 1 to disable the anime mascot wallpapers
 
+misc {
+  disable_hyprland_logo = true
+  disable_splash_rendering = true
+  force_default_wallpaper = -1
+  background_color = 0x000000
 }
 
 # Input
