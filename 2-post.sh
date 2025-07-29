@@ -397,7 +397,7 @@ window#waybar {
   color: #CFDFE2;
 }
 #workspaces button {
-  padding: 0px 7px 0px 7px;
+  padding: 0px 5.5px 0px 5.5px;
   background: #14191C;
   color: #CFDFE2;
 }
@@ -416,15 +416,19 @@ window#waybar {
   color: #14191C;
 }
 #clock,
-#custom-arch,
-#custom-lock,
-#custom-restart,
-#custom-shutdown,
-#custom-sleep,
 #group-power,
 #network,
 #pulseaudio {
   padding: 0px 7px 0px 7px;
+  background: #14191C;
+  color: #CFDFE2;
+}
+#custom-arch,
+#custom-lock,
+#custom-restart,
+#custom-shutdown,
+#custom-sleep {
+  padding: 0px 5.5px 0px 5.5px;
   background: #14191C;
   color: #CFDFE2;
 }
