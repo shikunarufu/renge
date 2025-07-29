@@ -120,14 +120,14 @@ env = SWWW_TRANSITION_STEP,1
 # Look And Feel
 general {
   border_size = 0
-  gaps_in = 3.5
-  gaps_out = 7
+  gaps_in = 3
+  gaps_out = 6
   layout = dwindle
   resize_on_border = false
   allow_tearing = false
 }
 decoration {
-  rounding = 7
+  rounding = 6
   rounding_power = 2
   active_opacity = 1.0
   inactive_opacity = 1.0
@@ -270,7 +270,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
   // Bar Configuration
   "layer": "bottom",
   "position": "top",
-  "height": 28,
+  "height": 24,
   "modules-left": [
     "clock",
     "clock#date",
@@ -285,10 +285,10 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
     "network",
     "group/group-power"
   ],
-  "margin-top": 7,
-  "margin-left": 7,
-  "margin-right": 7,
-  "spacing": 7,
+  "margin-top": 6,
+  "margin-left": 6,
+  "margin-right": 6,
+  "spacing": 6,
   // Module Configuration
   "clock": {
     "interval": "60",
@@ -304,11 +304,12 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
   },
   "custom/arch": {
     "format": "󰣇",
-    "tooltip": false
+    "tooltip": true,
+    "tooltip-format": "Arch Linux"
   },
   "custom/lock": {
     "format": "",
-    "on-click": "exit",
+    "on-click": "hyprctl dispatch exit",
     "tooltip": true,
     "tooltip-format": "Lock"
   },
@@ -326,16 +327,9 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
   },
   "custom/sleep": {
     "format": "󰤄",
-    "on-click": "exit",
+    "on-click": "systemctl hybrid-sleep",
     "tooltip": true,
     "tooltip-format": "Sleep"
-  },
-  "custom/weather": {
-    "exec": "${HOME}/.config/waybar/scripts/get_weather.sh Dasmariñas",
-    "return-type": "json",
-    "format": "{}",
-    "tooltip": true,
-    "interval": 3600
   },
   "group/group-power": {
     "orientation": "horizontal",
@@ -387,7 +381,7 @@ EOF
 cat > /home/"${username}"/.config/waybar/style.css << 'EOF'
 * {
   border: none;
-  border-radius: 7px;
+  border-radius: 6px;
   font-family: "JetBrainsMono Nerd Font Propo";
   font-size: 13px;
   font-weight: bold;
@@ -403,7 +397,7 @@ window#waybar {
   color: #CFDFE2;
 }
 #workspaces button {
-  padding: 0px 7.5px 0px 7.5px;
+  padding: 0px 5.5px 0px 5.5px;
   background: #14191C;
   color: #CFDFE2;
 }
@@ -427,19 +421,15 @@ window#waybar {
 #custom-restart,
 #custom-shutdown,
 #custom-sleep,
-#custom-weather,
 #group-power,
 #network,
 #pulseaudio {
-  padding: 0px 7.5px 0px 7.5px;
+  padding: 0px 5.5px 0px 5.5px;
   background: #14191C;
   color: #CFDFE2;
 }
-#custom-weather {
-  padding: 4px 7.5px 0px 7.5px;
-}
 #group-power {
-  padding: 0px 3.75px 0px 3.75px;
+  padding: 0px 2.75px 0px 2.75px;
   background: #14191C;
   color: #CFDFE2;
 }
@@ -450,25 +440,6 @@ tooltip label {
   color: #CFDFE2;
 }
 EOF
-mkdir /home/"${username}"/.config/waybar/scripts
-cat > /home/"${username}"/.config/waybar/scripts/get_weather.sh << 'EOF'
-#!/usr/bin/env bash
-for i in {1..5}; do
-  text=$(curl -s "https://wttr.in/$1?format=%c+%t\n")
-  if [[ $? == 0 ]]; then
-    text=$(echo "$text" | sed -E "s/\s+/ /g")
-    tooltip=$(curl -s "https://wttr.in/$1?format=%C,+Feels+Like+%f\n")
-    if [[ $? == 0 ]]; then
-      tooltip=$(echo "$tooltip" | sed -E "s/\s+/ /g")
-      echo "{\"text\":\"$text\", \"tooltip\":\"$tooltip\"}"
-      exit
-    fi
-  fi
-  sleep 2
-done
-echo "{\"text\":\"error\", \"tooltip\":\"error\"}"
-EOF
-chmod +x /home/"${username}"/.config/waybar/scripts/get_weather.sh
 
 # Rofi
 #entry_status "Installing Rofi"
