@@ -397,7 +397,7 @@ window#waybar {
   color: #CFDFE2;
 }
 #workspaces button {
-  padding: 0px 5.5px 0px 5.5px;
+  padding: 0px 6px 0px 6px;
   background: #14191C;
   color: #CFDFE2;
 }
@@ -424,7 +424,7 @@ window#waybar {
 #group-power,
 #network,
 #pulseaudio {
-  padding: 0px 5.5px 0px 5.5px;
+  padding: 0px 6px 0px 6px;
   background: #14191C;
   color: #CFDFE2;
 }
