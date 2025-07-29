@@ -309,7 +309,7 @@ cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
   },
   "custom/lock": {
     "format": "",
-    "on-click": "hyprctl dispatch exit",
+    "on-click": "hyprctl dispatch exec exit",
     "tooltip": true,
     "tooltip-format": "Lock"
   },
@@ -452,7 +452,7 @@ sudo pacman -S rofi-wayland --noconfirm
 
 # Dolphin
 #entry_status "Installing Dolphin"
-sudo pacman -S dolphin audiocd-kio baloo dolphin-plugins kio-admin kio-gdrive kompare konsole ffmpegthumbs icoutils kdegraphics-thumbnailers kdesdk-thumbnailers kimageformats libheif libappimage qt6-imageformats taglib --noconfirm
+sudo pacman -S dolphin audiocd-kio baloo dolphin-plugins kio-admin kio-gdrive kompare ffmpegthumbs icoutils kdegraphics-thumbnailers kdesdk-thumbnailers kimageformats libheif libappimage qt6-imageformats taglib --noconfirm
 #exit_status "Installed Dolphin"
 #entry_status "Installing Dolphin Dependencies"
 yay -S kde-thumbnailer-apk raw-thumbnailer resvg --answerclean All --answerdiff None --noconfirm
