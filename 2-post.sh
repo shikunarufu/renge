@@ -491,7 +491,7 @@ mainbox {
 imagebox {
   padding: 20px;
   background-color: transparent;
-  background-image: url("/home/${username}/Pictures/Wallpapers/Wallpaper.png", height);
+  background-image: url("~/Pictures/Wallpapers/Wallpaper.png", height);
   orientation: vertical;
   children: [ "inputbar", "dummy" ];
 }
