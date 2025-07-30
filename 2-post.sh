@@ -451,6 +451,16 @@ sudo pacman -S rofi-wayland --noconfirm
 #exit_status "Installed Rofi"
 mkdir /home/"${username}"/.config/rofi
 cat > /home/"${username}"/.config/rofi/config.rasi << 'EOF'
+/**
+ *
+ * Author : Aditya Shakya (adi1090x)
+ * Github : @adi1090x
+ * 
+ * Rofi Theme File
+ * Rofi Version: 1.7.3
+ **/
+
+/*****----- Configuration -----*****/
 configuration {
 	modi:                       "drun,run,filebrowser,window";
     show-icons:                 true;
@@ -461,15 +471,16 @@ configuration {
 	drun-display-format:        "{name}";
 	window-format:              "{w} · {c} · {t}";
 }
+@theme "default"
 /*****----- Global Properties -----*****/
 * {
     font:                        "JetBrains Mono Nerd Font 10";
-    background:                  #030B16;
-    background-alt:              #0A1B37;
+    background:                  #101010;
+    background-alt:              #252525;
     foreground:                  #FFFFFF;
-    selected:                    #CB43A6;
-    active:                      #095873;
-    urgent:                      #2FC6D8;
+    selected:                    #505050;
+    active:                      #909090;
+    urgent:                      #707070;
 }
 
 /*****----- Main Window -----*****/
@@ -502,7 +513,7 @@ mainbox {
 imagebox {
     padding:                     20px;
     background-color:            transparent;
-    background-image:            url("~/.config/rofi/images/h.jpg", height);
+    background-image:            url("~/.config/rofi/images/g.png", height);
     orientation:                 vertical;
     children:                    [ "inputbar", "dummy", "mode-switcher" ];
 }
