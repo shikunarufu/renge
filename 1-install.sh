@@ -193,8 +193,8 @@ entry_status "Selecting Mirrors"
 reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose --fastest 20 --latest 200 --protocol https,http > /dev/null 2>&1
 exit_status "Selected Mirrors"
 entry_status "Setting Parallel Compilation"
-core=$(grep -c ^processor /proc/cpuinfo)
-sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
+core=$(grep --count ^processor /proc/cpuinfo)
+sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 exit_status "Set Parallel Compilation"
 
 # Install essential packages
@@ -349,6 +349,10 @@ exit_status "Installed Reflector"
 entry_status "Installing Git"
 pacman -S --noconfirm git > /dev/null 2>&1
 exit_status "Installed Git"
+entry_status "Setting Parallel Compilation"
+core=$(grep --count ^processor /proc/cpuinfo)
+sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j\$core\"/g" /etc/makepkg.conf
+exit_status "Set Parallel Compilation"
 
 #######################################
 # Graphical User Interface
