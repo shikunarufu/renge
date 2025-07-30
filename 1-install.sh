@@ -108,7 +108,7 @@ exit_status "Updated System Clock"
 
 # Partition the disks
 entry_status "Unmounting All Partitions"
-umount --all-targets --recursive /mnt
+umount --all-targets --recursive /mnt > /dev/null 2>&1
 exit_status "Unmounted All Partitions"
 entry_status "Partitioning Disks"
 entry_status "Destroying GPT and MBR Data Structures"
@@ -118,10 +118,10 @@ entry_status "Destroying GPT and MBR Data Structures"
 sgdisk --zap-all /dev/"${hdd1}" > /dev/null 2>&1
 exit_status "Destroyed GPT and MBR Data Structures in /dev/${hdd1}"
 entry_status "Setting Sector Alignment to 2048"
-sgdisk --set-alignment=2048 --clear /dev/"${ssd1}"
+sgdisk --set-alignment=2048 --clear /dev/"${ssd1}" > /dev/null 2>&1
 exit_status "Set Sector Alignment to 2048 in /dev/${ssd1}"
 entry_status "Setting Sector Alignment to 2048"
-sgdisk --set-alignment=2048 --clear /dev/"${hdd1}"
+sgdisk --set-alignment=2048 --clear /dev/"${hdd1}" > /dev/null 2>&1
 exit_status "Set Sector Alignment to 2048 in /dev/${hdd1}"
 entry_status "Creating New Partition"
 sgdisk --new=1:0:+1G --typecode=1:EF00 --change-name=1:"EFI system partition" /dev/"${ssd1}" > /dev/null 2>&1
@@ -192,6 +192,10 @@ exit_status "Upgraded Arch Linux Keyring"
 entry_status "Selecting Mirrors"
 reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose --fastest 20 --latest 200 --protocol https,http > /dev/null 2>&1
 exit_status "Selected Mirrors"
+entry_status "Setting Parallel Compilation"
+core=$(grep -c ^processor /proc/cpuinfo)
+sed -i "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
+exit_status "Set Parallel Compilation"
 
 # Install essential packages
 entry_status "Installing Essential Packages"
