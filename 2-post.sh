@@ -104,7 +104,7 @@ monitor = , 1920x1080@180, 0x0, 1
 # Programs
 $terminal = foot
 $fileManager = dolphin
-$menu = rofi
+$menu = rofi -show drun
 
 # Autostart
 exec-once = waybar
@@ -569,15 +569,15 @@ element normal.active {
 }
 element selected.normal {
   background-color: @selected;
-  text-color: @foreground;
+  text-color: @foreground-alt;
 }
 element selected.urgent {
   background-color: @urgent;
-  text-color: @foreground;
+  text-color: @foreground-alt;
 }
 element selected.active {
   background-color: @urgent;
-  text-color: @foreground;
+  text-color: @foreground-alt;
 }
 element.alternate.normal {
   background-color: inherit;
