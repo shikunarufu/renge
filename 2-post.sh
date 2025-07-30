@@ -479,6 +479,7 @@ window {
   enabled: true;
   border-radius: 15px;
   cursor: "default";
+  padding: 0px;
   background-color: @background;
 }
 mainbox {
@@ -491,7 +492,8 @@ mainbox {
 imagebox {
   padding: 20px;
   background-color: transparent;
-  background-image: url("~/Pictures/Wallpapers/Wallpaper.png", height);
+  background-image: url("~/Pictures/Wallpapers/Desktop.png", height);
+  background-size: cover
   orientation: vertical;
   children: [ "inputbar", "dummy" ];
 }
@@ -507,7 +509,7 @@ dummy {
 }
 inputbar {
   enabled: true;
-  spacing: 10px;
+  spacing: 5px;
   padding: 15px;
   border-radius: 10px;
   background-color: @background-alt;
@@ -517,7 +519,7 @@ inputbar {
 textbox-prompt-colon {
   enabled: true;
   expand: false;
-  str: "";
+  str: " ";
   background-color: inherit;
   text-color: inherit;
 }
