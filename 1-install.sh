@@ -107,6 +107,9 @@ timedatectl set-ntp true
 exit_status "Updated System Clock"
 
 # Partition the disks
+entry_status "Unmounting All Partitions"
+umount --all-targets --recursive /mnt
+exit_status "Unmounted All Partitions"
 entry_status "Partitioning Disks"
 entry_status "Destroying GPT and MBR Data Structures"
 sgdisk --zap-all /dev/"${ssd1}" > /dev/null 2>&1
@@ -114,6 +117,12 @@ exit_status "Destroyed GPT and MBR Data Structures in /dev/${ssd1}"
 entry_status "Destroying GPT and MBR Data Structures"
 sgdisk --zap-all /dev/"${hdd1}" > /dev/null 2>&1
 exit_status "Destroyed GPT and MBR Data Structures in /dev/${hdd1}"
+entry_status "Setting Sector Alignment to 2048"
+sgdisk --set-alignment=2048 --clear /dev/"${ssd1}"
+exit_status "Set Sector Alignment to 2048 in /dev/${ssd1}"
+entry_status "Setting Sector Alignment to 2048"
+sgdisk --set-alignment=2048 --clear /dev/"${hdd1}"
+exit_status "Set Sector Alignment to 2048 in /dev/${hdd1}"
 entry_status "Creating New Partition"
 sgdisk --new=1:0:+1G --typecode=1:EF00 --change-name=1:"EFI system partition" /dev/"${ssd1}" > /dev/null 2>&1
 sgdisk --new=2:0:+4G --typecode=2:8200 --change-name=2:"Linux swap" /dev/"${ssd1}" > /dev/null 2>&1
@@ -123,6 +132,12 @@ entry_status "Creating New Partition"
 sgdisk --new=1:0:0 --typecode=1:8300 --change-name=1:"Linux filesystem" /dev/"${hdd1}" > /dev/null 2>&1
 exit_status "Created New Partition in /dev/${hdd1}"
 exit_status "Partitioned Disks"
+entry_status "Rereading Partition Table"
+partprobe /dev/"${ssd1}"
+exit_status "Reread Partition Table in /dev/${ssd1}"
+entry_status "Rereading Partition Table"
+partprobe /dev/"${hdd1}"
+exit_status "Reread Partition Table in /dev/${hdd1}"
 
 # Format the partitions
 entry_status "Formatting Partitions"
@@ -171,13 +186,16 @@ exit_status "Mounted File Systems"
 #######################################
 
 # Select the mirrors
+entry_status "Upgrading Arch Linux Keyring"
+pacman -S --noconfirm archlinux-keyring > /dev/null 2>&1
+exit_status "Upgraded Arch Linux Keyring"
 entry_status "Selecting Mirrors"
 reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose --fastest 20 --latest 200 --protocol https,http > /dev/null 2>&1
 exit_status "Selected Mirrors"
 
 # Install essential packages
 entry_status "Installing Essential Packages"
-pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo > /dev/null 2>&1
+pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo archlinux-keyring > /dev/null 2>&1
 exit_status "Installed Essential Packages"
 
 #######################################
