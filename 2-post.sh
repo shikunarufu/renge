@@ -587,7 +587,7 @@ listview {
     reverse:                     false;
     fixed-height:                true;
     fixed-columns:               true;
-    
+    border:                      0;
     spacing:                     10px;
     background-color:            transparent;
     text-color:                  @foreground;
@@ -605,10 +605,6 @@ element {
     cursor:                      pointer;
 }
 element normal.normal {
-    background-color:            inherit;
-    text-color:                  inherit;
-}
-element alternate.normal {
     background-color:            inherit;
     text-color:                  inherit;
 }
@@ -630,6 +626,18 @@ element selected.urgent {
 }
 element selected.active {
     background-color:            @urgent;
+    text-color:                  @foreground;
+}
+element.alternate.normal {
+    background-color:            inherit;
+    text-color:                  inherit;
+}
+element.alternate.urgent {
+    background-color:            @urgent;
+    text-color:                  @foreground;
+}
+element.alternate.active {
+    background-color:            @active;
     text-color:                  @foreground;
 }
 element-icon {
