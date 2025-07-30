@@ -608,6 +608,10 @@ element normal.normal {
     background-color:            inherit;
     text-color:                  inherit;
 }
+element alternate.normal {
+    background-color:            inherit;
+    text-color:                  inherit;
+}
 element normal.urgent {
     background-color:            @urgent;
     text-color:                  @foreground;
