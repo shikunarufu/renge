@@ -493,7 +493,6 @@ imagebox {
   padding: 20px;
   background-color: transparent;
   background-image: url("~/Pictures/Wallpapers/Desktop.png", height);
-  background-size: cover
   orientation: vertical;
   children: [ "inputbar", "dummy" ];
 }
