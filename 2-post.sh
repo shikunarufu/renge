@@ -458,7 +458,7 @@ configuration {
 }
 @theme "default"
 * {
-  font: "JetBrains Mono Nerd Font 10";
+  font: "JetBrainsMono Nerd Font Propo 10";
   background: #14191C;
   background-alt: #14191C;
   foreground: #CFDFE2;
@@ -508,7 +508,7 @@ dummy {
 }
 inputbar {
   enabled: true;
-  spacing: 5px;
+  spacing: 0px;
   padding: 12px;
   border-radius: 6px;
   background-color: @background-alt;
@@ -551,7 +551,7 @@ listview {
 element {
   enabled: true;
   spacing: 12px;
-  padding: 6px;
+  padding: 5px;
   border-radius: 6px;
   background-color: transparent;
   text-color: @foreground;
