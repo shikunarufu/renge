@@ -10,7 +10,7 @@
 # This script assumes a working internet connection is available.
 
 # Uncomment the line below to show command outputs.
-set -x
+# set -x
 
 #######################################
 # Preparation
@@ -67,9 +67,13 @@ exit_status "Allowed Sudo Access Without Password"
 #######################################
 
 # Yay
-entry_status "Installing Yay"
+entry_status "Installing Yay Dependencies"
 sudo pacman -S --noconfirm --needed git base-devel
+exit_status "Installed Yay Dependencies"
+entry_status "Cloning Yay Repository"
 git clone https://aur.archlinux.org/yay.git
+exit_status "Cloned Yay Repository"
+entry_status "Installing Yay"
 cd yay
 makepkg -si --noconfirm
 exit_status "Installed Yay"
