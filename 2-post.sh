@@ -96,7 +96,7 @@ git clone --recursive https://github.com/hyprwm/Hyprland > /dev/null 2>&1
 exit_status "Cloned Hyprland Repository"
 entry_status "Compiling Hyprland"
 cd Hyprland
-make all
+make all > /dev/null 2>&1
 entry_status "Compiled Hyprland"
 entry_status "Installing Hyprland"
 sudo make install > /dev/null 2>&1
@@ -665,5 +665,5 @@ exit_status "Allowed Sudo Access Without Password"
 
 # Launch Hyprland
 entry_status "Launching Hyprland"
-Hyprland
+Hyprland > /dev/null 2>&1
 exit_status "Launched Hyprland"
