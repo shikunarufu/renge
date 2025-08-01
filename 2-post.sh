@@ -99,7 +99,7 @@ cd Hyprland
 make all
 entry_status "Compiled Hyprland"
 entry_status "Installing Hyprland"
-sudo make install
+sudo make install > /dev/null 2>&1
 exit_status "Installed Hyprland"
 entry_status "Configuring Hyprland"
 mkdir /home/"${username}"/.config/hypr
@@ -256,7 +256,7 @@ windowrule = nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned
 EOF
 exit_status "Configured Hyprland"
 entry_status "Installing SWWW"
-yay -S swww --answerclean All --answerdiff None --noconfirm
+yay -S swww --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
 exit_status "Installed SWWW"
 entry_status "Configuring SWWW"
 mkdir /home/"${username}"/Pictures/Wallpapers
@@ -264,12 +264,12 @@ exit_status "Configured SWWW"
 
 # Foot
 entry_status "Installing Foot"
-sudo pacman -S foot foot-terminfo libnotify xdg-utils --noconfirm
+sudo pacman -S foot foot-terminfo libnotify xdg-utils --noconfirm > /dev/null 2>&1
 exit_status "Installed Foot"
 
 # Waybar
 entry_status "Installing Waybar"
-sudo pacman -S waybar --noconfirm
+sudo pacman -S waybar --noconfirm > /dev/null 2>&1
 exit_status "Installed Waybar"
 entry_status "Configuring Waybar"
 mkdir /home/"${username}"/.config/waybar
@@ -457,7 +457,7 @@ exit_status "Configured Waybar"
 
 # Rofi
 entry_status "Installing Rofi"
-sudo pacman -S rofi-wayland --noconfirm
+sudo pacman -S rofi-wayland --noconfirm > /dev/null 2>&1
 exit_status "Installed Rofi"
 entry_status "Configuring Rofi"
 mkdir /home/"${username}"/.config/rofi
@@ -622,36 +622,36 @@ exit_status "Configured Rofi"
 
 # Dolphin
 entry_status "Installing Dolphin"
-sudo pacman -S dolphin audiocd-kio baloo dolphin-plugins kio-admin kio-gdrive kompare ffmpegthumbs icoutils kdegraphics-thumbnailers kdesdk-thumbnailers kimageformats libheif libappimage qt6-imageformats taglib --noconfirm
+sudo pacman -S dolphin audiocd-kio baloo dolphin-plugins kio-admin kio-gdrive kompare ffmpegthumbs icoutils kdegraphics-thumbnailers kdesdk-thumbnailers kimageformats libheif libappimage qt6-imageformats taglib --noconfirm > /dev/null 2>&1
 exit_status "Installed Dolphin"
 entry_status "Installing Dolphin Dependencies"
-yay -S kde-thumbnailer-apk raw-thumbnailer resvg --answerclean All --answerdiff None --noconfirm
+yay -S kde-thumbnailer-apk raw-thumbnailer resvg --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
 exit_status "Installed Dolphin Dependencies"
 
 # Fish
 entry_status "Installing Fish"
-sudo pacman -S fish --noconfirm
+sudo pacman -S fish --noconfirm > /dev/null 2>&1
 exit_status "Installed Fish"
 
 # Fastfetch
 entry_status "Installing Fastfetch"
-sudo pacman -S fastfetch --noconfirm
+sudo pacman -S fastfetch --noconfirm > /dev/null 2>&1
 exit_status "Installed Fastfetch"
 
 # Display manager
 entry_status "Installing Greetd"
-sudo pacman -S greetd greetd-tuigreet --noconfirm
+sudo pacman -S greetd greetd-tuigreet --noconfirm > /dev/null 2>&1
 exit_status "Installed Greetd"
 entry_status "Configuring Greetd"
 sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland"|g' /etc/greetd/config.toml
 exit_status "Configured Greetd"
 entry_status "Enabling Greetd"
-sudo systemctl enable greetd.service
+sudo systemctl enable greetd.service > /dev/null 2>&1
 exit_status "Enabled Greetd"
 
 # Zen Browser
 entry_status "Installing Zen Browser"
-yay -S zen-browser-bin --answerclean All --answerdiff None --noconfirm
+yay -S zen-browser-bin --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
 exit_status "Installing Zen Browser"
 
 #######################################
