@@ -477,7 +477,7 @@ window {
   y-offset: 0px;
   border: 0px;
   enabled: true;
-  border-radius: 15px;
+  border-radius: 6px;
   cursor: "default";
   padding: 0px;
   background-color: @background;
@@ -490,15 +490,15 @@ mainbox {
   children: [ "imagebox", "listbox" ];
 }
 imagebox {
-  padding: 20px;
+  padding: 12px;
   background-color: transparent;
   background-image: url("~/Pictures/Wallpapers/Desktop.png", height);
   orientation: vertical;
   children: [ "inputbar", "dummy" ];
 }
 listbox {
-  spacing: 20px;
-  padding: 20px;
+  spacing: 12px;
+  padding: 12px;
   background-color: transparent;
   orientation: vertical;
   children: [ "message", "listview" ];
@@ -509,8 +509,8 @@ dummy {
 inputbar {
   enabled: true;
   spacing: 5px;
-  padding: 15px;
-  border-radius: 10px;
+  padding: 12px;
+  border-radius: 6px;
   background-color: @background-alt;
   text-color: @foreground;
   children: [ "textbox-prompt-colon", "entry" ];
@@ -542,16 +542,17 @@ listview {
   fixed-height: true;
   fixed-columns: true;
   border: 0px;
-  spacing: 10px;
+  spacing: 12px;
+  padding: 0px;
   background-color: transparent;
   text-color: @foreground;
   cursor: "default";
 }
 element {
   enabled: true;
-  spacing: 15px;
-  padding: 8px;
-  border-radius: 10px;
+  spacing: 12px;
+  padding: 6px;
+  border-radius: 6px;
   background-color: transparent;
   text-color: @foreground;
   cursor: pointer;
@@ -604,23 +605,6 @@ element-text {
   cursor: inherit;
   vertical-align: 0.5;
   horizontal-align: 0.0;
-}
-message {
-  background-color: transparent;
-}
-textbox {
-  padding: 15px;
-  border-radius: 10px;
-  background-color: @background-alt;
-  text-color: @foreground;
-  vertical-align: 0.5;
-  horizontal-align: 0.0;
-}
-error-message {
-    padding: 15px;
-    border-radius: 20px;
-    background-color: @background;
-    text-color: @foreground;
 }
 EOF
 
