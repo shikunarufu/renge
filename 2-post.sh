@@ -59,7 +59,7 @@ exit_status "Cleared Terminal Screen"
 
 # Allow members of group wheel sudo access without a password
 entry_status "Allowing Sudo Access Without Password"
-printf "%s\n%s" "${user_passwd}" | sudo --stdin sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+printf "%s\n%s" "${user_passwd}" | sudo --stdin sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers > /dev/null 2>&1
 exit_status "Allowed Sudo Access Without Password"
 
 #######################################
@@ -68,20 +68,20 @@ exit_status "Allowed Sudo Access Without Password"
 
 # Yay
 entry_status "Installing Yay Dependencies"
-sudo pacman -S --noconfirm --needed git base-devel
+sudo pacman -S --noconfirm --needed git base-devel > /dev/null 2>&1
 exit_status "Installed Yay Dependencies"
 entry_status "Cloning Yay Repository"
-git clone https://aur.archlinux.org/yay.git
+git clone https://aur.archlinux.org/yay.git > /dev/null 2>&1
 exit_status "Cloned Yay Repository"
 entry_status "Installing Yay"
 cd yay
-makepkg -si --noconfirm
+makepkg -si --noconfirm > /dev/null 2>&1
 exit_status "Installed Yay"
 entry_status "Generating Development Package Database"
-yay --yay --gendb
+yay --yay --gendb > /dev/null 2>&1
 exit_status "Generated Development Package Database"
 entry_status "Updating Development Package"
-yay -Syu --devel --answerupgrade None --noconfirm
+yay -Syu --devel --answerupgrade None --noconfirm > /dev/null 2>&1
 exit_status "Updated Development Package"
 entry_status "Enabling Development Package Updates"
 yay --yay --devel --save
@@ -89,10 +89,12 @@ exit_status "Enabled Development Package Updates"
 
 # Hyprland
 entry_status "Installing Hyprland Dependencies"
-yay -S ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils --answerclean All --answerdiff None --noconfirm
+yay -S ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
 exit_status "Installed Hyprland Dependencies"
+entry_status "Cloning Hyprland Repository"
+git clone --recursive https://github.com/hyprwm/Hyprland > /dev/null 2>&1
+exit_status "Cloned Hyprland Repository"
 entry_status "Installing Hyprland"
-git clone --recursive https://github.com/hyprwm/Hyprland
 cd Hyprland
 make all && sudo make install
 exit_status "Installed Hyprland"
