@@ -97,7 +97,7 @@ exit_status "Cloned Hyprland Repository"
 entry_status "Compiling Hyprland"
 cd Hyprland
 make all > /dev/null 2>&1
-entry_status "Compiled Hyprland"
+exit_status "Compiled Hyprland"
 entry_status "Installing Hyprland"
 sudo make install > /dev/null 2>&1
 exit_status "Installed Hyprland"
