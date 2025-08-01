@@ -53,46 +53,46 @@ exit_status() {
 }
 
 # Clear the terminal screen
-#entry_status "Clearing Terminal Screen"
+entry_status "Clearing Terminal Screen"
 clear
-#exit_status "Cleared Terminal Screen"
+exit_status "Cleared Terminal Screen"
 
 # Allow members of group wheel sudo access without a password
-#entry_status "Allowing Sudo Access Without Password"
+entry_status "Allowing Sudo Access Without Password"
 printf "%s\n%s" "${user_passwd}" | sudo --stdin sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-#exit_status "Allowed Sudo Access Without Password"
+exit_status "Allowed Sudo Access Without Password"
 
 #######################################
 # Installation
 #######################################
 
 # Yay
-#entry_status "Installing Yay"
+entry_status "Installing Yay"
 sudo pacman -S --noconfirm --needed git base-devel
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -si --noconfirm
-#exit_status "Installed Yay"
-#entry_status "Generating Development Package Database"
+exit_status "Installed Yay"
+entry_status "Generating Development Package Database"
 yay --yay --gendb
-#exit_status "Generated Development Package Database"
-#entry_status "Updating Development Package"
+exit_status "Generated Development Package Database"
+entry_status "Updating Development Package"
 yay -Syu --devel --answerupgrade None --noconfirm
-#exit_status "Updated Development Package"
-#entry_status "Enabling Development Package Updates"
+exit_status "Updated Development Package"
+entry_status "Enabling Development Package Updates"
 yay --yay --devel --save
-#exit_status "Enabled Development Package Updates"
+exit_status "Enabled Development Package Updates"
 
 # Hyprland
-#entry_status "Installing Hyprland Dependencies"
+entry_status "Installing Hyprland Dependencies"
 yay -S ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils --answerclean All --answerdiff None --noconfirm
-#exit_status "Installed Hyprland Dependencies"
-#entry_status "Installing Hyprland"
+exit_status "Installed Hyprland Dependencies"
+entry_status "Installing Hyprland"
 git clone --recursive https://github.com/hyprwm/Hyprland
 cd Hyprland
 make all && sudo make install
-#exit_status "Installed Hyprland"
-#entry_status "Configuring Hyprland"
+exit_status "Installed Hyprland"
+entry_status "Configuring Hyprland"
 mkdir /home/"${username}"/.config/hypr
 cat > /home/"${username}"/.config/hypr/hyprland.conf << 'EOF'
 # Hyprland Config File
@@ -245,24 +245,24 @@ bindl = , XF86AudioPrev, exec, playerctl previous
 windowrule = suppressevent maximize, class:.*
 windowrule = nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 EOF
-#exit_status "Configured Hyprland"
-#entry_status "Installing SWWW"
+exit_status "Configured Hyprland"
+entry_status "Installing SWWW"
 yay -S swww --answerclean All --answerdiff None --noconfirm
-#exit_status "Installed SWWW"
-#entry_status "Configuring SWWW"
+exit_status "Installed SWWW"
+entry_status "Configuring SWWW"
 mkdir /home/"${username}"/Pictures/Wallpapers
-#exit_status "Configured SWWW"
+exit_status "Configured SWWW"
 
 # Foot
-#entry_status "Installing Foot"
+entry_status "Installing Foot"
 sudo pacman -S foot foot-terminfo libnotify xdg-utils --noconfirm
-#exit_status "Installed Foot"
+exit_status "Installed Foot"
 
 # Waybar
-#entry_status "Installing Waybar"
+entry_status "Installing Waybar"
 sudo pacman -S waybar --noconfirm
-yay -S material-symbols-git --answerclean All --answerdiff None --noconfirm
-#exit_status "Installed Waybar"
+exit_status "Installed Waybar"
+entry_status "Configuring Waybar"
 mkdir /home/"${username}"/.config/waybar
 cat > /home/"${username}"/.config/waybar/config.jsonc << 'EOF'
 // Waybar Configuration File
@@ -444,11 +444,13 @@ tooltip label {
   color: #CFDFE2;
 }
 EOF
+exit_status "Configured Waybar"
 
 # Rofi
-#entry_status "Installing Rofi"
+entry_status "Installing Rofi"
 sudo pacman -S rofi-wayland --noconfirm
-#exit_status "Installed Rofi"
+exit_status "Installed Rofi"
+entry_status "Configuring Rofi"
 mkdir /home/"${username}"/.config/rofi
 cat > /home/"${username}"/.config/rofi/config.rasi << 'EOF'
 configuration {
@@ -607,44 +609,52 @@ element-text {
   horizontal-align: 0.0;
 }
 EOF
+exit_status "Configured Rofi"
 
 # Dolphin
-#entry_status "Installing Dolphin"
+entry_status "Installing Dolphin"
 sudo pacman -S dolphin audiocd-kio baloo dolphin-plugins kio-admin kio-gdrive kompare ffmpegthumbs icoutils kdegraphics-thumbnailers kdesdk-thumbnailers kimageformats libheif libappimage qt6-imageformats taglib --noconfirm
-#exit_status "Installed Dolphin"
-#entry_status "Installing Dolphin Dependencies"
+exit_status "Installed Dolphin"
+entry_status "Installing Dolphin Dependencies"
 yay -S kde-thumbnailer-apk raw-thumbnailer resvg --answerclean All --answerdiff None --noconfirm
-#exit_status "Installed Dolphin Dependencies"
+exit_status "Installed Dolphin Dependencies"
 
 # Fish
-#entry_status "Installing Fish"
+entry_status "Installing Fish"
 sudo pacman -S fish --noconfirm
-#exit_status "Installed Fish"
+exit_status "Installed Fish"
+
+# Fastfetch
+entry_status "Installing Fastfetch"
+sudo pacman -S fastfetch --noconfirm
+exit_status "Installed Fastfetch"
 
 # Display manager
-#entry_status "Installing Greetd"
+entry_status "Installing Greetd"
 sudo pacman -S greetd greetd-tuigreet --noconfirm
-#exit_status "Installed Greetd"
-#entry_status "Configuring Greetd"
+exit_status "Installed Greetd"
+entry_status "Configuring Greetd"
 sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland"|g' /etc/greetd/config.toml
-#exit_status "Configured Greetd"
-#entry_status "Enabling Greetd"
+exit_status "Configured Greetd"
+entry_status "Enabling Greetd"
 sudo systemctl enable greetd.service
-#exit_status "Enabled Greetd"
+exit_status "Enabled Greetd"
 
 # Zen Browser
+entry_status "Installing Zen Browser"
 yay -S zen-browser-bin --answerclean All --answerdiff None --noconfirm
+exit_status "Installing Zen Browser"
 
 #######################################
 # Post-Installation
 #######################################
 
 # Allow members of group wheel sudo access with a password
-#entry_status "Allowing Sudo Access With Password"
+entry_status "Allowing Sudo Access With Password"
 sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-#exit_status "Allowed Sudo Access Without Password"
+exit_status "Allowed Sudo Access Without Password"
 
 # Launch Hyprland
-#entry_status "Launching Hyprland"
+entry_status "Launching Hyprland"
 Hyprland
-#exit_status "Launched Hyprland"
+exit_status "Launched Hyprland"
