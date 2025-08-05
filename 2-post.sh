@@ -261,6 +261,7 @@ exit_status "Installed SWWW"
 entry_status "Configuring SWWW"
 mkdir /home/"${username}"/Pictures/Wallpapers
 cp /home/"${username}"/ALIS/Desktop.png /home/"${username}"/Pictures/Wallpapers
+swww img /home/"${username}"/Pictures/Wallpapers/Desktop.png
 exit_status "Configured SWWW"
 
 # Foot
