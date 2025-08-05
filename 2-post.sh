@@ -644,66 +644,83 @@ cat > /home/"${username}"/.config/fastfetch/config.jsonc << 'EOF'
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
-    "type": "auto",        // Logo type: auto, builtin, small, file, etc.
-    "source": "arch",      // Built-in logo name or file path
-    "width": 35,           // Width in characters (for image logos)
-    "height": 35,          // Height in characters (for image logos)
+    "type": "auto",
+    "source": "arch",
+    "width": 35,
+    "height": 35,
     "padding": {
-      "top": 0,            // Top padding
-      "left": 0,           // Left padding
-      "right": 2           // Right padding
+      "top": 0,
+      "left": 0,
+      "right": 2
     },
-    "color": {             // Override logo colors
+    "color": {
       "1": "blue",
       "2": "green"
     }
-  }
+  },
   "display": {
-    "separator": ": ",     // Separator between keys and values
+    "separator": ": ",
     "color": {
-      "keys": "blue",      // Key color
-      "title": "red"       // Title color
+      "keys": "blue",
+      "title": "red"
     },
     "key": {
-      "width": 12,         // Aligns keys to this width
-      "type": "string"     // string, icon, both, or none
-    },
-    "bar": {
-      "width": 10,         // Width of percentage bars
-      "charElapsed": "■",  // Character for elapsed portion
-      "charTotal": "-"     // Character for total portion
-    },
-    "percent": {
-      "type": 9,           // 1=number, 2=bar, 3=both, 9=colored number
-      "color": {
-        "green": "green",
-        "yellow": "light_yellow",
-        "red": "light_red"
-      }
+      "type": "string"
     }
-  }
+  },
   "modules": [
+    {
+    "type": "custom",
+    "format": "Hardware"
+    },
+    {
+      "type": "cpu",
+      "key": "CPU",
+    },
+    {
+      "type": "custom",
+      "key": "CPU Cooler"
+      "format": "Thermalright Peerless Assassin 120 Black"
+    },
+    {
+      "type": "custom",
+      "key": "MB"
+      "format": "MSI B450M MORTAR MAX Micro ATX AM4"
+    },
+    {
+      "type": "custom",
+      "key": "RAM"
+      "format": "G.Skill Ripjaws V 16 GB (2 x 8GB) DDR4-3200 CL16"
+    },
+    {
+      "type": "custom",
+      "key": "SSD"
+      "format": "Kingston A400 120 GB M.2-2280 SATA"
+    },
+    {
+      "type": "custom",
+      "key": "HDD"
+      "format": "Seagate BarraCuda 1 TB 3.5\" 7200 RPM"
+    },
+    {
+      "type": "gpu",
+      "key": "GPU"
+    },
+    {
+      "type": "custom",
+      "key": "Case"
+      "format": "NZXT H510i ATX Mid Tower"
+    },
+    {
+      "type": "custom",
+      "key": "PSU"
+      "format": "Corsair CV450 450 W 80+ Bronze Certified ATX"
+    },
+    {
+    "type": "custom",
+    "format": "Software"
+    },
     "title",
-    "separator",
-    {
-      "type": "os",
-      "key": "OS",
-      "keyColor": "blue",
-      "format": "{name} {version}"
-    },
-    {
-      "type": "kernel",
-      "key": "Kernel"
-    },
-    {
-      "type": "memory",
-      "key": "Memory",
-      "percent": {
-        "type": 3,         // Show both percentage number and bar
-        "green": 30,       // Values below 30% in green
-        "yellow": 70       // 30-70% in yellow, >70% in red
-      }
-    }
   ]
 }
 EOF
