@@ -260,6 +260,7 @@ yay -S swww --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
 exit_status "Installed SWWW"
 entry_status "Configuring SWWW"
 mkdir /home/"${username}"/Pictures/Wallpapers
+cp /home/"${username}"/ALIS/Desktop.png /home/"${username}"/Pictures/Wallpapers
 exit_status "Configured SWWW"
 
 # Foot
