@@ -638,6 +638,76 @@ exit_status "Installed Fish"
 entry_status "Installing Fastfetch"
 sudo pacman -S fastfetch --noconfirm > /dev/null 2>&1
 exit_status "Installed Fastfetch"
+entry_status "Configuring Fastfetch"
+mkdir /home/"${username}"/.config/fastfetch
+cat > /home/"${username}"/.config/fastfetch/config.jsonc << 'EOF'
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "type": "auto",        // Logo type: auto, builtin, small, file, etc.
+    "source": "arch",      // Built-in logo name or file path
+    "width": 35,           // Width in characters (for image logos)
+    "height": 35,          // Height in characters (for image logos)
+    "padding": {
+      "top": 0,            // Top padding
+      "left": 0,           // Left padding
+      "right": 2           // Right padding
+    },
+    "color": {             // Override logo colors
+      "1": "blue",
+      "2": "green"
+    }
+  }
+  "display": {
+    "separator": ": ",     // Separator between keys and values
+    "color": {
+      "keys": "blue",      // Key color
+      "title": "red"       // Title color
+    },
+    "key": {
+      "width": 12,         // Aligns keys to this width
+      "type": "string"     // string, icon, both, or none
+    },
+    "bar": {
+      "width": 10,         // Width of percentage bars
+      "charElapsed": "■",  // Character for elapsed portion
+      "charTotal": "-"     // Character for total portion
+    },
+    "percent": {
+      "type": 9,           // 1=number, 2=bar, 3=both, 9=colored number
+      "color": {
+        "green": "green",
+        "yellow": "light_yellow",
+        "red": "light_red"
+      }
+    }
+  }
+  "modules": [
+    "title",
+    "separator",
+    {
+      "type": "os",
+      "key": "OS",
+      "keyColor": "blue",
+      "format": "{name} {version}"
+    },
+    {
+      "type": "kernel",
+      "key": "Kernel"
+    },
+    {
+      "type": "memory",
+      "key": "Memory",
+      "percent": {
+        "type": 3,         // Show both percentage number and bar
+        "green": 30,       // Values below 30% in green
+        "yellow": 70       // 30-70% in yellow, >70% in red
+      }
+    }
+  ]
+}
+EOF
+exit_status "Configured Fastfetch"
 
 # Display manager
 entry_status "Installing Greetd"
