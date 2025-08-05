@@ -670,36 +670,36 @@ cat > /home/"${username}"/.config/fastfetch/config.jsonc << 'EOF'
   },
   "modules": [
     {
-    "type": "custom",
-    "format": "Hardware"
+      "type": "custom",
+      "key": " ",
+      "format": "Hardware"
     },
     {
       "type": "cpu",
-      "key": "CPU",
+      "key": "CPU"
     },
     {
       "type": "custom",
-      "key": "CPU Cooler"
+      "key": "Cooler",
       "format": "Thermalright Peerless Assassin 120 Black"
     },
     {
-      "type": "custom",
-      "key": "MB"
-      "format": "MSI B450M MORTAR MAX Micro ATX AM4"
+      "type": "board",
+      "key": "Board"
     },
     {
       "type": "custom",
-      "key": "RAM"
-      "format": "G.Skill Ripjaws V 16 GB (2 x 8GB) DDR4-3200 CL16"
+      "key": "RAM",
+      "format": "G.Skill Ripjaws V 16 GB (2 x 8 GB) DDR4-3200 CL16"
     },
     {
       "type": "custom",
-      "key": "SSD"
+      "key": "SSD",
       "format": "Kingston A400 120 GB M.2-2280 SATA"
     },
     {
       "type": "custom",
-      "key": "HDD"
+      "key": "HDD",
       "format": "Seagate BarraCuda 1 TB 3.5\" 7200 RPM"
     },
     {
@@ -708,19 +708,58 @@ cat > /home/"${username}"/.config/fastfetch/config.jsonc << 'EOF'
     },
     {
       "type": "custom",
-      "key": "Case"
+      "key": "Case",
       "format": "NZXT H510i ATX Mid Tower"
     },
     {
       "type": "custom",
-      "key": "PSU"
+      "key": "PSU",
       "format": "Corsair CV450 450 W 80+ Bronze Certified ATX"
     },
     {
-    "type": "custom",
-    "format": "Software"
+      "type": "monitor",
+      "key": "Monitor"
+    },
+    "break",
+    {
+      "type": "custom",
+      "key": " ",
+      "format": "Software"
     },
     "title",
+    "separator",
+    {
+      "type": "os",
+      "key": "OS"
+    },
+    {
+      "type": "kernel",
+      "key": "Kernel"
+    },
+    {
+      "type": "packages",
+      "key": "Packages"
+    },
+    {
+      "type": "shell",
+      "key": "Shell"
+    },
+    {
+      "type": "terminal",
+      "key": "Terminal"
+    },
+    {
+      "type": "wm",
+      "key": "WM"
+    },
+    {
+      "type": "lm",
+      "key": "LM"
+    },
+    {
+      "type": "uptime",
+      "key": "Uptime"
+    },
   ]
 }
 EOF
