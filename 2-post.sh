@@ -261,7 +261,6 @@ exit_status "Installed SWWW"
 entry_status "Configuring SWWW"
 mkdir /home/"${username}"/Pictures/Wallpapers
 cp /home/"${username}"/ALIS/Desktop.png /home/"${username}"/Pictures/Wallpapers
-swww img /home/"${username}"/Pictures/Wallpapers/Desktop.png
 exit_status "Configured SWWW"
 
 # Foot
@@ -669,3 +668,4 @@ exit_status "Allowed Sudo Access Without Password"
 entry_status "Launching Hyprland"
 Hyprland > /dev/null 2>&1
 exit_status "Launched Hyprland"
+swww img /home/"${username}"/Pictures/Wallpapers/Desktop.png
