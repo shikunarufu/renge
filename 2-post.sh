@@ -267,6 +267,47 @@ exit_status "Configured SWWW"
 entry_status "Installing Foot"
 sudo pacman -S foot foot-terminfo libnotify xdg-utils --noconfirm > /dev/null 2>&1
 exit_status "Installed Foot"
+entry_status "Configuring Foot"
+mkdir /home/"${username}"/.config/foot
+cat > /home/"${username}"/.config/foot/foot.ini << 'EOF'
+# -*- conf -*-
+
+shell=fish
+title=foot
+font=GeistMono Nerd Font:size=12
+letter-spacing=0
+dpi-aware=no
+gamma-correct-blending=no
+pad=25x25
+bold-text-in-bright=no
+
+[scrollback]
+lines=10000
+
+[cursor]
+style=beam
+# blink=no
+# blink-rate=500
+beam-thickness=1.5
+# underline-thickness=<font underline thickness>
+
+[mouse]
+hide-when-typing=yes
+
+[colors]
+alpha=0.78
+
+[key-bindings]
+scrollback-up-page=Page_Up
+scrollback-down-page=Page_Down
+# search-start=Control+Shift+r
+
+[search-bindings]
+cancel=Escape
+# find-prev=Control+r
+# find-next=Control+s
+EOF
+exit_status "Configured Foot"
 
 # Waybar
 entry_status "Installing Waybar"
@@ -761,6 +802,11 @@ cat > /home/"${username}"/.config/fastfetch/config.jsonc << 'EOF'
     {
       "type": "uptime",
       "key": "  Uptime"
+    },
+    {
+      "type": "colors",
+      "paddingLeft": 2,
+      "symbol": "circle"
     },
     {
       "type": "custom",
