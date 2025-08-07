@@ -654,15 +654,15 @@ cat > /home/"${username}"/.config/fastfetch/config.jsonc << 'EOF'
       "right": 2
     },
     "color": {
-      "1": "blue",
-      "2": "green"
+      "1": "\u001b[38;2;177;204;211m]",
+      "2": "\u001b[38;2;177;204;211m]",
     }
   },
   "display": {
     "separator": ": ",
     "color": {
-      "keys": "blue",
-      "title": "red"
+      "keys": "\u001b[38;2;177;204;211m]",
+      "title": "\u001b[38;2;210;175;149m]"
     },
     "key": {
       "type": "string"
@@ -672,7 +672,7 @@ cat > /home/"${username}"/.config/fastfetch/config.jsonc << 'EOF'
     {
       "type": "custom",
       "key": " ",
-      "format": "Hardware"
+      "format": "╭──────────────────────Hardware──────────────────────╮"
     },
     {
       "type": "cpu",
@@ -726,8 +726,17 @@ cat > /home/"${username}"/.config/fastfetch/config.jsonc << 'EOF'
       "key": " ",
       "format": "Software"
     },
+    {
+      "type": "custom",
+      "key": " ",
+      "format": "╰────────────────────────────────────────────────────╯"
+    },
+    {
+      "type": "custom",
+      "key": " ",
+      "format": "╭──────────────────────Software──────────────────────╮"
+    },
     "title",
-    "separator",
     {
       "type": "os",
       "key": "OS"
@@ -759,6 +768,11 @@ cat > /home/"${username}"/.config/fastfetch/config.jsonc << 'EOF'
     {
       "type": "uptime",
       "key": "Uptime"
+    },
+    {
+      "type": "custom",
+      "key": " ",
+      "format": "╰────────────────────────────────────────────────────╯"
     },
   ]
 }
