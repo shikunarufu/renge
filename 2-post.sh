@@ -655,7 +655,7 @@ cat > /home/"${username}"/.config/fastfetch/config.jsonc << 'EOF'
     },
     "color": {
       "1": "\u001b[38;2;177;204;211m",
-      "2": "\u001b[38;2;177;204;211m",
+      "2": "\u001b[38;2;177;204;211m"
     }
   },
   "display": {
@@ -672,102 +672,101 @@ cat > /home/"${username}"/.config/fastfetch/config.jsonc << 'EOF'
     {
       "type": "custom",
       "key": " ",
-      "format": "╭───────────────────────Hardware───────────────────────╮"
+      "format": "╭─────────────────────── Hardware ───────────────────────╮"
     },
     {
       "type": "cpu",
-      "key": " CPU"
+      "key": "  CPU"
     },
     {
       "type": "custom",
-      "key": " Cooler",
+      "key": "  Cooler",
       "format": "Thermalright Peerless Assassin 120 Black"
     },
     {
       "type": "board",
-      "key": " Board"
+      "key": "  Board"
     },
     {
       "type": "custom",
-      "key": " RAM",
+      "key": "  RAM",
       "format": "G.Skill Ripjaws V 16 GB (2 x 8 GB) DDR4-3200 CL16"
     },
     {
       "type": "custom",
-      "key": " SSD",
+      "key": "  SSD",
       "format": "Kingston A400 120 GB M.2-2280 SATA"
     },
     {
       "type": "custom",
-      "key": " HDD",
+      "key": "  HDD",
       "format": "Seagate BarraCuda 1 TB 3.5\" 7200 RPM"
     },
     {
       "type": "gpu",
-      "key": " GPU"
+      "key": "  GPU"
     },
     {
       "type": "custom",
-      "key": " Case",
+      "key": "  Case",
       "format": "NZXT H510i ATX Mid Tower"
     },
     {
       "type": "custom",
-      "key": " PSU",
+      "key": "  PSU",
       "format": "Corsair CV450 450 W 80+ Bronze Certified ATX"
     },
     {
       "type": "monitor",
-      "key": " Monitor"
+      "key": "  Monitor"
     },
     {
       "type": "custom",
       "key": " ",
-      "format": "╰──────────────────────────────────────────────────────╯"
+      "format": "╰────────────────────────────────────────────────────────╯"
     },
     {
       "type": "custom",
       "key": " ",
-      "format": "╭───────────────────────Software───────────────────────╮"
+      "format": "╭─────────────────────── Software ───────────────────────╮"
     },
-    "title",
     {
       "type": "os",
-      "key": " OS"
+      "key": "  OS"
     },
     {
       "type": "kernel",
-      "key": " Kernel"
+      "key": "  Kernel"
     },
     {
       "type": "packages",
-      "key": " Packages"
+      "key": "  Packages"
     },
     {
       "type": "shell",
-      "key": " Shell"
+      "key": "  Shell"
     },
     {
       "type": "terminal",
-      "key": " Terminal"
+      "key": "  Terminal"
     },
     {
       "type": "wm",
-      "key": " WM"
+      "key": "  WM"
     },
     {
       "type": "lm",
-      "key": " LM"
+      "key": "  LM"
     },
     {
       "type": "uptime",
-      "key": " Uptime"
+      "key": "  Uptime"
     },
     {
       "type": "custom",
       "key": " ",
-      "format": "╰──────────────────────────────────────────────────────╯"
-    },
+      "format": "╰────────────────────────────────────────────────────────╯"
+    }
   ]
 }
 EOF
