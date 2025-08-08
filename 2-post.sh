@@ -10,7 +10,7 @@
 # This script assumes a working internet connection is available.
 
 # Uncomment the line below to show command outputs.
-# set -x
+set -x
 
 #######################################
 # Preparation
@@ -274,7 +274,7 @@ cat > /home/"${username}"/.config/foot/foot.ini << 'EOF'
 
 shell=fish
 title=foot
-font=GeistMono Nerd Font:size=12
+font=GeistMono Nerd Font:size=10
 letter-spacing=0
 dpi-aware=no
 gamma-correct-blending=no
@@ -286,8 +286,8 @@ lines=10000
 
 [cursor]
 style=beam
-# blink=no
-# blink-rate=500
+blink=yes
+blink-rate=500
 beam-thickness=1.5
 # underline-thickness=<font underline thickness>
 
@@ -295,7 +295,7 @@ beam-thickness=1.5
 hide-when-typing=yes
 
 [colors]
-alpha=0.78
+alpha=0.8
 
 [key-bindings]
 scrollback-up-page=Page_Up
@@ -674,6 +674,16 @@ exit_status "Installed Dolphin Dependencies"
 entry_status "Installing Fish"
 sudo pacman -S fish --noconfirm > /dev/null 2>&1
 exit_status "Installed Fish"
+cat > /home/"${username}"/.config/fish/config.fish << 'EOF'
+if status is-interactive
+  starship init fish | source
+end
+EOF
+
+# Starship
+entry_status "Installing Starship"
+curl -sS https://starship.rs/install.sh | sh
+exit_status "Installed Starship"
 
 # Fastfetch
 entry_status "Installing Fastfetch"
