@@ -10,7 +10,7 @@
 # This script assumes a working internet connection is available.
 
 # Uncomment the line below to show command outputs.
-set -x
+# set -x
 
 #######################################
 # Preparation
@@ -682,7 +682,7 @@ EOF
 
 # Starship
 entry_status "Installing Starship"
-curl -sS https://starship.rs/install.sh | sh
+curl -sS https://starship.rs/install.sh | sudo sh --noconfirm
 exit_status "Installed Starship"
 
 # Fastfetch
