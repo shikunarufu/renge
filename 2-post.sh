@@ -674,6 +674,7 @@ exit_status "Installed Dolphin Dependencies"
 entry_status "Installing Fish"
 sudo pacman -S fish --noconfirm > /dev/null 2>&1
 exit_status "Installed Fish"
+mkdir /home/"${username}"/.config/fish
 cat > /home/"${username}"/.config/fish/config.fish << 'EOF'
 if status is-interactive
   starship init fish | source
@@ -682,7 +683,7 @@ EOF
 
 # Starship
 entry_status "Installing Starship"
-curl -sS https://starship.rs/install.sh | sudo sh --noconfirm
+sudo pacman -S starship --noconfirm > /dev/null 2>&1
 exit_status "Installed Starship"
 
 # Fastfetch
