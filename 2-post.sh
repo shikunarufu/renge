@@ -675,10 +675,12 @@ entry_status "Installing Fish"
 sudo pacman -S fish --noconfirm > /dev/null 2>&1
 exit_status "Installed Fish"
 mkdir /home/"${username}"/.config/fish
+mkdir /home/"${username}"/.config/fish/functions
 cat > /home/"${username}"/.config/fish/config.fish << 'EOF'
 if status is-interactive
   starship init fish | source
 end
+set fish_greeting ""
 EOF
 
 # Starship
