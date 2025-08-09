@@ -686,16 +686,17 @@ cat > /home/"${username}"/.config/fish/functions/fish_greeting.fish << 'EOF'
 function fish_greeting
   switch (random 1 5)
     case 1
-      echo "A"
+      echo "Shimmy Shimmy Yay, Shimmy Yay, Shimmy Ya (Drank) Swalla-la-la"
     case 2
-      echo "B"
+      echo "Uh, summa-lumma, dooma-lumma, you assumin' I'm a human. What I gotta do to get it through to you? I'm superhuman. Innovative and I'm made of rubber so that anything you say is ricochetin' off of me and-"
     case 3
-      echo "C"
+      echo "What's this smell? Wut da heeeeeeeell, oh my god, no waaaaayy"
     case 4
-      echo "D"
+      echo "Super idol 的笑容都没你的甜八月正午的阳光都没你耀眼热爱105度的你滴滴清纯的蒸馏水"
     case 5
-      echo "E"
+      echo "近前看其牆上寫著秦香蓮年三十二歲那狀告當朝駙馬郎欺君王瞞皇上"
   end
+  echo ""
 end
 EOF
 exit_status "Configured Fish"
@@ -708,10 +709,7 @@ entry_status "Configuring Starship"
 cat > /home/"${username}"/.config/starship.toml << 'EOF'
 # ~/.config/starship.toml
 
-add_newline = false
-continuation_prompt = "[▸▹ ](dimmed white)"
-
-format = """($nix_shell$container$fill$git_metrics\n)$cmd_duration\
+format = """($nix_shell$container$git_metrics\n)$cmd_duration\
 $hostname\
 $localip\
 $shlvl\
@@ -796,6 +794,9 @@ $os\
 $battery\
 $time"""
 
+add_newline = false
+continuation_prompt = "[▸▹ ](dimmed white)"
+
 [aws]
 format = '\[[$symbol($profile)(\($region\))(\[$duration\])]($style)\]'
 
@@ -812,7 +813,7 @@ format = '\[[$symbol($version(-$name))]($style)\]'
 format = '\[[$symbol($version)]($style)\]'
 
 [cmd_duration]
-format = '\[[⏱ $duration]($style)\]'
+format = '\[[ $duration]($style)\]'
 
 [cobol]
 format = '\[[$symbol($version)]($style)\]'
