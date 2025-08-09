@@ -813,7 +813,7 @@ format = '\[[$symbol($version(-$name))]($style)\]'
 format = '\[[$symbol($version)]($style)\]'
 
 [cmd_duration]
-format = '\[[ $duration]($style)\]'
+format = '\[[  $duration]($style)\] '
 
 [cobol]
 format = '\[[$symbol($version)]($style)\]'
@@ -1148,7 +1148,7 @@ entry_status "Installing Greetd"
 sudo pacman -S greetd greetd-tuigreet --noconfirm > /dev/null 2>&1
 exit_status "Installed Greetd"
 entry_status "Configuring Greetd"
-sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland"|g' /etc/greetd/config.toml
+sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland > /dev/null 2>&1"|g' /etc/greetd/config.toml
 exit_status "Configured Greetd"
 entry_status "Enabling Greetd"
 sudo systemctl enable greetd.service > /dev/null 2>&1
