@@ -678,7 +678,7 @@ mkdir /home/"${username}"/.config/fish
 mkdir /home/"${username}"/.config/fish/functions
 cat > /home/"${username}"/.config/fish/config.fish << 'EOF'
 if status is-interactive
-  set fish_greeting ""
+  # set fish_greeting ""
   starship init fish | source
 end
 EOF
