@@ -674,14 +674,15 @@ exit_status "Installed Dolphin Dependencies"
 entry_status "Installing Fish"
 sudo pacman -S fish --noconfirm > /dev/null 2>&1
 exit_status "Installed Fish"
+entry_status "Configuring Fish"
 mkdir /home/"${username}"/.config/fish
-mkdir /home/"${username}"/.config/fish/functions
 cat > /home/"${username}"/.config/fish/config.fish << 'EOF'
 if status is-interactive
   # set fish_greeting ""
   starship init fish | source
 end
 EOF
+exit_status "Configured Fish"
 
 # Starship
 entry_status "Installing Starship"
