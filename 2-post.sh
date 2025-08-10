@@ -1176,7 +1176,8 @@ entry_status "Installing Spicetify"
 yay -S spicetify-cli --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
 exit_status "Installed Spicetify"
 
-cat > /home/"${username}"/.config/spicetify/user.css << 'EOF'
+mkdir /home/"${username}"/.config/spicetify/Themes/Shiku
+cat > /home/"${username}"/.config/spicetify/Themes/Shiku/user.css << 'EOF'
 /* Background buttons, main play/pause button and progress bar */
 .encore-bright-accent-set,
 .encore-inverted-light-set,
@@ -1230,9 +1231,9 @@ button,
 EOF
 
 # VSCodium
-entry_status "Installing VSCodium"
-yay -S vscodium-bin --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
-exit_status "Installed VSCodium"
+# entry_status "Installing VSCodium"
+# yay -S vscodium-bin --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
+# exit_status "Installed VSCodium"
 
 # Zen Browser
 entry_status "Installing Zen Browser"
