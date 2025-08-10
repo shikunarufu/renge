@@ -255,6 +255,8 @@ windowrule = suppressevent maximize, class:.*
 windowrule = nofocus,class:^$,title:^$,xwayland:1,floating:1,fullscreen:0,pinned:0
 EOF
 exit_status "Configured Hyprland"
+
+# SWWW
 entry_status "Installing SWWW"
 yay -S swww --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
 exit_status "Installed SWWW"
