@@ -1154,6 +1154,23 @@ entry_status "Enabling Greetd"
 sudo systemctl enable greetd.service > /dev/null 2>&1
 exit_status "Enabled Greetd"
 
+# Spotify
+entry_status "Installing Spotify"
+yay -S spotify --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
+exit_status "Installed Spotify"
+entry_status "Installing Spotify Dependencies"
+sudo pacman -S ffmpeg4.4 libnotify zenity --noconfirm > /dev/null 2>&1
+exit_status "Installed Spotify Dependencies"
+entry_status "Configuring Spotify"
+sudo chmod a+wr /opt/spotify
+sudo chmod a+wr /opt/spotify/Apps -R
+exit_status "Configured Spotify"
+
+# Spicetify
+entry_status "Installing Spicetify"
+yay -S spicetify-cli --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
+exit_status "Installed Spicetify"
+
 # Zen Browser
 entry_status "Installing Zen Browser"
 yay -S zen-browser-bin --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
@@ -1162,6 +1179,11 @@ exit_status "Installing Zen Browser"
 #######################################
 # Post-Installation
 #######################################
+
+# Clean
+# entry_status "Removing Files From Cache And Unused Repositories"
+# yay -Scc --noconfirm
+# exit_status "Removed Files From Cache And Unused Repositories"
 
 # Allow members of group wheel sudo access with a password
 entry_status "Allowing Sudo Access With Password"
@@ -1172,4 +1194,5 @@ exit_status "Allowed Sudo Access Without Password"
 entry_status "Launching Hyprland"
 Hyprland > /dev/null 2>&1
 exit_status "Launched Hyprland"
-swww img /home/"${username}"/Pictures/Wallpapers/Desktop.png
+
+# swww img /home/"${username}"/Pictures/Wallpapers/Desktop.png
