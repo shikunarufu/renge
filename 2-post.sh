@@ -1166,17 +1166,30 @@ sudo chmod a+wr /opt/spotify
 sudo chmod a+wr /opt/spotify/Apps -R
 exit_status "Configured Spotify"
 
+# SpotX
+entry_status "Applying SpotX"
 bash <(curl -sSL https://spotx-official.github.io/run.sh)
+entry_status "Applied SpotX"
 
 # Spicetify
 entry_status "Installing Spicetify"
 yay -S spicetify-cli --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
 exit_status "Installed Spicetify"
 
+# VSCodium
+entry_status "Installing VSCodium"
+yay -S vscodium-bin --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
+exit_status "Installed VSCodium"
+
 # Zen Browser
 entry_status "Installing Zen Browser"
 yay -S zen-browser-bin --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
-exit_status "Installing Zen Browser"
+exit_status "Installed Zen Browser"
+
+# Steam
+entry_status "Installing Steam"
+sudo pacman -S steam --noconfirm > /dev/null 2>&1
+exit_status "Installed Steam"
 
 #######################################
 # Post-Installation
