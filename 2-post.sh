@@ -1168,7 +1168,7 @@ exit_status "Configured Spotify"
 
 # SpotX
 entry_status "Applying SpotX"
-bash <(curl -sSL https://spotx-official.github.io/run.sh)
+bash <(curl -sSL https://spotx-official.github.io/run.sh) > /dev/null 2>&1
 entry_status "Applied SpotX"
 
 # Spicetify
