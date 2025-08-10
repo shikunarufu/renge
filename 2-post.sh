@@ -1169,12 +1169,65 @@ exit_status "Configured Spotify"
 # SpotX
 entry_status "Applying SpotX"
 bash <(curl -sSL https://spotx-official.github.io/run.sh) > /dev/null 2>&1
-entry_status "Applied SpotX"
+exit_status "Applied SpotX"
 
 # Spicetify
 entry_status "Installing Spicetify"
 yay -S spicetify-cli --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
 exit_status "Installed Spicetify"
+
+cat > /home/"${username}"/.config/spicetify/user.css << 'EOF'
+/* Background buttons, main play/pause button and progress bar */
+.encore-bright-accent-set,
+.encore-inverted-light-set,
+.x-progressBar-fillColor {
+    background-color: var(--spice-button-active) !important;
+}
+
+/* Left sidebar search button */
+.x-filterBox-expandButton {
+    border-radius: 1000px !important;
+}
+
+/* Queue and recently played right sidebar buttons */
+.encore-text-body-small-bold {
+    border-radius: 10px !important;
+}
+
+/* Hover animations for buttons, tracklist and context menu */
+button,
+.main-trackList-trackListRow,
+.main-contextMenu-menuItemButton {
+    transition: color 200ms cubic-bezier(0, 0.55, 0.45, 1), background-color 200ms cubic-bezier(0, 0.55, 0.45, 1) !important;
+}
+
+/* Search bar and dropdown */
+.main-topBar-searchBar,
+#recent-searches-dropdown > div {
+    background-color: var(--spice-main-elevated) !important;
+}
+
+/* Hide the main header on the home page */
+.main-home-homeHeader {
+  display: none !important;
+}
+
+/* Remove any decorative pseudo-elements inside the home header */
+.search-searchCategory-contentArea::before,
+.search-searchCategory-contentArea::after {
+  display: none !important;
+  content: none !important;
+}
+
+/* Hide the gradient background bar that appears between the playlist/album header and the song list */
+.main-actionBarBackground-background {
+  display: none !important;
+}
+
+.main-view-container__scroll-node-child div[style*="--background-base"]:not([style*="--background-base-min-contrast"]) {
+  display: none !important;
+}
+EOF
 
 # VSCodium
 entry_status "Installing VSCodium"
@@ -1185,6 +1238,11 @@ exit_status "Installed VSCodium"
 entry_status "Installing Zen Browser"
 yay -S zen-browser-bin --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
 exit_status "Installed Zen Browser"
+
+# Vesktop
+entry_status "Installing Vesktop"
+yay -S vesktop --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
+exit_status "Installed Vesktop"
 
 # Steam
 entry_status "Installing Steam"
