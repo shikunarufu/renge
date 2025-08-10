@@ -1166,6 +1166,8 @@ sudo chmod a+wr /opt/spotify
 sudo chmod a+wr /opt/spotify/Apps -R
 exit_status "Configured Spotify"
 
+bash <(curl -sSL https://spotx-official.github.io/run.sh)
+
 # Spicetify
 entry_status "Installing Spicetify"
 yay -S spicetify-cli --answerclean All --answerdiff None --noconfirm > /dev/null 2>&1
