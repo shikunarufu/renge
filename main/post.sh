@@ -52,254 +52,194 @@ exit_status() {
   fi
 }
 
-
-
-# Persistent bottom status line
-status_init() {
-  tput civis
-  trap status_cleanup EXIT
-  STATUS_LINES=$(tput lines)
-  STATUS_COLS=$(tput cols)
-  printf '\e[1;%dr' "$((STATUS_LINES-1))"  # scroll region: all but last line
-  status_update "Ready"
-}
-
-status_update() {
-  local msg="$1"
-  tput sc
-  tput cup $((STATUS_LINES-1)) 0
-  tput el
-  printf "[%s] %s" "$(date +%H:%M:%S)" "${msg:0:STATUS_COLS}"
-  tput rc
-}
-
-spinner_start() {
-  _sp_msg="$1"; _sp_i=0; _sp_chars='|/-\' ; _sp_run=1
-  (
-    while [ "$_sp_run" -eq 1 ]; do
-      _sp_i=$(( (_sp_i + 1) % 4 ))
-      status_update "$_sp_msg ${_sp_chars:_sp_i:1}"
-      sleep 0.1
-    done
-  ) & _sp_pid=$!
-}
-
-spinner_stop() {
-  _sp_run=0
-  kill "$_sp_pid" 2>/dev/null
-  wait "$_sp_pid" 2>/dev/null
-  status_update "$1"
-}
-
-run() {
-  local msg="$1"; shift
-  spinner_start "$msg"
-  "$@"; local rc=$?
-  if [ $rc -eq 0 ]; then
-    spinner_stop "$msg - OK"
-  else
-    spinner_stop "$msg - FAILED ($rc)"
-    return $rc
-  fi
-}
-
-status_cleanup() {
-  tput sc
-  printf '\e[r'    # reset scroll region
-  tput cnorm
-  tput rc
-}
-
-
-
 # Clear the terminal screen
-run "Clearing Terminal Screen"
+entry_status "Clearing Terminal Screen"
 clear
-#exit_status "Cleared Terminal Screen"
+exit_status "Cleared Terminal Screen"
 
 # Allow members of group wheel sudo access without a password
-run "Allowing Sudo Access Without Password"
+entry_status "Allowing Sudo Access Without Password"
 printf "%s\n%s" "${user_passwd}" | sudo --stdin sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-#exit_status "Allowed Sudo Access Without Password"
+exit_status "Allowed Sudo Access Without Password"
 
 #######################################
 # Installation
 #######################################
 
 # Yay
-run "Installing Yay Dependencies"
+entry_status "Installing Yay Dependencies"
 sudo pacman -S --noconfirm --needed git base-devel
-#exit_status "Installed Yay Dependencies"
-run "Cloning Yay Repository"
+exit_status "Installed Yay Dependencies"
+entry_status "Cloning Yay Repository"
 git clone https://aur.archlinux.org/yay.git
-#exit_status "Cloned Yay Repository"
-run "Installing Yay"
+exit_status "Cloned Yay Repository"
+entry_status "Installing Yay"
 cd yay
 makepkg -si --noconfirm
-#exit_status "Installed Yay"
-run "Generating Development Package Database"
+exit_status "Installed Yay"
+entry_status "Generating Development Package Database"
 yay --yay --gendb
-#exit_status "Generated Development Package Database"
-run "Updating Development Package"
+exit_status "Generated Development Package Database"
+entry_status "Updating Development Package"
 yay -Syu --devel --answerupgrade None --noconfirm
-#exit_status "Updated Development Package"
-run "Enabling Development Package Updates"
+exit_status "Updated Development Package"
+entry_status "Enabling Development Package Updates"
 yay --yay --devel --save
-#exit_status "Enabled Development Package Updates"
+exit_status "Enabled Development Package Updates"
 
 # Hyprland
-run "Installing Hyprland Dependencies"
+entry_status "Installing Hyprland Dependencies"
 yay -S --answerclean All --answerdiff None --noconfirm ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils
-#exit_status "Installed Hyprland Dependencies"
-run "Cloning Hyprland Repository"
+exit_status "Installed Hyprland Dependencies"
+entry_status "Cloning Hyprland Repository"
 git clone --recursive https://github.com/hyprwm/Hyprland
-#exit_status "Cloned Hyprland Repository"
-run "Compiling Hyprland"
+exit_status "Cloned Hyprland Repository"
+entry_status "Compiling Hyprland"
 cd Hyprland
 make all
-#exit_status "Compiled Hyprland"
-run "Installing Hyprland"
+exit_status "Compiled Hyprland"
+entry_status "Installing Hyprland"
 sudo make install
-#exit_status "Installed Hyprland"
-run "Configuring Hyprland"
+exit_status "Installed Hyprland"
+entry_status "Configuring Hyprland"
 cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
-#exit_status "Configured Hyprland"
+exit_status "Configured Hyprland"
 
 # Foot
-run "Installing Foot"
+entry_status "Installing Foot"
 sudo pacman -S --noconfirm --needed foot foot-terminfo libnotify xdg-utils
-#exit_status "Installed Foot"
-run "Configuring Foot"
+exit_status "Installed Foot"
+entry_status "Configuring Foot"
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
-#exit_status "Configured Foot"
+exit_status "Configured Foot"
 
 # Greetd
-run "Installing Greetd"
+entry_status "Installing Greetd"
 sudo pacman -S --noconfirm --needed greetd greetd-tuigreet
-#exit_status "Installed Greetd"
-run "Configuring Greetd"
+exit_status "Installed Greetd"
+entry_status "Configuring Greetd"
 sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland --remember"|g' /etc/greetd/config.toml
-#exit_status "Configured Greetd"
-run "Enabling Greetd"
+exit_status "Configured Greetd"
+entry_status "Enabling Greetd"
 sudo systemctl enable greetd.service
-#exit_status "Enabled Greetd"
+exit_status "Enabled Greetd"
 
 # Waybar
-run "Installing Waybar"
+entry_status "Installing Waybar"
 sudo pacman -S --noconfirm --needed waybar
-#exit_status "Installed Waybar"
-run "Configuring Waybar"
+exit_status "Installed Waybar"
+entry_status "Configuring Waybar"
 cp --recursive /home/"${username}"/renge/waybar /home/"${username}"/.config
-#exit_status "Configured Waybar"
+exit_status "Configured Waybar"
 
 # SWWW
-run "Installing SWWW"
+entry_status "Installing SWWW"
 yay -S --answerclean All --answerdiff None --noconfirm swww
-#exit_status "Installed SWWW"
-run "Configuring SWWW"
+exit_status "Installed SWWW"
+entry_status "Configuring SWWW"
 mkdir /home/"${username}"/Pictures/Wallpapers
 cp /home/"${username}"/renge/wallpapers/desktop.png /home/"${username}"/Pictures/Wallpapers
-#exit_status "Configured SWWW"
+exit_status "Configured SWWW"
 
 # Rofi
-run "Installing Rofi"
+entry_status "Installing Rofi"
 sudo pacman -S --noconfirm --needed rofi-wayland
-#exit_status "Installed Rofi"
-run "Configuring Rofi"
+exit_status "Installed Rofi"
+entry_status "Configuring Rofi"
 cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
-#exit_status "Configured Rofi"
+exit_status "Configured Rofi"
 
 # Vesktop
-run "Installing Vesktop"
+entry_status "Installing Vesktop"
 yay -S --answerclean All --answerdiff None --noconfirm vesktop
-#exit_status "Installed Vesktop"
+exit_status "Installed Vesktop"
 
 # Dolphin
-run "Installing Dolphin"
+entry_status "Installing Dolphin"
 sudo pacman -S --noconfirm --needed dolphin audiocd-kio baloo dolphin-plugins kio-admin kio-gdrive kompare ffmpegthumbs icoutils kdegraphics-thumbnailers kdesdk-thumbnailers kimageformats libheif libappimage qt6-imageformats taglib
-#exit_status "Installed Dolphin"
-run "Installing Dolphin Dependencies"
+exit_status "Installed Dolphin"
+entry_status "Installing Dolphin Dependencies"
 yay -S --answerclean All --answerdiff None --noconfirm kde-thumbnailer-apk raw-thumbnailer resvg
-#exit_status "Installed Dolphin Dependencies"
+exit_status "Installed Dolphin Dependencies"
 
 # Hyprshot
-run "Installing Hyprshot"
+entry_status "Installing Hyprshot"
 yay -S --answerclean All --answerdiff None --noconfirm hyprshot-git
-#exit_status "Installed Hyprshot"
+exit_status "Installed Hyprshot"
 
 # Fish
-run "Installing Fish"
+entry_status "Installing Fish"
 sudo pacman -S --noconfirm --needed fish
-#exit_status "Installed Fish"
-run "Configuring Fish"
+exit_status "Installed Fish"
+entry_status "Configuring Fish"
 cp --recursive /home/"${username}"/renge/fish /home/"${username}"/.config
-#exit_status "Configured Fish"
+exit_status "Configured Fish"
 
 # Starship
-run "Installing Starship"
+entry_status "Installing Starship"
 sudo pacman -S --noconfirm --needed starship
-#exit_status "Installed Starship"
-run "Configuring Starship"
+exit_status "Installed Starship"
+entry_status "Configuring Starship"
 cp --recursive /home/"${username}"/renge/starship/starship.toml /home/"${username}"/.config
-#exit_status "Configured Starship"
+exit_status "Configured Starship"
 
 # Fastfetch
-run "Installing Fastfetch"
+entry_status "Installing Fastfetch"
 sudo pacman -S --noconfirm --needed fastfetch
-#exit_status "Installed Fastfetch"
-run "Configuring Fastfetch"
+exit_status "Installed Fastfetch"
+entry_status "Configuring Fastfetch"
 cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
-#exit_status "Configured Fastfetch"
+exit_status "Configured Fastfetch"
 
 # Spotify
-run "Installing Spotify"
+entry_status "Installing Spotify"
 yay -S --answerclean All --answerdiff None --noconfirm spotify
-#exit_status "Installed Spotify"
-run "Installing Spotify Dependencies"
+exit_status "Installed Spotify"
+entry_status "Installing Spotify Dependencies"
 sudo pacman -S --noconfirm --needed ffmpeg4.4 libnotify zenity
-#exit_status "Installed Spotify Dependencies"
-run "Configuring Spotify"
+exit_status "Installed Spotify Dependencies"
+entry_status "Configuring Spotify"
 sudo chmod a+wr /opt/spotify
 sudo chmod a+wr /opt/spotify/Apps -R
-#exit_status "Configured Spotify"
+exit_status "Configured Spotify"
 
 # SpotX
-run "Applying SpotX"
+entry_status "Applying SpotX"
 bash <(curl -sSL https://spotx-official.github.io/run.sh)
-#exit_status "Applied SpotX"
+exit_status "Applied SpotX"
 
 # VSCodium
-# run "Installing VSCodium"
+# entry_status "Installing VSCodium"
 # yay -S --answerclean All --answerdiff None --noconfirm vscodium-bin
-# #exit_status "Installed VSCodium"
+# exit_status "Installed VSCodium"
 
 # Zen Browser
-run "Installing Zen Browser"
+entry_status "Installing Zen Browser"
 yay -S --answerclean All --answerdiff None --noconfirm zen-browser-bin
-#exit_status "Installed Zen Browser"
+exit_status "Installed Zen Browser"
 
 # Steam
-run "Installing Steam"
+entry_status "Installing Steam"
 sudo pacman -S --noconfirm --needed steam
-#exit_status "Installed Steam"
+exit_status "Installed Steam"
 
 #######################################
 # Post-Installation
 #######################################
 
 # Clean
-run "Removing Files From Cache And Unused Repositories"
+entry_status "Removing Files From Cache And Unused Repositories"
 yay -Scc --noconfirm
-#exit_status "Removed Files From Cache And Unused Repositories"
+exit_status "Removed Files From Cache And Unused Repositories"
 
 # Allow members of group wheel sudo access with a password
-run "Allowing Sudo Access With Password"
+entry_status "Allowing Sudo Access With Password"
 sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-#exit_status "Allowed Sudo Access Without Password"
+exit_status "Allowed Sudo Access Without Password"
 
 # Launch Hyprland
-run "Launching Hyprland"
+entry_status "Launching Hyprland"
 Hyprland
-#exit_status "Launched Hyprland"
+exit_status "Launched Hyprland"
 
 # swww img /home/"${username}"/Pictures/Wallpapers/desktop.png
