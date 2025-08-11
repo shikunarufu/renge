@@ -102,7 +102,7 @@ entry_status "Installing Hyprland"
 sudo make install > /dev/null 2>&1
 exit_status "Installed Hyprland"
 entry_status "Configuring Hyprland"
-cp /home/"${username}"/ALIS/hypr /home/"${username}"/.config
+cp --recursive /home/"${username}"/ALIS/hypr /home/"${username}"/.config
 exit_status "Configured Hyprland"
 
 # SWWW
