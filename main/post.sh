@@ -138,7 +138,7 @@ yay -S --answerclean All --answerdiff None --noconfirm swww
 exit_status "Installed SWWW"
 entry_status "Configuring SWWW"
 mkdir /home/"${username}"/Pictures/Wallpapers
-cp /home/"${username}"/renge/Desktop.png /home/"${username}"/Pictures/Wallpapers
+cp /home/"${username}"/renge/wallpapers/desktop.png /home/"${username}"/Pictures/Wallpapers
 exit_status "Configured SWWW"
 
 # Rofi
