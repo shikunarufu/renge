@@ -187,7 +187,7 @@ exit_status "Mounted File Systems"
 
 # Select the mirrors
 entry_status "Upgrading Arch Linux Keyring"
-pacman -S --noconfirm archlinux-keyring > /dev/null 2>&1
+pacman -S --noconfirm --needed archlinux-keyring > /dev/null 2>&1
 exit_status "Upgraded Arch Linux Keyring"
 entry_status "Selecting Mirrors"
 reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose --fastest 20 --latest 200 --protocol https,http > /dev/null 2>&1
@@ -289,7 +289,7 @@ exit_status "Set Root Password"
 
 # Boot loader
 entry_status "Installing Boot Loader"
-pacman -S --noconfirm grub efibootmgr > /dev/null 2>&1
+pacman -S --noconfirm --needed grub efibootmgr > /dev/null 2>&1
 exit_status "Installed Boot Loader (GRUB)"
 entry_status "Installing GRUB"
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB > /dev/null 2>&1
@@ -325,7 +325,7 @@ exit_status "Disabled Password Prompt Timeout"
 
 # pacman
 entry_status "Installing Pacman Contrib"
-pacman -S --noconfirm pacman-contrib > /dev/null 2>&1
+pacman -S --noconfirm --needed pacman-contrib > /dev/null 2>&1
 exit_status "Installed Pacman Contrib"
 entry_status "Enabling paccache.timer"
 systemctl enable paccache.timer > /dev/null 2>&1
@@ -342,12 +342,12 @@ exit_status "Upgraded System"
 
 # Mirrors
 entry_status "Installing Reflector"
-pacman -S --noconfirm reflector > /dev/null 2>&1
+pacman -S --noconfirm --needed reflector > /dev/null 2>&1
 exit_status "Installed Reflector"
 
 # Arch Build System
 entry_status "Installing Git"
-pacman -S --noconfirm git > /dev/null 2>&1
+pacman -S --noconfirm --needed git > /dev/null 2>&1
 exit_status "Installed Git"
 entry_status "Setting Parallel Compilation"
 core=$(grep --count ^processor /proc/cpuinfo)
@@ -360,12 +360,12 @@ exit_status "Set Parallel Compilation"
 
 # Display drivers
 entry_status "Installing AMD Radeon Graphics Card Drivers"
-pacman -S --noconfirm mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon > /dev/null 2>&1
+pacman -S --noconfirm --needed mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon > /dev/null 2>&1
 exit_status "Installed AMD Radeon Graphics Card Drivers"
 
 # User directories
 entry_status "Creating User Directories"
-pacman -S --noconfirm xdg-user-dirs > /dev/null 2>&1
+pacman -S --noconfirm --needed xdg-user-dirs > /dev/null 2>&1
 xdg-user-dirs-update
 exit_status "Created User Directories"
 
@@ -375,7 +375,7 @@ exit_status "Created User Directories"
 
 # Sound system
 entry_status "Installing Sound Servers"
-pacman -S --noconfirm pipewire lib32-pipewire pipewire-docs wireplumber pipewire-audio pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack > /dev/null 2>&1
+pacman -S --noconfirm --needed pipewire lib32-pipewire pipewire-docs wireplumber pipewire-audio pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack > /dev/null 2>&1
 exit_status "Installed Sound Servers"
 
 #######################################
@@ -393,7 +393,7 @@ exit_status "Enabled fstrim.timer"
 
 # File index and search
 entry_status "Installing Plocate"
-pacman -S --noconfirm plocate > /dev/null 2>&1
+pacman -S --noconfirm --needed plocate > /dev/null 2>&1
 exit_status "Installed Plocate"
 
 #######################################
@@ -402,7 +402,7 @@ exit_status "Installed Plocate"
 
 # Fonts
 entry_status "Installing Fonts"
-pacman -S --noconfirm noto-fonts noto-fonts-cjk ttf-jetbrains-mono-nerd otf-geist-mono-nerd > /dev/null 2>&1
+pacman -S --noconfirm --needed noto-fonts noto-fonts-cjk ttf-jetbrains-mono-nerd otf-geist-mono-nerd > /dev/null 2>&1
 exit_status "Installed Fonts"
 
 #######################################
@@ -411,7 +411,7 @@ exit_status "Installed Fonts"
 
 # Tab-completion enhancements
 entry_status "Installing Bash Completion"
-pacman -S --noconfirm bash-completion > /dev/null 2>&1
+pacman -S --noconfirm --needed bash-completion > /dev/null 2>&1
 exit_status "Installed Bash Completion"
 
 # Aliases
@@ -420,7 +420,7 @@ exit_status "Installed Bash Completion"
 
 # Compressed files
 entry_status "Installing Archiving and Compression Tools"
-pacman -S --noconfirm 7zip tar zip unzip > /dev/null 2>&1
+pacman -S --noconfirm --needed 7zip tar zip unzip > /dev/null 2>&1
 exit_status "Installed Archiving and Compression Tools"
 EOF
 
