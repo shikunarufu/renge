@@ -1,0 +1,133 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    "type": "auto",
+    "source": "arch",
+    "width": 35,
+    "height": 35,
+    "padding": {
+      "top": 0,
+      "left": 0,
+      "right": 2
+    },
+    "color": {
+      "1": "\u001b[38;2;177;204;211m",
+      "2": "\u001b[38;2;177;204;211m"
+    }
+  },
+  "display": {
+    "separator": ": ",
+    "color": {
+      "keys": "\u001b[38;2;177;204;211m",
+      "title": "\u001b[38;2;210;175;149m"
+    },
+    "key": {
+      "type": "string"
+    }
+  },
+  "modules": [
+    {
+      "type": "custom",
+      "key": " ",
+      "format": "╭─────────────────────── Hardware ───────────────────────╮"
+    },
+    {
+      "type": "cpu",
+      "key": "  CPU"
+    },
+    {
+      "type": "custom",
+      "key": "  Cooler",
+      "format": "Thermalright Peerless Assassin 120 Black"
+    },
+    {
+      "type": "board",
+      "key": "  Board"
+    },
+    {
+      "type": "custom",
+      "key": "  RAM",
+      "format": "G.Skill Ripjaws V 16 GB (2 x 8 GB) DDR4-3200 CL16"
+    },
+    {
+      "type": "custom",
+      "key": "  SSD",
+      "format": "Kingston A400 120 GB M.2-2280 SATA"
+    },
+    {
+      "type": "custom",
+      "key": "  HDD",
+      "format": "Seagate BarraCuda 1 TB 3.5\" 7200 RPM"
+    },
+    {
+      "type": "gpu",
+      "key": "  GPU"
+    },
+    {
+      "type": "custom",
+      "key": "  Case",
+      "format": "NZXT H510i ATX Mid Tower"
+    },
+    {
+      "type": "custom",
+      "key": "  PSU",
+      "format": "Corsair CV450 450 W 80+ Bronze Certified ATX"
+    },
+    {
+      "type": "monitor",
+      "key": "  Monitor"
+    },
+    {
+      "type": "custom",
+      "key": " ",
+      "format": "╰────────────────────────────────────────────────────────╯"
+    },
+    {
+      "type": "custom",
+      "key": " ",
+      "format": "╭─────────────────────── Software ───────────────────────╮"
+    },
+    {
+      "type": "os",
+      "key": "  OS"
+    },
+    {
+      "type": "kernel",
+      "key": "  Kernel"
+    },
+    {
+      "type": "packages",
+      "key": "  Packages"
+    },
+    {
+      "type": "shell",
+      "key": "  Shell"
+    },
+    {
+      "type": "terminal",
+      "key": "  Terminal"
+    },
+    {
+      "type": "wm",
+      "key": "  WM"
+    },
+    {
+      "type": "lm",
+      "key": "  LM"
+    },
+    {
+      "type": "uptime",
+      "key": "  Uptime"
+    },
+    {
+      "type": "colors",
+      "paddingLeft": 2,
+      "symbol": "circle"
+    },
+    {
+      "type": "custom",
+      "key": " ",
+      "format": "╰────────────────────────────────────────────────────────╯"
+    }
+  ]
+}
