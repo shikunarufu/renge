@@ -162,6 +162,11 @@ entry_status "Installing Dolphin Dependencies"
 yay -S --answerclean All --answerdiff None --noconfirm kde-thumbnailer-apk raw-thumbnailer resvg
 exit_status "Installed Dolphin Dependencies"
 
+# Hyprshot
+entry_status "Installing Hyprshot"
+yay -S --answerclean All --answerdiff None --noconfirm hyprshot-git
+exit_status "Installed Hyprshot"
+
 # Fish
 entry_status "Installing Fish"
 sudo pacman -S --noconfirm --needed fish
