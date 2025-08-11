@@ -1,0 +1,112 @@
+// Waybar Configuration File
+{
+  // Bar Configuration
+  "layer": "bottom",
+  "position": "top",
+  "height": 24,
+  "modules-left": [
+    "clock",
+    "clock#date",
+    "custom/weather"
+  ],
+  "modules-center": [
+    "hyprland/workspaces"
+  ],
+  "modules-right": [
+    "custom/media",
+    "pulseaudio",
+    "network",
+    "group/group-power"
+  ],
+  "margin-top": 6,
+  "margin-left": 6,
+  "margin-right": 6,
+  "spacing": 6,
+  // Module Configuration
+  "clock": {
+    "interval": "60",
+    "format": " {:%H:%M}",
+    "tooltip": true,
+    "tooltip-format": "{:%I:%M %p}"
+  },
+  "clock#date": {
+    "interval": "60",
+    "format": " {:%a %b %d}",
+    "tooltip": true,
+    "tooltip-format": "{:%A, %d %B %Y}"
+  },
+  "custom/arch": {
+    "format": "󰣇",
+    "tooltip": true,
+    "tooltip-format": "Arch Linux"
+  },
+  "custom/lock": {
+    "format": "",
+    "on-click": "hyprctl dispatch exec exit",
+    "tooltip": true,
+    "tooltip-format": "Lock"
+  },
+  "custom/restart": {
+    "format": "",
+    "on-click": "reboot",
+    "tooltip": true,
+    "tooltip-format": "Restart"
+  },
+  "custom/shutdown": {
+    "format": "",
+    "on-click": "shutdown now",
+    "tooltip": true,
+    "tooltip-format": "Shut Down"
+  },
+  "custom/sleep": {
+    "format": "󰤄",
+    "on-click": "systemctl hybrid-sleep",
+    "tooltip": true,
+    "tooltip-format": "Sleep"
+  },
+  "group/group-power": {
+    "orientation": "horizontal",
+    "modules": [
+      "custom/arch",
+      "custom/lock",
+      "custom/sleep",
+      "custom/restart",
+      "custom/shutdown"
+    ],
+    "drawer": {
+      "transition-duration": 250,
+      "transition-left-to-right": true,
+      "transition-timing-function": "ease-in-out"
+    }
+  },
+  "hyprland/workspaces": {
+    "active-only": false,
+    "hide-active": false,
+    "all-outputs": false,
+    "format": "{icon}",
+    "format-icons": {
+      "active": "",
+      "default": "",
+      "urgent": ""
+    }
+  },
+  "network": {
+    "interval": "60",
+    "family": "ipv4_6",
+    "format-ethernet": "󰛳",
+    "format-linked": "󰛵",
+    "format-disconnected": "󰲛",
+    "tooltip": true,
+    "tooltip-format-ethernet": "Network Connected",
+    "tooltip-format-disconnected": "Network Disconnected"
+  },
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": "",
+    "format-icons": {
+      "default": ["", "", ""]
+    },
+    "scroll-step": 1,
+    "tooltip": false
+  }
+},
