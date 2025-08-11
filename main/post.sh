@@ -10,7 +10,7 @@
 # This script assumes a working internet connection is available.
 
 # Uncomment the line below to show command outputs.
-set -x
+# set -x
 
 #######################################
 # Preparation
@@ -24,9 +24,9 @@ user_passwd="narufu"
 entry_status() {
   printf "\e[10G"
   if [[ $1 == *" "* ]]; then
-    local subject=${1%% *}
-    local predicate=${1#* }
-    printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
+    local sbjct=${1%% *}
+    local prdct=${1#* }
+    printf "%s \e[1;37m%s\e[0m\n" "${sbjct}" "${prdct}"
   else
     printf "%s\n" "$1"
   fi
@@ -44,9 +44,9 @@ exit_status() {
   printf "]"
   printf "\e[10G"
   if [[ $1 == *" "* ]]; then
-    local subject=${1%% *}
-    local predicate=${1#* }
-    printf "%s \e[1;37m%s\e[0m\n" "${subject}" "${predicate}"
+    local sbjct=${1%% *}
+    local prdct=${1#* }
+    printf "%s \e[1;37m%s\e[0m\n" "${sbjct}" "${prdct}"
   else
     printf "%s\n" "$1"
   fi
@@ -237,4 +237,4 @@ entry_status "Launching Hyprland"
 Hyprland
 exit_status "Launched Hyprland"
 
-# swww img /home/"${username}"/Pictures/Wallpapers/Desktop.png
+# swww img /home/"${username}"/Pictures/Wallpapers/desktop.png
