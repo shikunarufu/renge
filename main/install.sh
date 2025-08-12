@@ -142,14 +142,15 @@ systemctl enable NetworkManager.service
 printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd
 
 # Installation
-pkgs=(
-  # Boot loader
-  grub
-  efibootmgr
-)
+# pkgs=(
+#   # Boot loader
+#   grub
+#   efibootmgr
+# )
 
 # Boot loader
-pacman -S --noconfirm --needed "${pkgs}"
+# pacman -S --noconfirm --needed "${pkgs}"
+pacman -S --noconfirm --needed grub efibootmgr
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg 
 
