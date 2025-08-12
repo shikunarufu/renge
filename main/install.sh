@@ -149,6 +149,7 @@ pacman -Syu --noconfirm
 
 # Installation
 curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/install-pkglist.txt >> install-pkglist.txt
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pkglist.txt | sort --output=install-pkglist.txt --unique
 pacman -S --noconfirm --needed - < install-pkglist.txt
 rm install-pkglist.txt
 
