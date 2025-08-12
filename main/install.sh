@@ -142,7 +142,7 @@ systemctl enable NetworkManager.service
 printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd
 
 # Installation
-curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/install-pkglist.txt >> /home/"${username}"/install-pkglist.txt
+curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/install-pkglist.txt >> install-pkglist.txt
 # pkgs=(
 #   # Boot loader
 #   grub
@@ -150,12 +150,12 @@ curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/ref
 # )
 
 # Boot loader
-pacman -S --noconfirm --needed - < /home/"${username}"/install-pkglist.txt
+pacman -S --noconfirm --needed - < install-pkglist.txt
 # pacman -S --noconfirm --needed grub efibootmgr
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg 
 
-rm /home/"${username}"/install-pkglist.txt
+rm install-pkglist.txt
 
 #######################################
 # System Administration
