@@ -1,0 +1,50 @@
+# Foot
+foot
+foot-terminfo
+libnotify
+xdg-utils
+
+# Greetd
+greetd
+greetd-tuigreet
+
+# Waybar
+waybar
+
+# Rofi
+rofi-wayland
+
+# Dolphin
+dolphin
+audiocd-kio
+baloo
+dolphin-plugins
+kio-admin
+kio-gdrive
+kompare
+ffmpegthumbs
+icoutils
+kdegraphics-thumbnailers
+kdesdk-thumbnailers
+kimageformats
+libheif
+libappimage
+qt6-imageformats
+taglib
+
+# Fish
+fish
+
+# Starship
+starship
+
+# Fastfetch
+fastfetch
+
+# Spotify
+ffmpeg4.4
+libnotify
+zenity
+
+# Steam
+steam
