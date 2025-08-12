@@ -142,7 +142,7 @@ systemctl enable NetworkManager.service
 printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd
 
 # Boot loader
-pacman -S --noconfirm --needed - < /home/"${username}"/renge/main/pkgs/install-pkglist.txt
+pacman -S --noconfirm --needed < /home/"${username}"/renge/main/pkgs/install-pkglist.txt
 # pacman -S --noconfirm --needed grub efibootmgr
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg 
