@@ -114,6 +114,7 @@ pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-header
 # Fstab
 genfstab -U /mnt >> /mnt/etc/fstab
 
+# Preparation for chroot
 cat << EOF > /mnt/configure.sh
 #!/bin/bash
 
@@ -141,21 +142,19 @@ systemctl enable NetworkManager.service
 # Root password
 printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd
 
+# Repositories
+sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
+sed --in-place '93s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
+pacman -Syu --noconfirm
+
 # Installation
 curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/install-pkglist.txt >> install-pkglist.txt
-# pkgs=(
-#   # Boot loader
-#   grub
-#   efibootmgr
-# )
+pacman -S --noconfirm --needed - < install-pkglist.txt
+rm install-pkglist.txt
 
 # Boot loader
-pacman -S --noconfirm --needed - < install-pkglist.txt
-# pacman -S --noconfirm --needed grub efibootmgr
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-grub-mkconfig -o /boot/grub/grub.cfg 
-
-rm install-pkglist.txt
+grub-mkconfig -o /boot/grub/grub.cfg
 
 #######################################
 # System Administration
@@ -175,37 +174,14 @@ echo "Defaults passwd_timeout=0" >> /etc/sudoers
 #######################################
 
 # pacman
-pacman -S --noconfirm --needed pacman-contrib
 systemctl enable paccache.timer
-
-# Repositories
-sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
-sed --in-place '93s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
-pacman -Syu --noconfirm
-
-# Mirrors
-pacman -S --noconfirm --needed reflector
-
-# Arch Build System
-pacman -S --noconfirm --needed git
 
 #######################################
 # Graphical User Interface
 #######################################
 
-# Display drivers
-pacman -S --noconfirm --needed mesa lib32-mesa vulkan-radeon lib32-vulkan-radeon
-
 # User directories
-pacman -S --noconfirm --needed xdg-user-dirs
 xdg-user-dirs-update
-
-#######################################
-# Multimedia
-#######################################
-
-# Sound system
-pacman -S --noconfirm --needed pipewire lib32-pipewire pipewire-docs wireplumber pipewire-audio pipewire-alsa pipewire-pulse pipewire-jack lib32-pipewire-jack
 
 #######################################
 # Optimization
@@ -213,34 +189,6 @@ pacman -S --noconfirm --needed pipewire lib32-pipewire pipewire-docs wireplumber
 
 # Solid state drives
 systemctl enable fstrim.timer
-
-#######################################
-# System Services
-#######################################
-
-# File index and search
-pacman -S --noconfirm --needed plocate
-
-#######################################
-# Appearance
-#######################################
-
-# Fonts
-pacman -S --noconfirm --needed noto-fonts noto-fonts-cjk ttf-jetbrains-mono-nerd otf-geist-mono-nerd
-
-#######################################
-# Console Improvements
-#######################################
-
-# Tab-completion enhancements
-pacman -S --noconfirm --needed bash-completion
-
-# Aliases
-
-# Alternative shells
-
-# Compressed files
-pacman -S --noconfirm --needed 7zip tar zip unzip
 EOF
 
 #######################################
