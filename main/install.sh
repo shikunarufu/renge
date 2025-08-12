@@ -100,7 +100,7 @@ swapon /dev/"${swap_partition}"
 # Select the mirrors
 sed --in-place 's/ParallelDownloads = 5/ParallelDownloads = 10/g' /etc/pacman.conf
 pacman -S --noconfirm --needed archlinux-keyring
-reflector --save /etc/pacman.d/mirrorlist --sort rate --fastest 20 --latest 200 --protocol https,http
+# reflector --save /etc/pacman.d/mirrorlist --sort rate --fastest 20 --latest 200 --protocol https,http
 core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 
@@ -141,9 +141,15 @@ systemctl enable NetworkManager.service
 # Root password
 printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd
 
+# Installation
+pkgs=(
+  # Boot loader
+  grub
+  efibootmgr
+)
+
 # Boot loader
-pacman -S --noconfirm --needed < /home/"${username}"/renge/main/pkgs/install-pkglist.txt
-# pacman -S --noconfirm --needed grub efibootmgr
+pacman -S --noconfirm --needed "${pkgs}"
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg 
 
