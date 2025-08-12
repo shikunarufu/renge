@@ -46,17 +46,20 @@ cd Hyprland
 make all && sudo make install
 cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 
+# Installation
+curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-pacman-pkglist.txt | sort --output=post-pacman-pkglist.txt --unique
+pacman -S --noconfirm --needed - < post-pacman-pkglist.txt
+rm post-pacman-pkglist.txt
+
 # Foot
-sudo pacman -S --noconfirm --needed foot foot-terminfo libnotify xdg-utils
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
 
 # Greetd
-sudo pacman -S --noconfirm --needed greetd greetd-tuigreet
 sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland --remember"|g' /etc/greetd/config.toml
 sudo systemctl enable greetd.service
 
 # Waybar
-sudo pacman -S --noconfirm --needed waybar
 cp --recursive /home/"${username}"/renge/waybar /home/"${username}"/.config
 
 # SWWW
@@ -65,34 +68,28 @@ mkdir /home/"${username}"/Pictures/Wallpapers
 cp /home/"${username}"/renge/wallpapers/desktop.png /home/"${username}"/Pictures/Wallpapers
 
 # Rofi
-sudo pacman -S --noconfirm --needed rofi-wayland
 cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 
 # Vesktop
 yay -S --answerclean All --answerdiff None --noconfirm vesktop
 
 # Dolphin
-sudo pacman -S --noconfirm --needed dolphin audiocd-kio baloo dolphin-plugins kio-admin kio-gdrive kompare ffmpegthumbs icoutils kdegraphics-thumbnailers kdesdk-thumbnailers kimageformats libheif libappimage qt6-imageformats taglib
 yay -S --answerclean All --answerdiff None --noconfirm kde-thumbnailer-apk raw-thumbnailer resvg
 
 # Hyprshot
 yay -S --answerclean All --answerdiff None --noconfirm hyprshot-git
 
 # Fish
-sudo pacman -S --noconfirm --needed fish
 cp --recursive /home/"${username}"/renge/fish /home/"${username}"/.config
 
 # Starship
-sudo pacman -S --noconfirm --needed starship
 cp --recursive /home/"${username}"/renge/starship/starship.toml /home/"${username}"/.config
 
 # Fastfetch
-sudo pacman -S --noconfirm --needed fastfetch
 cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 
 # Spotify
 yay -S --answerclean All --answerdiff None --noconfirm spotify
-sudo pacman -S --noconfirm --needed ffmpeg4.4 libnotify zenity
 sudo chmod a+wr /opt/spotify
 sudo chmod a+wr /opt/spotify/Apps -R
 
@@ -104,9 +101,6 @@ bash <(curl -sSL https://spotx-official.github.io/run.sh)
 
 # Zen Browser
 yay -S --answerclean All --answerdiff None --noconfirm zen-browser-bin
-
-# Steam
-sudo pacman -S --noconfirm --needed steam
 
 #######################################
 # Post-Installation
