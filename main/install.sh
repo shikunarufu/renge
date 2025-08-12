@@ -100,7 +100,9 @@ swapon /dev/"${swap_partition}"
 # Select the mirrors
 sed --in-place 's/ParallelDownloads = 5/ParallelDownloads = 10/g' /etc/pacman.conf
 pacman -S --noconfirm --needed archlinux-keyring
-# reflector --save /etc/pacman.d/mirrorlist --sort rate --fastest 20 --latest 200 --protocol https,http
+reflector --save /etc/pacman.d/mirrorlist --sort rate --fastest 20 --latest 200 --protocol https,http
+
+# Parallel compilation
 core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 
@@ -114,11 +116,11 @@ pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-header
 # Fstab
 genfstab -U /mnt >> /mnt/etc/fstab
 
-# Preparation for chroot
+# Prepare for chroot
 cat << EOF > /mnt/configure.sh
 #!/bin/bash
 
-# Preparation
+# Prepare for installation
 sed --in-place 's/ParallelDownloads = 5/ParallelDownloads = 10/g' /etc/pacman.conf
 core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j\$core\"/g" /etc/makepkg.conf
@@ -142,6 +144,15 @@ systemctl enable NetworkManager.service
 # Root password
 printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd
 
+# Users and groups
+useradd --create-home --groups wheel "${username}"
+printf "%s\n%s" "${user_passwd}" "${user_passwd}" | passwd "${username}"
+
+# Security
+sed --in-place 's/# %wheel/%wheel/g' /etc/sudoers
+sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+echo "Defaults passwd_timeout=0" >> /etc/sudoers
+
 # Repositories
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
 sed --in-place '93s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
@@ -157,45 +168,13 @@ rm install-pkglist.txt
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
-#######################################
-# System Administration
-#######################################
-
-# Users and groups
-useradd --create-home --groups wheel "${username}"
-printf "%s\n%s" "${user_passwd}" "${user_passwd}" | passwd "${username}"
-
-# Security
-sed --in-place 's/# %wheel/%wheel/g' /etc/sudoers
-sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-echo "Defaults passwd_timeout=0" >> /etc/sudoers
-
-#######################################
-# Package Management
-#######################################
-
-# pacman
+# System services
 systemctl enable paccache.timer
-
-#######################################
-# Graphical User Interface
-#######################################
-
-# User directories
 xdg-user-dirs-update
-
-#######################################
-# Optimization
-#######################################
-
-# Solid state drives
 systemctl enable fstrim.timer
 EOF
 
-#######################################
 # Chroot
-#######################################
-
 chmod +x /mnt/configure.sh
 arch-chroot /mnt /configure.sh
 
