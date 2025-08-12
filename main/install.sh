@@ -57,7 +57,7 @@ else
 fi
 
 # Connect to the internet
-ping -c 5 archlinux.org 
+ping -c 1 archlinux.org 
 
 # Update the system clock
 timedatectl set-ntp true
@@ -98,13 +98,14 @@ swapon /dev/"${swap_partition}"
 #######################################
 
 # Select the mirrors
+sed --in-place 's/ParallelDownloads = 5/ParallelDownloads = 10/g' /etc/pacman.conf
 pacman -S --noconfirm --needed archlinux-keyring
-reflector --save /etc/pacman.d/mirrorlist --sort rate --verbose --fastest 20 --latest 200 --protocol https,http
+reflector --save /etc/pacman.d/mirrorlist --sort rate --fastest 20 --latest 200 --protocol https,http
 core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 
 # Install essential packages
-pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo archlinux-keyring
+pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo archlinux-keyring --noconfirm --needed
 
 #######################################
 # Configure The System
@@ -115,6 +116,11 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 cat << EOF > /mnt/configure.sh
 #!/bin/bash
+
+# Preparation
+sed --in-place 's/ParallelDownloads = 5/ParallelDownloads = 10/g' /etc/pacman.conf
+core=$(grep --count ^processor /proc/cpuinfo)
+sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j\$core\"/g" /etc/makepkg.conf
 
 # Time
 ln -sf /usr/share/zoneinfo/"${time_zone}" /etc/localtime
@@ -136,7 +142,8 @@ systemctl enable NetworkManager.service
 printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd
 
 # Boot loader
-pacman -S --noconfirm --needed grub efibootmgr
+pacman -S --noconfirm --needed - < /home/"${username}"/renge/main/pkgs/install-pkglist.txt
+# pacman -S --noconfirm --needed grub efibootmgr
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg 
 
@@ -171,8 +178,6 @@ pacman -S --noconfirm --needed reflector
 
 # Arch Build System
 pacman -S --noconfirm --needed git
-core=$(grep --count ^processor /proc/cpuinfo)
-sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j\$core\"/g" /etc/makepkg.conf
 
 #######################################
 # Graphical User Interface
