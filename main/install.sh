@@ -142,7 +142,7 @@ systemctl enable NetworkManager.service
 printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd
 
 # Installation
-curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/install-pkglist.txt >> /home/"${username}"
+curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/install-pkglist.txt >> /home/"${username}"/install-pkglist.txt
 # pkgs=(
 #   # Boot loader
 #   grub
