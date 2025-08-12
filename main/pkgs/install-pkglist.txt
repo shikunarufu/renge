@@ -1,2 +1,50 @@
+# Boot loader
 grub
 efibootmgr
+
+# pacman
+pacman-contrib
+
+# Mirrors
+reflector
+
+# Arch Build System
+git
+
+# Display drivers
+mesa
+lib32-mesa
+vulkan-radeon
+lib32-vulkan-radeon
+
+# User directories
+xdg-user-dirs
+
+# Sound system
+pipewire
+lib32-pipewire
+pipewire-docs
+wireplumber
+pipewire-audio
+pipewire-alsa
+pipewire-pulse
+pipewire-jack
+lib32-pipewire-jack
+
+# File index and search
+plocate
+
+# Fonts
+noto-fonts
+noto-fonts-cjk
+ttf-jetbrains-mono-nerd
+otf-geist-mono-nerd
+
+# Tab-completion enhancements
+bash-completion
+
+# Compressed files
+7zip
+tar
+zip
+unzip
