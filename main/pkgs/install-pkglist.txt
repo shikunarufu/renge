@@ -1,3 +1,2 @@
-# Boot loader
 grub
 efibootmgr
