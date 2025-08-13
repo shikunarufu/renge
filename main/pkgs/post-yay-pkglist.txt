@@ -1,1 +1,19 @@
+# SWWW
+swww
 
+# Vesktop
+vesktop
+
+# Dolphin
+kde-thumbnailer-apk
+raw-thumbnailer
+resvg
+
+# Hyprshot
+hyprshot-git
+
+# Spotify
+spotify
+
+# Zen Browser
+zen-browser-bin
