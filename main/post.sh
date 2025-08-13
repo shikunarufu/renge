@@ -49,8 +49,13 @@ cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 # Installation
 curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-pacman-pkglist.txt | sort --output=post-pacman-pkglist.txt --unique
-pacman -S --noconfirm --needed - < post-pacman-pkglist.txt
+sudo pacman -S --noconfirm --needed - < post-pacman-pkglist.txt
 rm post-pacman-pkglist.txt
+
+curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-yay-pkglist.txt >> post-yay-pkglist.txt
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-yay-pkglist.txt | sort --output=post-yay-pkglist.txt --unique
+yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist.txt
+rm post-yay-pkglist.txt
 
 # Foot
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
@@ -63,21 +68,11 @@ sudo systemctl enable greetd.service
 cp --recursive /home/"${username}"/renge/waybar /home/"${username}"/.config
 
 # SWWW
-yay -S --answerclean All --answerdiff None --noconfirm swww
 mkdir /home/"${username}"/Pictures/Wallpapers
 cp /home/"${username}"/renge/wallpapers/desktop.png /home/"${username}"/Pictures/Wallpapers
 
 # Rofi
 cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
-
-# Vesktop
-yay -S --answerclean All --answerdiff None --noconfirm vesktop
-
-# Dolphin
-yay -S --answerclean All --answerdiff None --noconfirm kde-thumbnailer-apk raw-thumbnailer resvg
-
-# Hyprshot
-yay -S --answerclean All --answerdiff None --noconfirm hyprshot-git
 
 # Fish
 cp --recursive /home/"${username}"/renge/fish /home/"${username}"/.config
@@ -89,7 +84,6 @@ cp --recursive /home/"${username}"/renge/starship/starship.toml /home/"${usernam
 cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 
 # Spotify
-yay -S --answerclean All --answerdiff None --noconfirm spotify
 sudo chmod a+wr /opt/spotify
 sudo chmod a+wr /opt/spotify/Apps -R
 
@@ -98,9 +92,6 @@ bash <(curl -sSL https://spotx-official.github.io/run.sh)
 
 # VSCodium
 # yay -S --answerclean All --answerdiff None --noconfirm vscodium-bin
-
-# Zen Browser
-yay -S --answerclean All --answerdiff None --noconfirm zen-browser-bin
 
 #######################################
 # Post-Installation
