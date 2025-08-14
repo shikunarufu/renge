@@ -35,6 +35,9 @@ taglib
 # Fish
 fish
 
+# Dunst
+dunst
+
 # Starship
 starship
 
