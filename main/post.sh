@@ -77,6 +77,9 @@ cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 # Fish
 cp --recursive /home/"${username}"/renge/fish /home/"${username}"/.config
 
+# Dunst
+cp --recursive /home/"${username}"/renge/dunst /home/"${username}"/.config
+
 # Hyprshot
 mkdir /home/"${username}"/Pictures/Screenshots
 
