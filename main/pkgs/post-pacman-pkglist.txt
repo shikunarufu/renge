@@ -38,6 +38,9 @@ fish
 # Dunst
 dunst
 
+# Hyprlock
+hyprlock
+
 # Starship
 starship
 
