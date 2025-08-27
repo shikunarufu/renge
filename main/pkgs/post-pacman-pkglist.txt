@@ -41,6 +41,9 @@ dunst
 # Hyprlock
 hyprlock
 
+# Hypridle
+hypridle
+
 # Starship
 starship
 
