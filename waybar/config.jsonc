@@ -42,7 +42,7 @@
   },
   "custom/lock": {
     "format": "",
-    "on-click": "hyprctl dispatch exec exit",
+    "on-click": "hyprlock",
     "tooltip": true,
     "tooltip-format": "Lock"
   },
