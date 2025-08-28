@@ -54,10 +54,17 @@ elif [[ "${bootmode}" == "32" ]]; then
 else
   echo "System may be booted in BIOS (or CSM) mode"
   echo "Refer to your motherboard's manual"
+  exit 1
 fi
 
 # Connect to the internet
-ping -c 1 archlinux.org 
+ping -c 1 archlinux.org
+if ! ping -c 1 archlinux.org; then
+  echo "Connected to the internet"
+else
+  echo "Failed to connect to the internet"
+  exit 1
+fi
 
 # Update the system clock
 timedatectl set-ntp true
