@@ -24,7 +24,6 @@ user_passwd="narufu"
 clear
 
 # Connect to the internet
-ping -c 1 archlinux.org
 if ! ping -c 1 archlinux.org; then
   echo "Connected to the internet"
 else
