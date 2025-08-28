@@ -25,10 +25,7 @@ clear
 
 # Connect to the internet
 if ! ping -c 1 archlinux.org; then
-  echo "Connected to the internet"
-else
   echo "Failed to connect to the internet"
-  exit 1
 fi
 
 # Allow members of group wheel sudo access without a password
