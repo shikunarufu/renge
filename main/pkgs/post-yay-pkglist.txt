@@ -18,5 +18,5 @@ spotify
 # Zen Browser
 zen-browser-bin
 
-# VSCodium
-# vscodium-bin
+# Steam
+ttf-ms-win11-auto
