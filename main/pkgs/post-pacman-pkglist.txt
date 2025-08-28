@@ -57,3 +57,14 @@ zenity
 
 # Steam
 steam
+
+# Virtualization
+virt-manager
+qemu
+vde2
+ebtables
+iptables-nft
+nftables
+dnsmasq
+bridge-utils
+ovmf
