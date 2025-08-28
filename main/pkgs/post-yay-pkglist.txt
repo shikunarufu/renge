@@ -19,4 +19,4 @@ spotify
 zen-browser-bin
 
 # VSCodium
-vscodium-bin
+# vscodium-bin
