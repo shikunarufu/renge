@@ -23,6 +23,15 @@ user_passwd="narufu"
 # Clear the terminal screen
 clear
 
+# Connect to the internet
+ping -c 1 archlinux.org
+if ! ping -c 1 archlinux.org; then
+  echo "Connected to the internet"
+else
+  echo "Failed to connect to the internet"
+  exit 1
+fi
+
 # Allow members of group wheel sudo access without a password
 printf "%s\n%s" "${user_passwd}" | sudo --stdin sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
@@ -88,10 +97,6 @@ cp --recursive /home/"${username}"/renge/starship/starship.toml /home/"${usernam
 
 # Fastfetch
 cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
-
-# Spotify
-sudo chmod a+wr /opt/spotify
-sudo chmod a+wr /opt/spotify/Apps -R
 
 # SpotX
 bash <(curl -sSL https://spotx-official.github.io/run.sh)
