@@ -101,9 +101,6 @@ cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 # SpotX
 bash <(curl -sSL https://spotx-official.github.io/run.sh)
 
-# VSCodium
-# yay -S --answerclean All --answerdiff None --noconfirm vscodium-bin
-
 #######################################
 # Post-Installation
 #######################################
