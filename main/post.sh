@@ -26,40 +26,65 @@ clear
 # Connect to the internet
 if ! ping -c 1 archlinux.org; then
   echo "Failed to connect to the internet"
+  exit
 fi
 
 # Allow members of group wheel sudo access without a password
-printf "%s\n%s" "${user_passwd}" | sudo --stdin sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+printf "%s\n%s" "${user_passwd}" "${user_passwd}" | sudo --stdin sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
 #######################################
 # Installation
 #######################################
 
 # Yay
-sudo pacman -S --noconfirm --needed git base-devel
-git clone https://aur.archlinux.org/yay.git
-cd yay
+if ! sudo pacman -S --noconfirm --needed git base-devel; then
+  echo "Failed to install Yay dependencies"
+  exit
+fi
+if ! git clone https://aur.archlinux.org/yay.git; then
+  echo "Failed to clone Yay repository"
+  exit
+fi
+cd yay || exit
 makepkg -si --noconfirm
 yay --yay --gendb
 yay -Syu --devel --answerupgrade None --noconfirm
 yay --yay --devel --save
 
 # Hyprland
-yay -S --answerclean All --answerdiff None --noconfirm ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils
-git clone --recursive https://github.com/hyprwm/Hyprland
-cd Hyprland
+if ! yay -S --answerclean All --answerdiff None --noconfirm ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils; then
+  echo "Failed to install Hyprland dependencies"
+  exit
+fi
+if ! git clone --recursive https://github.com/hyprwm/Hyprland; then
+  echo "Failed to clone Hyprland repository"
+  exit
+fi
+cd Hyprland || exit
 make all && sudo make install
 cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 
 # Installation
-curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt
+if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt; then
+  echo "Failed to retrieve package list"
+  exit
+fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-pacman-pkglist.txt | sort --output=post-pacman-pkglist.txt --unique
-sudo pacman -S --noconfirm --needed - < post-pacman-pkglist.txt
+if ! sudo cat post-pacman-pkglist.txt | pacman -S --noconfirm --needed -; then
+  echo "Failed to install packages"
+  exit
+fi
 rm post-pacman-pkglist.txt
 
-curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-yay-pkglist.txt >> post-yay-pkglist.txt
+if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-yay-pkglist.txt >> post-yay-pkglist.txt; then
+  echo "Failed to retrieve (AUR) package list"
+  exit
+fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-yay-pkglist.txt | sort --output=post-yay-pkglist.txt --unique
-yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist.txt
+if ! yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist.txt; then
+  echo "Failed to install (AUR) packages"
+  exit
+fi
 rm post-yay-pkglist.txt
 
 # Foot
