@@ -17,3 +17,6 @@ spotify
 
 # Zen Browser
 zen-browser-bin
+
+# VSCodium
+vscodium-bin
