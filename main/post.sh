@@ -70,7 +70,7 @@ if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/reng
   exit
 fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-pacman-pkglist.txt | sort --output=post-pacman-pkglist.txt --unique
-if ! sudo pacman -S --noconfirm --needed - < post-pacman-pkglist.txt; then
+if ! yes | sudo pacman -S --noconfirm --needed - < post-pacman-pkglist.txt; then
   echo "Failed to install packages"
   exit
 fi
