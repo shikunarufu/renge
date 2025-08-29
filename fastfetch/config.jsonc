@@ -32,8 +32,9 @@
       "format": "╭─────────────────────── Hardware ───────────────────────╮"
     },
     {
-      "type": "cpu",
-      "key": "  CPU"
+      "type": "custom",
+      "key": "  CPU",
+      "format": "AMD Ryzen 5 3600 GHz 6-Core"
     },
     {
       "type": "custom",
@@ -41,8 +42,9 @@
       "format": "Thermalright Peerless Assassin 120 Black"
     },
     {
-      "type": "board",
-      "key": "  Board"
+      "type": "custom",
+      "key": "  Board",
+      "format": "MSI B450M MORTAR MAX Micro ATX AM4"
     },
     {
       "type": "custom",
@@ -60,8 +62,9 @@
       "format": "Seagate BarraCuda 1 TB 3.5\" 7200 RPM"
     },
     {
-      "type": "gpu",
-      "key": "  GPU"
+      "type": "custom",
+      "key": "  GPU",
+      "format": "XFX Speedster SWFT 210 Radeon RX 6600 8 GB"
     },
     {
       "type": "custom",
@@ -74,8 +77,9 @@
       "format": "Corsair CV450 450 W 80+ Bronze Certified ATX"
     },
     {
-      "type": "monitor",
-      "key": "  Monitor"
+      "type": "custom",
+      "key": "  Monitor",
+      "format": "AOC 24G4 23.8\" 1920 x 1080 180 Hz"
     },
     {
       "type": "custom",
