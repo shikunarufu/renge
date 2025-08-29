@@ -12,6 +12,9 @@ resvg
 # Hyprshot
 hyprshot-git
 
+# Hyprlock
+ttf-google-sans
+
 # Spotify
 spotify
 
