@@ -60,6 +60,7 @@ fi
 # Connect to the internet
 if ! ping -c 1 archlinux.org; then
   echo "Failed to connect to the internet"
+  exit 1
 fi
 
 # Update the system clock
