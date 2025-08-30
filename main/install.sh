@@ -102,6 +102,7 @@ swapon /dev/"${swap_partition}"
 #######################################
 
 # Select the mirrors
+sed --in-place 's/#Color/Color/g' /etc/pacman.conf
 sed --in-place 's/ParallelDownloads = 5/ParallelDownloads = 12/g' /etc/pacman.conf
 pacman -S --noconfirm --needed archlinux-keyring
 reflector --save /etc/pacman.d/mirrorlist --sort rate --threads 12 --latest 200 --protocol https,http
@@ -125,6 +126,7 @@ cat << EOF > /mnt/configure.sh
 #!/bin/bash
 
 # Prepare for installation
+sed --in-place 's/#Color/Color/g' /etc/pacman.conf
 sed --in-place 's/ParallelDownloads = 5/ParallelDownloads = 12/g' /etc/pacman.conf
 core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j\$core\"/g" /etc/makepkg.conf
