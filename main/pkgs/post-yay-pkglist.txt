@@ -3,6 +3,7 @@ swww
 
 # Vesktop
 vesktop
+xdg-desktop-portal-hyprland-git
 
 # Dolphin
 kde-thumbnailer-apk
