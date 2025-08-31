@@ -14,6 +14,9 @@ waybar
 # Rofi
 rofi-wayland
 
+# Vesktop
+xdg-desktop-portal-wlr
+
 # Dolphin
 dolphin
 audiocd-kio
