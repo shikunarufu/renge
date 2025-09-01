@@ -55,5 +55,32 @@ ffmpeg4.4
 libnotify
 zenity
 
+# Wine
+wine-staging
+wine-gecko
+wine-mono
+alsa-lib
+alsa-plugins
+cups
+dosbox
+ffmpeg
+giflib
+gnutls
+gst-plugins-base-libs
+gtk3
+libgphoto2
+libpulse
+libva
+libxcomposite
+libxinerama
+ocl-icd
+pcsclite
+samba
+sane
+sdl2-compat
+v4l-utils
+vulkan-icd-loader
+winetricks
+
 # Steam
 steam
