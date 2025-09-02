@@ -59,7 +59,6 @@ zenity
 wine-staging
 wine-gecko
 wine-mono
-
 giflib
 lib32-giflib
 libpng
@@ -103,9 +102,7 @@ lib32-vulkan-icd-loader
 cups
 samba
 dosbox
-
 winetricks
-
 
 # Steam
 steam
