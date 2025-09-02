@@ -14,7 +14,7 @@
 # manually using the official installation guide.
 
 # Uncomment the line below to show command outputs.
-# set -x
+# set -ex
 
 #######################################
 # Preparation
