@@ -26,6 +26,7 @@ clear
 # Connect to the internet
 if ! ping -c 1 archlinux.org; then
   echo "Failed to connect to the internet"
+  rm --recursive /home/"${username}"/renge
   exit
 fi
 
@@ -39,11 +40,15 @@ printf "%s\n%s" "${user_passwd}" "${user_passwd}" | sudo --stdin sed --in-place 
 # Yay
 if ! sudo pacman -S --noconfirm --needed git base-devel; then
   echo "Failed to install Yay dependencies"
+  rm --recursive /home/"${username}"/renge
   exit
 fi
 if ! git clone https://aur.archlinux.org/yay.git; then
-  echo "Failed to clone Yay repository"
-  exit
+  if ! git clone --branch yay --single-branch https://github.com/archlinux/aur.git yay; then
+    echo "Failed to clone Yay repository"
+    rm --recursive /home/"${username}"/renge
+    exit
+  fi
 fi
 cd yay || exit
 makepkg -si --noconfirm
@@ -53,11 +58,60 @@ yay --yay --devel --save
 
 # Hyprland
 if ! yay -S --answerclean All --answerdiff None --noconfirm ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils; then
-  echo "Failed to install Hyprland dependencies"
-  exit
+  pkgs=(
+  "ninja"
+  "gcc"
+  "cmake"
+  "meson"
+  "libxcb"
+  "xcb-proto"
+  "xcb-util"
+  "xcb-util-keysyms"
+  "libxfixes"
+  "libx11"
+  "libxcomposite"
+  "libxrender"
+  "libxcursor"
+  "pixman"
+  "wayland-protocols"
+  "cairo"
+  "pango"
+  "libxkbcommon"
+  "xcb-util-wm"
+  "xorg-xwayland"
+  "libinput"
+  "libliftoff"
+  "libdisplay-info"
+  "cpio"
+  "tomlplusplus"
+  "hyprlang-git"
+  "hyprcursor-git"
+  "hyprwayland-scanner-git"
+  "xcb-util-errors"
+  "hyprutils-git"
+  "glaze"
+  "hyprgraphics-git"
+  "aquamarine-git"
+  "re2"
+  "hyprland-qtutils"
+  )
+  for pkg_dir in "${pkgs[@]}"; do
+    cd "$pkg_dir"
+    make clean
+    make && sudo make install
+    if [ $? -eq 0 ]; then
+      echo "Installed Hyprland dependencies"
+    else
+      echo "Failed to install Hyprland dependencies"
+      rm --recursive /home/"${username}"/renge
+      exit
+    fi
+    cd /home/"${username}"
+  done
 fi
 if ! git clone --recursive https://github.com/hyprwm/Hyprland; then
   echo "Failed to clone Hyprland repository"
+  rm --recursive /home/"${username}"/renge
   exit
 fi
 cd Hyprland || exit
@@ -67,22 +121,26 @@ cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 # Installation
 if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt; then
   echo "Failed to retrieve package list"
+  rm --recursive /home/"${username}"/renge
   exit
 fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-pacman-pkglist.txt | sort --output=post-pacman-pkglist.txt --unique
 if ! yes | sudo pacman -S --noconfirm --needed - < post-pacman-pkglist.txt; then
   echo "Failed to install packages"
+  rm --recursive /home/"${username}"/renge
   exit
 fi
 rm post-pacman-pkglist.txt
 
 if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-yay-pkglist.txt >> post-yay-pkglist.txt; then
   echo "Failed to retrieve (AUR) package list"
+  rm --recursive /home/"${username}"/renge
   exit
 fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-yay-pkglist.txt | sort --output=post-yay-pkglist.txt --unique
 if ! yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist.txt; then
   echo "Failed to install (AUR) packages"
+  rm --recursive /home/"${username}"/renge
   exit
 fi
 rm post-yay-pkglist.txt
