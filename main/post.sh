@@ -119,6 +119,7 @@ make all && sudo make install
 cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 
 # Installation
+sudo pacman -Runs iptables --noconfirm
 if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt; then
   echo "Failed to retrieve package list"
   rm --recursive /home/"${username}"/renge
@@ -179,6 +180,8 @@ cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 
 # SpotX
 bash <(curl -sSL https://spotx-official.github.io/run.sh)
+
+# Virtual Machine
 
 #######################################
 # Post-Installation
