@@ -126,7 +126,7 @@ if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/reng
   exit
 fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-pacman-pkglist.txt | sort --output=post-pacman-pkglist.txt --unique
-if ! yes y | sudo pacman -S --needed - < post-pacman-pkglist.txt; then
+if ! sudo pacman -S --noconfirm --needed - < post-pacman-pkglist.txt; then
   echo "Failed to install packages"
   rm --force --recursive /home/"${username}"/renge
   exit
@@ -182,6 +182,7 @@ cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 bash <(curl -sSL https://spotx-official.github.io/run.sh)
 
 # Virtual Machine
+yes y | sudo pacman -S virt-manager qemu-full vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf
 
 #######################################
 # Post-Installation
