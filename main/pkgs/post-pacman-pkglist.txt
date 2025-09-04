@@ -106,7 +106,7 @@ winetricks
 
 # Virtual Machine
 virt-manager
-qemu
+qemu-full
 vde2
 ebtables
 iptables-nft
