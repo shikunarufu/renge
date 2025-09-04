@@ -46,7 +46,7 @@ fi
 if ! git clone https://aur.archlinux.org/yay.git; then
   if ! git clone --branch yay --single-branch https://github.com/archlinux/aur.git yay; then
     echo "Failed to clone Yay repository"
-    rm --force --recursive /home/"${username}"/renge
+    rm --force --recursive /home/"${username}"/yay
     rm --force --recursive /home/"${username}"/renge
     exit
   fi
