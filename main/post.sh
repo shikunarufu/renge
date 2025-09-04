@@ -120,14 +120,13 @@ make all && sudo make install
 cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 
 # Installation
-sudo pacman -Runs iptables --noconfirm
 if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt; then
   echo "Failed to retrieve package list"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-pacman-pkglist.txt | sort --output=post-pacman-pkglist.txt --unique
-if ! yes | sudo pacman -S --noconfirm --needed - < post-pacman-pkglist.txt; then
+if ! yes y | sudo pacman -S --needed - < post-pacman-pkglist.txt; then
   echo "Failed to install packages"
   rm --force --recursive /home/"${username}"/renge
   exit
