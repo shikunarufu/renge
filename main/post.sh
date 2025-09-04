@@ -26,7 +26,7 @@ clear
 # Connect to the internet
 if ! ping -c 1 archlinux.org; then
   echo "Failed to connect to the internet"
-  rm --recursive /home/"${username}"/renge
+  rm --force --recursive /home/"${username}"/renge
   exit
 fi
 
@@ -40,13 +40,14 @@ printf "%s\n%s" "${user_passwd}" "${user_passwd}" | sudo --stdin sed --in-place 
 # Yay
 if ! sudo pacman -S --noconfirm --needed git base-devel; then
   echo "Failed to install Yay dependencies"
-  rm --recursive /home/"${username}"/renge
+  rm --force --recursive /home/"${username}"/renge
   exit
 fi
 if ! git clone https://aur.archlinux.org/yay.git; then
   if ! git clone --branch yay --single-branch https://github.com/archlinux/aur.git yay; then
     echo "Failed to clone Yay repository"
-    rm --recursive /home/"${username}"/renge
+    rm --force --recursive /home/"${username}"/renge
+    rm --force --recursive /home/"${username}"/renge
     exit
   fi
 fi
@@ -103,7 +104,7 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm ninja gcc cmake meso
       echo "Installed Hyprland dependencies"
     else
       echo "Failed to install Hyprland dependencies"
-      rm --recursive /home/"${username}"/renge
+      rm --force --recursive /home/"${username}"/renge
       exit
     fi
     cd /home/"${username}"
@@ -111,7 +112,7 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm ninja gcc cmake meso
 fi
 if ! git clone --recursive https://github.com/hyprwm/Hyprland; then
   echo "Failed to clone Hyprland repository"
-  rm --recursive /home/"${username}"/renge
+  rm --force --recursive /home/"${username}"/renge
   exit
 fi
 cd Hyprland || exit
@@ -122,26 +123,26 @@ cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 sudo pacman -Runs iptables --noconfirm
 if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt; then
   echo "Failed to retrieve package list"
-  rm --recursive /home/"${username}"/renge
+  rm --force --recursive /home/"${username}"/renge
   exit
 fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-pacman-pkglist.txt | sort --output=post-pacman-pkglist.txt --unique
 if ! yes | sudo pacman -S --noconfirm --needed - < post-pacman-pkglist.txt; then
   echo "Failed to install packages"
-  rm --recursive /home/"${username}"/renge
+  rm --force --recursive /home/"${username}"/renge
   exit
 fi
 rm post-pacman-pkglist.txt
 
 if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-yay-pkglist.txt >> post-yay-pkglist.txt; then
   echo "Failed to retrieve (AUR) package list"
-  rm --recursive /home/"${username}"/renge
+  rm --force --recursive /home/"${username}"/renge
   exit
 fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-yay-pkglist.txt | sort --output=post-yay-pkglist.txt --unique
 if ! yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist.txt; then
   echo "Failed to install (AUR) packages"
-  rm --recursive /home/"${username}"/renge
+  rm --force --recursive /home/"${username}"/renge
   exit
 fi
 rm post-yay-pkglist.txt
