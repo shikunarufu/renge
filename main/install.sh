@@ -112,7 +112,10 @@ core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 
 # Install essential packages
-pacstrap -K /mnt base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo archlinux-keyring --noconfirm --needed
+curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/install-pacstrap-pkglist.txt >> install-pacstrap-pkglist.txt
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacstrap-pkglist.txt | sort --output=install-pacstrap-pkglist.txt --unique
+pacstrap -K --noconfirm --needed /mnt - < install-pacstrap-pkglist.txt
+rm install-pacstrap-pkglist.txt
 
 #######################################
 # Configure The System
@@ -165,10 +168,10 @@ sed --in-place '93s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/
 pacman -Syu --noconfirm
 
 # Installation
-curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/install-pkglist.txt >> install-pkglist.txt
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pkglist.txt | sort --output=install-pkglist.txt --unique
-pacman -S --noconfirm --needed - < install-pkglist.txt
-rm install-pkglist.txt
+curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacman-pkglist.txt | sort --output=install-pacman-pkglist.txt --unique
+pacman -S --noconfirm --needed - < install-pacman-pkglist.txt
+rm install-pacman-pkglist.txt
 
 # Boot loader
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
