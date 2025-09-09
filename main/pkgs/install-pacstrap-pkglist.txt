@@ -1,1 +1,30 @@
-base base-devel linux linux-firmware linux-zen linux-zen-headers amd-ucode exfatprogs ntfs-3g networkmanager neovim man-db man-pages texinfo archlinux-keyring
+# Basic
+base
+base-devel
+linux
+linux-firmware
+
+# Linux Zen Kernel
+linux-zen
+linux-zen-headers
+
+# CPU Microcode
+amd-ucode
+
+# Userspace Utility
+exfatprogs
+ntfs-3g
+
+# Networking
+networkmanager
+
+# Console Text Editor
+neovim
+
+# Documentation
+man-db
+man-pages
+texinfo
+
+# Keyring
+archlinux-keyring
