@@ -120,6 +120,11 @@
       "key": "  LM"
     },
     {
+      "type": "command",
+      "key": "  Age",
+      "text": "install_date=$(stat -c %W /); current_date=$(date +%s); days_difference=$(( (current_date - install_date) / 86400 )); echo $days_difference days"
+    },
+    {
       "type": "uptime",
       "key": "  Uptime"
     },
