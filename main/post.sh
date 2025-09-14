@@ -182,6 +182,9 @@ cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 bash <(curl -sSL https://spotx-official.github.io/run.sh)
 
 # Virtual Machine
+sudo sed --in-place "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet video=efifb:off\"/g" /etc/default/grub
+sudo grub-mkconfig -o /boot/grub/grub.cfg
+
 yes y | sudo pacman -S virt-manager qemu-full vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf
 sudo sed --in-place 's/#unix_sock_group = \"libvirt\"/unix_sock_group = \"libvirt\"/g' /etc/libvirt/libvirtd.conf
 sudo sed --in-place 's/#unix_sock_rw_perms = \"0770\"/unix_sock_rw_perms = \"0770\"/g' /etc/libvirt/libvirtd.conf
