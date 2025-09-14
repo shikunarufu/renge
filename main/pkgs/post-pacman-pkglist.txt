@@ -106,3 +106,18 @@ winetricks
 
 # Steam
 steam
+
+# qBittorrent
+qbittorrent
+
+# Strawberry
+strawberry
+
+# Haruna
+haruna
+
+# Qalculate!
+qalculate-qt
+
+# Linux GPU Control Application
+lact
