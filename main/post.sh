@@ -198,6 +198,9 @@ bash <(curl -sSL https://spotx-official.github.io/run.sh)
 # sudo systemctl restart libvirtd
 # sudo virsh net-autostart default
 
+# Linux GPU Control Application
+sudo systemctl enable --now lactd
+
 #######################################
 # Post-Installation
 #######################################
