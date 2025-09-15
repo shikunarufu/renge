@@ -31,11 +31,5 @@ mirage
 # Phoronix Test Suite
 phoronix-test-suite
 
-# MPrime
-mprime
-
-# Furmark 2
-furmark
-
 # MangoJuice
 mangojuice
