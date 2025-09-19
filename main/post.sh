@@ -201,7 +201,10 @@ bash <(curl -sSL https://spotx-official.github.io/run.sh)
 # sudo virsh net-autostart default
 
 # Linux GPU Control Application
-sudo systemctl enable --now lactd
+if ! sudo systemctl enable --now lactd; then
+  echo "Failed to enable lactd"
+  exit
+fi
 
 #######################################
 # Post-Installation
