@@ -63,7 +63,6 @@ taglib
 
 # Idle Management Daemon
 hypridle
-brightnessctl
 
 # XDG Desktop Menu
 archlinux-xdg-menu
@@ -94,6 +93,7 @@ qalculate-qt
 
 # System Information Viewer
 fastfetch
+ddcutil
 imagemagick
 
 # Compatibility Layer
