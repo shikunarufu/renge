@@ -20,8 +20,8 @@ resvg
 # Others
 #######################################
 
-# Screen Lock
-ttf-google-sans
+# Hypridle
+ddcci-driver-linux-dkms
 
 #######################################
 # Applications
@@ -47,6 +47,9 @@ spotify
 
 # Audio Tag Editor
 puddletag
+
+# Hyprlock
+ttf-google-sans
 
 # Archiving and Compression Tool
 p7zip-gui
