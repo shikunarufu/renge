@@ -23,27 +23,45 @@ resvg
 # Screen Lock
 ttf-google-sans
 
-# Screenshot
-hyprshot-git
-
 #######################################
 # Applications
 #######################################
 
-# Phoronix Test Suite
-phoronix-test-suite
+# Text Editor
+# vscodium-bin
 
-# MangoJuice
-mangojuice
+# Manga Reader
+komikku
 
-# Spotify
+# Web Browser
+zen-browser-bin
+
+# Image Viewer
+mirage
+
+# Screenshot
+hyprshot-git
+
+# Music Streaming Client
 spotify
 
-# Zen Browser
-zen-browser-bin
+# Audio Tag Editor
+puddletag
+
+# Archiving and Compression Tool
+p7zip-gui
+desktop-file-utils
+kservice
+
+# Flashcards
+anki
 
 # Steam
 ttf-ms-win11-auto
 
-# Mirage
-mirage
+# Game Launcher
+heroic-games-launcher
+
+# Benchmarking
+phoronix-test-suite
+mangojuice
