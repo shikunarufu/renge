@@ -1,3 +1,6 @@
+# XDG Desktop Menu
+archlinux-xdg-menu
+
 # Foot
 foot
 foot-terminfo
