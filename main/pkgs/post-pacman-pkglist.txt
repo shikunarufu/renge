@@ -8,7 +8,7 @@ foot-terminfo
 libnotify
 xdg-utils
 
-# Shell
+# Command Shell
 fish
 
 # Shell Prompt
@@ -64,20 +64,38 @@ taglib
 # Idle Management Daemon
 hypridle
 
-# Screen Lock
-hyprlock
-
 # XDG Desktop Menu
 archlinux-xdg-menu
-
-# Fastfetch
-fastfetch
 
 #######################################
 # Applications
 #######################################
 
-# Wine
+# BitTorrent Client
+qbittorrent
+
+# Audio Player
+strawberry
+
+# Spotify
+ffmpeg4.4
+libnotify
+zenity
+
+# Video Player
+haruna
+
+# Screen Locker
+hyprlock
+
+# Calculator
+qalculate-qt
+
+# System Information Viewer
+fastfetch
+imagemagick
+
+# Compatibility Layer
 wine-staging
 wine-gecko
 wine-mono
@@ -126,25 +144,9 @@ samba
 dosbox
 winetricks
 
-# Linux GPU Control Application
-lact
-
-# Spotify
-ffmpeg4.4
-libnotify
-zenity
-
-# Steam
+# Game Launcher
 steam
+umu-launcher
 
-# qBittorrent
-qbittorrent
-
-# Strawberry
-strawberry
-
-# Haruna
-haruna
-
-# Qalculate!
-qalculate-qt
+# Benchmarking
+lact
