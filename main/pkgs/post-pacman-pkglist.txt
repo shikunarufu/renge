@@ -1,23 +1,44 @@
-# XDG Desktop Menu
-archlinux-xdg-menu
+#######################################
+# Hyprland
+#######################################
 
-# Foot
+# Terminal Emulator
 foot
 foot-terminfo
 libnotify
 xdg-utils
 
-# Greetd
+# Shell
+fish
+
+# Shell Prompt
+starship
+
+# Login Manager
 greetd
 greetd-tuigreet
 
-# Waybar
+#######################################
+# Essentials
+#######################################
+
+# Notification Daemon
+dunst
+
+# Authentication Agent
+hyprpolkitagent
+
+# Qt Wayland Support
+qt5-wayland
+qt6-wayland
+
+# Status Bar
 waybar
 
-# Rofi
+# App Launcher
 rofi-wayland
 
-# Dolphin
+# File Manager
 dolphin
 audiocd-kio
 baloo
@@ -35,28 +56,25 @@ libappimage
 qt6-imageformats
 taglib
 
-# Fish
-fish
+#######################################
+# Others
+#######################################
 
-# Dunst
-dunst
-
-# Hyprlock
-hyprlock
-
-# Hypridle
+# Idle Management Daemon
 hypridle
 
-# Starship
-starship
+# Screen Lock
+hyprlock
+
+# XDG Desktop Menu
+archlinux-xdg-menu
 
 # Fastfetch
 fastfetch
 
-# Spotify
-ffmpeg4.4
-libnotify
-zenity
+#######################################
+# Applications
+#######################################
 
 # Wine
 wine-staging
@@ -107,6 +125,14 @@ samba
 dosbox
 winetricks
 
+# Linux GPU Control Application
+lact
+
+# Spotify
+ffmpeg4.4
+libnotify
+zenity
+
 # Steam
 steam
 
@@ -121,6 +147,3 @@ haruna
 
 # Qalculate!
 qalculate-qt
-
-# Linux GPU Control Application
-lact
