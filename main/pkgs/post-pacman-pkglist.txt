@@ -93,6 +93,7 @@ qalculate-qt
 
 # System Information Viewer
 fastfetch
+chafa
 ddcutil
 imagemagick
 
