@@ -1,20 +1,40 @@
-# SWWW
-swww
+#######################################
+# Essentials
+#######################################
 
-# Vesktop
-vesktop
+# XDG Desktop Portal
 xdg-desktop-portal-hyprland-git
 
-# Dolphin
+# Wallpaper
+swww
+
+# App Client
+vesktop
+
+# File Manager
 kde-thumbnailer-apk
 raw-thumbnailer
 resvg
 
-# Hyprshot
+#######################################
+# Others
+#######################################
+
+# Screen Lock
+ttf-google-sans
+
+# Screenshot
 hyprshot-git
 
-# Hyprlock
-ttf-google-sans
+#######################################
+# Applications
+#######################################
+
+# Phoronix Test Suite
+phoronix-test-suite
+
+# MangoJuice
+mangojuice
 
 # Spotify
 spotify
@@ -27,9 +47,3 @@ ttf-ms-win11-auto
 
 # Mirage
 mirage
-
-# Phoronix Test Suite
-phoronix-test-suite
-
-# MangoJuice
-mangojuice
