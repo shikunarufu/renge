@@ -176,9 +176,6 @@ cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 # Hyprshot
 mkdir /home/"${username}"/Pictures/Screenshots
 
-# XDG Desktop Menu
-XDG_MENU_PREFIX=arch- kbuildsycoca6
-
 # Fastfetch
 cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 
