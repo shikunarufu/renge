@@ -46,6 +46,7 @@ dolphin-plugins
 kio-admin
 kio-gdrive
 kompare
+konsole
 ffmpegthumbs
 icoutils
 kdegraphics-thumbnailers
