@@ -146,15 +146,21 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist
 fi
 rm post-yay-pkglist.txt
 
-# XDG Desktop Menu
-XDG_MENU_PREFIX=arch- kbuildsycoca6
-
 # Foot
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
+
+# Fish
+cp --recursive /home/"${username}"/renge/fish /home/"${username}"/.config
+
+# Starship
+cp --recursive /home/"${username}"/renge/starship/starship.toml /home/"${username}"/.config
 
 # Greetd
 sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland --remember"|g' /etc/greetd/config.toml
 sudo systemctl enable greetd.service
+
+# Dunst
+cp --recursive /home/"${username}"/renge/dunst /home/"${username}"/.config
 
 # Waybar
 cp --recursive /home/"${username}"/renge/waybar /home/"${username}"/.config
@@ -167,17 +173,11 @@ cp /home/"${username}"/renge/wallpapers/desktop.png /home/"${username}"/Pictures
 # Rofi
 cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 
-# Fish
-cp --recursive /home/"${username}"/renge/fish /home/"${username}"/.config
-
-# Dunst
-cp --recursive /home/"${username}"/renge/dunst /home/"${username}"/.config
-
 # Hyprshot
 mkdir /home/"${username}"/Pictures/Screenshots
 
-# Starship
-cp --recursive /home/"${username}"/renge/starship/starship.toml /home/"${username}"/.config
+# XDG Desktop Menu
+XDG_MENU_PREFIX=arch- kbuildsycoca6
 
 # Fastfetch
 cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
