@@ -137,7 +137,10 @@ sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j\$core\"/g" /etc/makepkg.conf
 # Time
 ln -sf /usr/share/zoneinfo/"${time_zone}" /etc/localtime
 hwclock --systohc
-systemctl enable systemd-timesyncd.service
+if ! systemctl enable systemd-timesyncd.service; then
+  echo "Failed to enable systemd-timesyncd.service"
+  exit
+fi
 
 # Localization
 sed --in-place 's/#${utf_locale}/${utf_locale}/g' /etc/locale.gen
@@ -148,7 +151,10 @@ echo "KEYMAP="${console_keyboard}"" >> /etc/vconsole.conf
 
 # Network configuration
 echo "${hostname}" >> /etc/hostname
-systemctl enable NetworkManager.service
+if ! systemctl enable NetworkManager.service; then
+  echo "Failed to enable NetworkManager.service"
+  exit
+fi
 
 # Root password
 printf "%s\n%s" "${root_passwd}" "${root_passwd}" | passwd
@@ -178,9 +184,15 @@ grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # System services
-systemctl enable paccache.timer
+if ! systemctl enable paccache.timer; then
+  echo "Failed to enable paccache.timer"
+  exit
+fi
 xdg-user-dirs-update
-systemctl enable fstrim.timer
+if ! systemctl enable fstrim.timer; then
+  echo "Failed to enable fstrim.timer"
+  exit
+fi
 EOF
 
 # Chroot
