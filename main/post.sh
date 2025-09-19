@@ -146,6 +146,9 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist
 fi
 rm post-yay-pkglist.txt
 
+# XDG Desktop Menu
+XDG_MENU_PREFIX=arch- kbuildsycoca6
+
 # Foot
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
 
