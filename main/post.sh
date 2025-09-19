@@ -167,7 +167,7 @@ cp --recursive /home/"${username}"/renge/waybar /home/"${username}"/.config
 
 # SWWW
 mkdir /home/"${username}"/Pictures/Wallpapers
-cp /home/"${username}"/renge/wallpapers/desktop.png /home/"${username}"/Pictures/Wallpapers
+cp /home/"${username}"/renge/pictures/wallpapers/desktop.png /home/"${username}"/Pictures/Wallpapers
 # swww img /home/"${username}"/Pictures/Wallpapers/desktop.png
 
 # Rofi
@@ -177,6 +177,8 @@ cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 mkdir /home/"${username}"/Pictures/Screenshots
 
 # Fastfetch
+mkdir /home/"${username}"/Pictures/Logo
+cp /home/"${username}"/renge/pictures/logo/shiku.png /home/"${username}"/Pictures/Logo
 cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 
 # SpotX
