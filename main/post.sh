@@ -178,7 +178,7 @@ mkdir /home/"${username}"/Pictures/Screenshots
 
 # Fastfetch
 mkdir /home/"${username}"/Pictures/Logo
-cp /home/"${username}"/renge/pictures/logo/shiku.png /home/"${username}"/Pictures/Logo
+cp /home/"${username}"/renge/pictures/logo/shiku.sixel /home/"${username}"/Pictures/Logo
 cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 
 # SpotX
