@@ -67,4 +67,21 @@ sudo sed --in-place "s/#group = \"libvirt-qemu\"/group = \"$username\"/g" /etc/l
 sudo systemctl restart libvirtd
 # sudo virsh net-autostart default
 
-# Configuration of Virtual Machine Manager
+# GPU
+# 28:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Navi 44 [Radeon RX 9060 XT] [1002:7590] (rev c0)
+# 28:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Navi 48 HDMI/DP Audio Controller [1002:ab40]
+
+# USB Controller
+# 03:00.0 USB controller [0c03]: Advanced Micro Devices, Inc. [AMD] 400 Series Chipset USB 3.1 xHCI Compliant Host Controller [1022:43d5] (rev 01)
+# 2a:00.3 USB controller [0c03]: Advanced Micro Devices, Inc. [AMD] Matisse USB 3.0 Host Controller [1022:149c]
+
+# Audio Device
+# 2a:00.4 Audio device [0403]: Advanced Micro Devices, Inc. [AMD] Starship/Matisse HD Audio Controller [1022:1487]
+
+# Ethernet Controller
+# 22:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller [10ec:8168] (rev 15)
+
+# Script
+git clone https://gitlab.com/akshaycodes/vfio-script.git
+cd vfio-script
+sudo bash vfio_script_install.sh
