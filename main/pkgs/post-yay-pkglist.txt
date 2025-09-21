@@ -56,7 +56,7 @@ anki
 ttf-ms-win11-auto
 
 # Game Launcher
-# heroic-games-launcher
+heroic-games-launcher
 
 # Benchmarking
 phoronix-test-suite
