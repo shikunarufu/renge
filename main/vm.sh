@@ -87,3 +87,6 @@ sudo systemctl restart libvirtd
 git clone https://gitlab.com/akshaycodes/vfio-script.git
 cd vfio-script
 sudo bash vfio_script_install.sh
+
+# XML File
+<feature policy='require' name='topoext'/>
