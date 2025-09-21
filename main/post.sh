@@ -184,22 +184,6 @@ cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 # SpotX
 bash <(curl -sSL https://spotx-official.github.io/run.sh)
 
-# Virtual Machine
-# sudo sed --in-place "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet video=efifb:off\"/g" /etc/default/grub
-# sudo grub-mkconfig -o /boot/grub/grub.cfg
-# yes y | sudo pacman -S virt-manager qemu-full vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf
-# sudo sed --in-place 's/#unix_sock_group = \"libvirt\"/unix_sock_group = \"libvirt\"/g' /etc/libvirt/libvirtd.conf
-# sudo sed --in-place 's/#unix_sock_rw_perms = \"0770\"/unix_sock_rw_perms = \"0770\"/g' /etc/libvirt/libvirtd.conf
-# sudo sed --in-place 's/#log_filters=\"1:qemu 1:libvirt 4:object 4:json 4:event 1:util\"/log_filters=\"3:qemu 1:libvirt\"/g' /etc/libvirt/libvirtd.conf
-# sudo sed --in-place 's/#log_outputs=\"3:syslog:libvirtd\"/log_outputs=\"2:file:/var/log/libvirt/libvirtd.log\"/g' /etc/libvirt/libvirtd.conf
-# sudo usermod --append --groups kvm,libvirt "${username}"
-# sudo systemctl enable libvirtd
-# sudo systemctl start libvirtd
-# sudo sed --in-place "s/#user = \"libvirt-qemu\"/user = \"$username\"/g" /etc/libvirt/qemu.conf
-# sudo sed --in-place "s/#group = \"libvirt-qemu\"/group = \"$username\"/g" /etc/libvirt/qemu.conf
-# sudo systemctl restart libvirtd
-# sudo virsh net-autostart default
-
 # Linux GPU Control Application
 if ! sudo systemctl enable --now lactd; then
   echo "Failed to enable lactd"
