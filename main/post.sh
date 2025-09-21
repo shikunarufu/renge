@@ -176,6 +176,7 @@ sudo systemctl start libvirtd
 sudo sed --in-place "s/#user = \"libvirt-qemu\"/user = \"$username\"/g" /etc/libvirt/qemu.conf
 sudo sed --in-place "s/#group = \"libvirt-qemu\"/group = \"$username\"/g" /etc/libvirt/qemu.conf
 sudo systemctl restart libvirtd
+mkdir /home/"${username}"/Virtualization
 
 #######################################
 # Post-Installation
