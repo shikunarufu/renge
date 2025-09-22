@@ -67,6 +67,9 @@ hypridle
 # XDG Desktop Menu
 archlinux-xdg-menu
 
+# JavaScript Runtime Environment
+nodejs
+
 #######################################
 # Applications
 #######################################
