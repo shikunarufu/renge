@@ -207,3 +207,4 @@ arch-chroot /mnt /configure.sh
 # Reboot
 rm /mnt/configure.sh
 umount -R /mnt
+reboot
