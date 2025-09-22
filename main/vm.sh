@@ -86,7 +86,9 @@ sudo systemctl restart libvirtd
 # 2a:00.1 Encryption controller [1080]: Advanced Micro Devices, Inc. [AMD] Starship/Matisse Cryptographic Coprocessor PSPCPP [1022:1486]
 
 # Script
-git clone https://gitlab.com/akshaycodes/vfio-script.git && cd vfio-script && sudo bash vfio_script_install.sh
+git clone https://gitlab.com/akshaycodes/vfio-script.git
+cd vfio-script
+sudo bash vfio_script_install.sh
 
 # XML File
 <feature policy='require' name='topoext'/>
