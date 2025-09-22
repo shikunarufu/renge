@@ -35,6 +35,9 @@ qt6-wayland
 # Status Bar
 waybar
 
+# Wallpaper
+swww
+
 # App Launcher
 rofi-wayland
 
@@ -55,6 +58,7 @@ kimageformats
 libheif
 libappimage
 qt6-imageformats
+resvg
 taglib
 
 #######################################
@@ -67,12 +71,12 @@ hypridle
 # XDG Desktop Menu
 archlinux-xdg-menu
 
-# JavaScript Runtime Environment
-nodejs
-
 #######################################
 # Applications
 #######################################
+
+# Manga Reader
+komikku
 
 # BitTorrent Client
 qbittorrent
@@ -93,6 +97,10 @@ hyprlock
 
 # Calculator
 qalculate-qt
+
+# p7zip-gui
+desktop-file-utils
+kservice
 
 # System Information Viewer
 fastfetch
