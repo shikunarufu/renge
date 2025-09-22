@@ -189,7 +189,4 @@ yay -Scc --noconfirm
 sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
 # Launch Hyprland
-# Hyprland
-
-# Reboot
-reboot
+Hyprland
