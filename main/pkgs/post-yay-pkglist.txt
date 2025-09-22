@@ -5,26 +5,19 @@
 # XDG Desktop Portal
 xdg-desktop-portal-hyprland-git
 
-# Wallpaper
-swww
-
 # App Client
-vesktop
+vesktop-bin
 
-# File Manager
+# Dolphin
 kde-thumbnailer-apk
 raw-thumbnailer
-resvg
 
 #######################################
 # Applications
 #######################################
 
 # Text Editor
-# vscodium-bin
-
-# Manga Reader
-komikku
+vscodium-bin
 
 # Web Browser
 zen-browser-bin
@@ -46,17 +39,15 @@ ttf-google-sans
 
 # Archiving and Compression Tool
 p7zip-gui
-desktop-file-utils
-kservice
 
 # Flashcards
-anki
+anki-bin
 
 # Steam
 ttf-ms-win11-auto
 
 # Game Launcher
-heroic-games-launcher
+heroic-games-launcher-bin
 
 # Benchmarking
 phoronix-test-suite
