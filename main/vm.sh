@@ -67,6 +67,19 @@ sudo sed --in-place "s/#group = \"libvirt-qemu\"/group = \"$username\"/g" /etc/l
 sudo systemctl restart libvirtd
 # sudo virsh net-autostart default
 
+# Virtual Manager
+# Overview
+# Chipset: Q35
+# Firmware: UEFI x86_64: /usr/share/edk2/x64/OVMF_CODE.4m.fd
+# CPU
+# Sockets: 1
+# Cores: 6
+# Threads: 2
+# Memory
+# Allocation: 13312 MB
+# VirtIO Disk
+# Cache mode: writeback
+
 # GPU
 # 28:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Navi 44 [Radeon RX 9060 XT] [1002:7590] (rev c0)
 # 28:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Navi 48 HDMI/DP Audio Controller [1002:ab40]
