@@ -67,36 +67,33 @@ sudo sed --in-place "s/#group = \"libvirt-qemu\"/group = \"$username\"/g" /etc/l
 sudo systemctl restart libvirtd
 # sudo virsh net-autostart default
 
-# Virtual Manager
+#######################################
+# Virtual Machine Setup
+#######################################
+
 # Overview
 # Chipset: Q35
 # Firmware: UEFI x86_64: /usr/share/edk2/x64/OVMF_CODE.4m.fd
+
 # CPU
 # Sockets: 1
 # Cores: 6
 # Threads: 2
+
 # Memory
 # Allocation: 13312 MB
+
 # VirtIO Disk
 # Cache mode: writeback
 
-# GPU
+# PCI
 # 28:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Navi 44 [Radeon RX 9060 XT] [1002:7590] (rev c0)
 # 28:00.1 Audio device [0403]: Advanced Micro Devices, Inc. [AMD/ATI] Navi 48 HDMI/DP Audio Controller [1002:ab40]
-
-# USB Controller
 # 03:00.0 USB controller [0c03]: Advanced Micro Devices, Inc. [AMD] 400 Series Chipset USB 3.1 xHCI Compliant Host Controller [1022:43d5] (rev 01)
 # 2a:00.3 USB controller [0c03]: Advanced Micro Devices, Inc. [AMD] Matisse USB 3.0 Host Controller [1022:149c]
-
-# Audio Device
 # 2a:00.4 Audio device [0403]: Advanced Micro Devices, Inc. [AMD] Starship/Matisse HD Audio Controller [1022:1487]
-
-# Ethernet Controller
 # 22:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller [10ec:8168] (rev 15)
-
-# Other PCI Host Device
 # 2a:00.0 Non-Essential Instrumentation [1300]: Advanced Micro Devices, Inc. [AMD] Starship/Matisse Reserved SPP [1022:1485]
-# 2a:00.1 Encryption controller [1080]: Advanced Micro Devices, Inc. [AMD] Starship/Matisse Cryptographic Coprocessor PSPCPP [1022:1486]
 
 # Script
 git clone https://gitlab.com/akshaycodes/vfio-script.git
@@ -104,22 +101,20 @@ cd vfio-script
 sudo bash vfio_script_install.sh
 
 # XML File
-...
-<features>
-  ...
-  <hyperv>
-    ...
-    <vendor_id state='on' value='AMD'/>
-    ...
-  </hyperv>
-  ...
-  <kvm>
-    <hidden state='on'/>
-  </kvm>
-</features>
-<cpu>
-  ...
-  <feature policy='require' name='topoext'/>
-  ...
-</cpu>
-...
+# ...
+# <features>
+#   ...
+#   <hyperv>
+#     ...
+#     <vendor_id state='on' value='AMD'/>
+#   </hyperv>
+#   ...
+#   <kvm>
+#     <hidden state='on'/>
+#   </kvm>
+# </features>
+# <cpu>
+#   ...
+#   <feature policy='require' name='topoext'/>
+# </cpu>
+# ...
