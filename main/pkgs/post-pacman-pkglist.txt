@@ -89,6 +89,9 @@ ffmpeg4.4
 libnotify
 zenity
 
+# Audio Effects
+easyeffects
+
 # Video Player
 haruna
 
