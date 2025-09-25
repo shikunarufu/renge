@@ -91,6 +91,11 @@ zenity
 
 # Audio Effects
 easyeffects
+calf
+lsp-plugins-lv2
+mda.lv2
+yelp
+zam-plugins-lv2
 
 # Video Player
 haruna
