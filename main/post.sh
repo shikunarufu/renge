@@ -143,7 +143,7 @@ cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 mkdir /home/"${username}"/Pictures/Screenshots
 
 # OBS Studio
-flatpak install flathub com.obsproject.Studio
+flatpak install --assumeyes --noninteractive flathub com.obsproject.Studio
 
 # Fastfetch
 mkdir /home/"${username}"/Pictures/Logo
