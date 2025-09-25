@@ -166,3 +166,6 @@ umu-launcher
 
 # Benchmarking
 lact
+
+# OpenRGB
+openrgb
