@@ -112,6 +112,8 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist
 fi
 rm post-yay-pkglist.txt
 
+flatpak install --assumeyes --noninteractive flathub com.obsproject.Studio com.heroicgameslauncher.hgl
+
 # Foot
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
 
@@ -141,9 +143,6 @@ cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 
 # Hyprshot
 mkdir /home/"${username}"/Pictures/Screenshots
-
-# OBS Studio
-flatpak install --assumeyes --noninteractive flathub com.obsproject.Studio
 
 # Fastfetch
 mkdir /home/"${username}"/Pictures/Logo
