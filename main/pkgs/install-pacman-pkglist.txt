@@ -52,3 +52,6 @@ bash-completion
 tar
 zip
 unzip
+
+# Software Distributions
+flatpak
