@@ -207,4 +207,10 @@ arch-chroot /mnt /configure.sh
 # Reboot
 rm /mnt/configure.sh
 umount -R /mnt
+sec=10
+while [[ ${sec} -gt 0 ]]; do
+  printf "Restarting in $sec seconds \r"
+  sleep 1
+  ((duration--))
+done
 reboot
