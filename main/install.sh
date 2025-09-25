@@ -211,6 +211,6 @@ sec=10
 while [[ ${sec} -gt 0 ]]; do
   printf "Restarting in $sec seconds \r"
   sleep 1
-  ((duration--))
+  ((sec--))
 done
 reboot
