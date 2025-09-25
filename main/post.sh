@@ -142,6 +142,9 @@ cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 # Hyprshot
 mkdir /home/"${username}"/Pictures/Screenshots
 
+# OBS Studio
+flatpak install flathub com.obsproject.Studio
+
 # Fastfetch
 mkdir /home/"${username}"/Pictures/Logo
 cp /home/"${username}"/renge/pictures/logo/shiku.sixel /home/"${username}"/Pictures/Logo
