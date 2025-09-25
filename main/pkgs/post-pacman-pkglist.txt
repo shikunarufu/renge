@@ -167,7 +167,7 @@ imagemagick
 
 # Game Launcher
 steam
-umu-launcher
+# umu-launcher
 
 # Benchmarking
 lact
