@@ -1,0 +1,12 @@
+# Manga Reader
+info.febvre.Komikku
+
+# Web Browser
+app.zen_browser.zen
+
+# Screencast
+com.obsproject.Studio
+
+# Game Launcher
+com.heroicgameslauncher.hgl
+com.github.tchx84.Flatseal
