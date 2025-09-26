@@ -112,8 +112,6 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist
 fi
 rm post-yay-pkglist.txt
 
-flatpak install --assumeyes --noninteractive flathub com.obsproject.Studio com.heroicgameslauncher.hgl
-
 # Foot
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
 
