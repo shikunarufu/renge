@@ -121,7 +121,7 @@ if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/reng
   exit
 fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-flatpak-pkglist.txt | sort --output=post-flatpak-pkglist.txt --unique
-if ! flatpak install --assumeyes flathub < post-flatpak-pkglist.txt; then
+if ! flatpak install --assumeyes < post-flatpak-pkglist.txt; then
   echo "Failed to install (Flatpak) packages"
   rm --force --recursive /home/"${username}"/yay
   rm --force --recursive /home/"${username}"/renge
