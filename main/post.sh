@@ -81,7 +81,7 @@ cd Hyprland || exit
 make all && sudo make install
 cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 
-# Installation
+# Pacman Packages
 if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt; then
   echo "Failed to retrieve package list"
   rm --force --recursive /home/"${username}"/yay
@@ -97,6 +97,7 @@ if ! sudo pacman -S --noconfirm --needed - < post-pacman-pkglist.txt; then
 fi
 rm post-pacman-pkglist.txt
 
+# Yay Packages
 if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-yay-pkglist.txt >> post-yay-pkglist.txt; then
   echo "Failed to retrieve (AUR) package list"
   rm --force --recursive /home/"${username}"/yay
@@ -111,6 +112,22 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist
   exit
 fi
 rm post-yay-pkglist.txt
+
+# Flatpak Packages
+if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-flatpak-pkglist.txt >> post-flatpak-pkglist.txt; then
+  echo "Failed to retrieve (Flatpak) package list"
+  rm --force --recursive /home/"${username}"/yay
+  rm --force --recursive /home/"${username}"/renge
+  exit
+fi
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-flatpak-pkglist.txt | sort --output=post-flatpak-pkglist.txt --unique
+if ! flatpak install --assumeyes flathub < post-flatpak-pkglist.txt; then
+  echo "Failed to install (Flatpak) packages"
+  rm --force --recursive /home/"${username}"/yay
+  rm --force --recursive /home/"${username}"/renge
+  exit
+fi
+rm post-flatpak-pkglist.txt
 
 # Foot
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
