@@ -128,6 +128,7 @@ while IFS= read -r app_id; do
     rm --force --recursive /home/"${username}"/yay
     rm --force --recursive /home/"${username}"/renge
     exit
+  fi
 done < "$fp_pkg"
 rm post-flatpak-pkglist.txt
 
