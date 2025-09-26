@@ -34,6 +34,10 @@ spotify
 # Audio Tag Editor
 puddletag
 
+# OBS Studio
+obs-vkcapture
+lib32-obs-vkcapture
+
 # Hyprlock
 ttf-google-sans
 
@@ -47,7 +51,7 @@ anki-bin
 ttf-ms-win11-auto
 
 # Game Launcher
-# heroic-games-launcher-bin
+heroic-games-launcher-bin
 
 # Benchmarking
 phoronix-test-suite
