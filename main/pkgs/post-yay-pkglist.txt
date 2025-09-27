@@ -45,5 +45,4 @@ ttf-ms-win11-auto
 
 # Benchmarking
 phoronix-test-suite
-mangojuice
 zenergy-dkms-git
