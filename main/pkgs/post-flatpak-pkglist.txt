@@ -13,3 +13,4 @@ com.github.tchx84.Flatseal
 
 # Benchmarking
 io.github.radiolamp.mangojuice
+org.freedesktop.Platform.VulkanLayer.MangoHud
