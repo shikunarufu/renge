@@ -10,3 +10,6 @@ com.obsproject.Studio
 # Game Launcher
 com.heroicgameslauncher.hgl
 com.github.tchx84.Flatseal
+
+# Benchmarking
+io.github.radiolamp.mangojuice
