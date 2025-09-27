@@ -123,7 +123,7 @@ fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-flatpak-pkglist.txt | sort --output=post-flatpak-pkglist.txt --unique
 fp_pkg="post-flatpak-pkglist.txt"
 while IFS= read -r app_id; do
-  if ! flatpak install --assumeyes flathub "$app_id"; then
+  if ! flatpak install --assumeyes --noninteractive flathub "$app_id"; then
     echo "Failed to install (Flatpak) packages"
     rm --force --recursive /home/"${username}"/yay
     rm --force --recursive /home/"${username}"/renge
