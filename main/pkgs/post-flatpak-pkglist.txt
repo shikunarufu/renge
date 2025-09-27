@@ -13,4 +13,4 @@ com.github.tchx84.Flatseal
 
 # Benchmarking
 io.github.radiolamp.mangojuice
-org.freedesktop.Platform.VulkanLayer.MangoHud
+runtime/org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/23.08
