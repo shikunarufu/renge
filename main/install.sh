@@ -34,6 +34,18 @@ root_passwd="nyanpasu"
 username="Shiku"
 user_passwd="narufu"
 
+#######################################
+# Aesthetics
+#######################################
+
+# Set tty background color
+# echo -e "\033]P014191E"
+printf "%s\n" "\033]P014191E"
+
+# Set tty text color
+# echo -e "\033]P7C1DFFF"
+printf "%s\n" "\033]P014191E"
+
 # Clear the terminal screen
 clear
 
@@ -48,19 +60,19 @@ setfont "${console_font}"
 # Verify the boot mode
 bootmode="$(cat /sys/firmware/efi/fw_platform_size)"
 if [[ "${bootmode}" == "64" ]]; then
-  echo "System is booted in UEFI mode and has a 64-bit x64 UEFI"
+  printf "%s\n" "System is booted in UEFI mode and has a 64-bit x64 UEFI"
 elif [[ "${bootmode}" == "32" ]]; then
-  echo "System is booted in UEFI mode and has a 32-bit IA32 UEFI"
+  printf "%s\n" "System is booted in UEFI mode and has a 32-bit IA32 UEFI"
 else
-  echo "System may be booted in BIOS (or CSM) mode"
-  echo "Refer to your motherboard's manual"
+  printf "%s\n" "System may be booted in BIOS (or CSM) mode"
+  printf "%s\n" "Refer to your motherboard's manual"
   rm --force --recursive renge
   exit
 fi
 
 # Connect to the internet
 if ! ping -c 1 archlinux.org; then
-  echo "Failed to connect to the internet"
+  printf "%s\n" "Failed to connect to the internet"
   rm --force --recursive renge
   exit
 fi
@@ -140,7 +152,7 @@ sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j\$core\"/g" /etc/makepkg.conf
 ln -sf /usr/share/zoneinfo/"${time_zone}" /etc/localtime
 hwclock --systohc
 if ! systemctl enable systemd-timesyncd.service; then
-  echo "Failed to enable systemd-timesyncd.service"
+  printf "%s\n" "Failed to enable systemd-timesyncd.service"
   exit
 fi
 
@@ -148,13 +160,13 @@ fi
 sed --in-place 's/#${utf_locale}/${utf_locale}/g' /etc/locale.gen
 sed --in-place 's/#${iso_locale}/${iso_locale}/g' /etc/locale.gen
 locale-gen
-echo "LANG="${language}"" >> /etc/locale.conf
-echo "KEYMAP="${console_keyboard}"" >> /etc/vconsole.conf
+printf "%s\n" "LANG="${language}"" >> /etc/locale.conf
+printf "%s\n" "KEYMAP="${console_keyboard}"" >> /etc/vconsole.conf
 
 # Network configuration
-echo "${hostname}" >> /etc/hostname
+printf "%s\n" "${hostname}" >> /etc/hostname
 if ! systemctl enable NetworkManager.service; then
-  echo "Failed to enable NetworkManager.service"
+  printf "%s\n" "Failed to enable NetworkManager.service"
   exit
 fi
 
@@ -168,7 +180,7 @@ printf "%s\n%s" "${user_passwd}" "${user_passwd}" | passwd "${username}"
 # Security
 sed --in-place 's/# %wheel/%wheel/g' /etc/sudoers
 sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-echo "Defaults passwd_timeout=0" >> /etc/sudoers
+printf "%s\n" "Defaults passwd_timeout=0" >> /etc/sudoers
 
 # Repositories
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
@@ -188,12 +200,12 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 # System services
 if ! systemctl enable paccache.timer; then
-  echo "Failed to enable paccache.timer"
+  printf "%s\n" "Failed to enable paccache.timer"
   exit
 fi
 xdg-user-dirs-update
 if ! systemctl enable fstrim.timer; then
-  echo "Failed to enable fstrim.timer"
+  printf "%s\n" "Failed to enable fstrim.timer"
   exit
 fi
 EOF
