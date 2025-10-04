@@ -92,7 +92,7 @@ keyboard_font() {
   setfont "${console_font}"
 }
 export -f keyboard_font
-gum spin --spinner dot --title "Setting the console keyboard layout and font" -- keyboard_font
+gum spin --spinner dot --title "Setting the console keyboard layout and font" -- bash -c keyboard_font
 ok_text "Set the console keyboard layout and font"
 
 # Verify the boot mode
@@ -110,7 +110,7 @@ boot() {
   fi
 }
 export -f boot
-gum spin --spinner dot --title "Verifying the boot mode" -- boot
+gum spin --spinner dot --title "Verifying the boot mode" -- bash -c boot
 ok_text "Verified the boot mode"
 
 # Connect to the internet
@@ -122,7 +122,7 @@ internet() {
   fi
 }
 export -f internet
-gum spin --spinner dot --title "Connecting to the internet" -- internet
+gum spin --spinner dot --title "Connecting to the internet" -- bash -c internet
 ok_text "Connected to the internet"
 
 # Update the system clock
@@ -144,7 +144,7 @@ partition() {
   partprobe /dev/"${hdd}"
 }
 export -f partition
-gum spin --spinner dot --title "Partitioning the disks" -- partition
+gum spin --spinner dot --title "Partitioning the disks" -- bash -c partition
 ok_text "Partitioned the disks"
 
 # Format the partitions
@@ -159,7 +159,7 @@ format() {
   mkfs.fat -F 32 /dev/"${efi_system_partition}"
 }
 export -f format
-gum spin --spinner dot --title "Formatting the partitions" -- format
+gum spin --spinner dot --title "Formatting the partitions" -- bash -c format
 ok_text "Formatted the partitions"
 
 # Mount the file systems
@@ -172,7 +172,7 @@ mount_files() {
   swapon /dev/"${swap_partition}"
 }
 export -f mount_files
-gum spin --spinner dot --title "Mounting the file systems" -- mount_files
+gum spin --spinner dot --title "Mounting the file systems" -- bash -c mount_files
 ok_text "Mounted the file systems"
 
 #######################################
@@ -188,7 +188,7 @@ mirrors() {
   reflector --save /etc/pacman.d/mirrorlist --sort rate --threads 12 --latest 200 --protocol https,http
 }
 export -f mirrors
-gum spin --spinner dot --title "Selecting the mirrors" -- mirrors
+gum spin --spinner dot --title "Selecting the mirrors" -- bash -c mirrors
 ok_text "Selected the mirrors"
 
 # Parallel compilation
@@ -197,7 +197,7 @@ parallel() {
   sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 }
 export -f parallel
-gum spin --spinner dot --title "Configuring parallel compilation" -- parallel
+gum spin --spinner dot --title "Configuring parallel compilation" -- bash -c parallel
 ok_text "Configured parallel compilation"
 
 # Install essential packages
@@ -208,7 +208,7 @@ pacstrap_pkgs() {
   rm install-pacstrap-pkglist.txt
 }
 export -f pacstrap_pkgs
-gum spin --spinner dot --title "Installing essential packages" -- pacstrap_pkgs
+gum spin --spinner dot --title "Installing essential packages" -- bash -c pacstrap_pkgs
 ok_text "Installed essential packages"
 
 #######################################
