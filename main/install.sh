@@ -23,8 +23,8 @@
 # Configuration
 console_keyboard="us"
 console_font="Lat2-Terminus16"
-ssd1="sdb"
-hdd1="sda"
+ssd="vda"   # sdb
+hdd="vdb"   # sda
 time_zone="Asia/Manila"
 utf_locale="en_GB.UTF-8 UTF-8"
 iso_locale="en_GB ISO-8859-1"
@@ -37,6 +37,30 @@ user_passwd="narufu"
 #######################################
 # Aesthetics
 #######################################
+
+# Clear the terminal screen
+clear
+
+# Connect to the internet
+if ! ping -c 1 archlinux.org; then
+  printf "%s\n" "Failed to connect to the internet"
+  rm --force --recursive renge
+  exit
+fi
+
+# Add developer keys
+if ! pacman -S --noconfirm archlinux-keyring; then
+  printf "%s\n" "Failed to add developer keys"
+  rm --force --recursive renge
+  exit
+fi
+
+# Install gum
+if ! pacman -S --noconfirm --needed gum; then
+  printf "%s\n" "Failed to install gum"
+  rm --force --recursive renge
+  exit
+fi
 
 # Set tty background color
 echo -e "\033]P014191E"
@@ -52,8 +76,12 @@ clear
 #######################################
 
 # Set the console keyboard layout and font
-loadkeys "${console_keyboard}"
-setfont "${console_font}"
+# loadkeys "${console_keyboard}"
+gum spin --spinner dot --title "Setting console keyboard layout" -- loadkeys "${console_keyboard}"
+printf "%s\n" "Set console keyboard layout"
+# setfont "${console_font}"
+gum spin --spinner dot --title "Setting console font" -- setfont "${console_font}"
+printf "%s\n" "Set console font"
 
 # Verify the boot mode
 bootmode="$(cat /sys/firmware/efi/fw_platform_size)"
@@ -80,22 +108,22 @@ timedatectl set-ntp true
 
 # Partition the disks
 umount --all-targets --recursive /mnt
-sgdisk --zap-all /dev/"${ssd1}"
-sgdisk --zap-all /dev/"${hdd1}"
-sgdisk --set-alignment=2048 --clear /dev/"${ssd1}"
-sgdisk --set-alignment=2048 --clear /dev/"${hdd1}"
-sgdisk --new=1:0:+1G --typecode=1:EF00 --change-name=1:"EFI system partition" /dev/"${ssd1}"
-sgdisk --new=2:0:+4G --typecode=2:8200 --change-name=2:"Linux swap" /dev/"${ssd1}"
-sgdisk --new=3:0:0 --typecode=3:8300 --change-name=3:"Linux filesystem" /dev/"${ssd1}"
-sgdisk --new=1:0:0 --typecode=1:8300 --change-name=1:"Linux filesystem" /dev/"${hdd1}"
-partprobe /dev/"${ssd1}"
-partprobe /dev/"${hdd1}"
+sgdisk --zap-all /dev/"${ssd}"
+sgdisk --zap-all /dev/"${hdd}"
+sgdisk --set-alignment=2048 --clear /dev/"${ssd}"
+sgdisk --set-alignment=2048 --clear /dev/"${hdd}"
+sgdisk --new=1:0:+1G --typecode=1:EF00 --change-name=1:"EFI system partition" /dev/"${ssd}"
+sgdisk --new=2:0:+4G --typecode=2:8200 --change-name=2:"Linux swap" /dev/"${ssd}"
+sgdisk --new=3:0:0 --typecode=3:8300 --change-name=3:"Linux filesystem" /dev/"${ssd}"
+sgdisk --new=1:0:0 --typecode=1:8300 --change-name=1:"Linux filesystem" /dev/"${hdd}"
+partprobe /dev/"${ssd}"
+partprobe /dev/"${hdd}"
 
 # Format the partitions
-root_partition="${ssd1}3"
-home_partition="${hdd1}1"
-swap_partition="${ssd1}2"
-efi_system_partition="${ssd1}1"
+root_partition="${ssd}3"
+home_partition="${hdd}1"
+swap_partition="${ssd}2"
+efi_system_partition="${ssd}1"
 mkfs.ext4 -F /dev/"${root_partition}"
 mkfs.ext4 -F /dev/"${home_partition}"
 mkswap /dev/"${swap_partition}"
