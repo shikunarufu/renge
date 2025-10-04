@@ -91,6 +91,7 @@ keyboard_font() {
   loadkeys "${console_keyboard}"
   setfont "${console_font}"
 }
+export -f keyboard_font
 gum spin --spinner dot --title "Setting the console keyboard layout and font" -- keyboard_font
 ok_text "Set the console keyboard layout and font"
 
@@ -108,6 +109,7 @@ boot() {
     exit
   fi
 }
+export -f boot
 gum spin --spinner dot --title "Verifying the boot mode" -- boot
 ok_text "Verified the boot mode"
 
@@ -119,6 +121,7 @@ internet() {
     exit
   fi
 }
+export -f internet
 gum spin --spinner dot --title "Connecting to the internet" -- internet
 ok_text "Connected to the internet"
 
@@ -140,6 +143,7 @@ partition() {
   partprobe /dev/"${ssd}"
   partprobe /dev/"${hdd}"
 }
+export -f partition
 gum spin --spinner dot --title "Partitioning the disks" -- partition
 ok_text "Partitioned the disks"
 
@@ -154,6 +158,7 @@ format() {
   mkswap /dev/"${swap_partition}"
   mkfs.fat -F 32 /dev/"${efi_system_partition}"
 }
+export -f format
 gum spin --spinner dot --title "Formatting the partitions" -- format
 ok_text "Formatted the partitions"
 
@@ -166,6 +171,7 @@ mount_files() {
   mount /dev/"${home_partition}" /mnt/home
   swapon /dev/"${swap_partition}"
 }
+export -f mount_files
 gum spin --spinner dot --title "Mounting the file systems" -- mount_files
 ok_text "Mounted the file systems"
 
@@ -181,6 +187,7 @@ mirrors() {
   # pacman -S --noconfirm archlinux-keyring
   reflector --save /etc/pacman.d/mirrorlist --sort rate --threads 12 --latest 200 --protocol https,http
 }
+export -f mirrors
 gum spin --spinner dot --title "Selecting the mirrors" -- mirrors
 ok_text "Selected the mirrors"
 
@@ -189,6 +196,7 @@ parallel() {
   core=$(grep --count ^processor /proc/cpuinfo)
   sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 }
+export -f parallel
 gum spin --spinner dot --title "Configuring parallel compilation" -- parallel
 ok_text "Configured parallel compilation"
 
@@ -199,6 +207,7 @@ pacstrap_pkgs() {
   pacstrap -K /mnt - < install-pacstrap-pkglist.txt
   rm install-pacstrap-pkglist.txt
 }
+export -f pacstrap_pkgs
 gum spin --spinner dot --title "Installing essential packages" -- pacstrap_pkgs
 ok_text "Installed essential packages"
 
