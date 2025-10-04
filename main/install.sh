@@ -62,11 +62,22 @@ if ! pacman -S --noconfirm --needed gum; then
   exit
 fi
 
-# Set tty background color
-echo -e "\033]P014191E"
-
-# Set tty text color
-echo -e "\033]P7C1DFFF"
+# Set text color
+ok_text() {
+  printf "["
+  printf "\e[0;32m"
+  printf "  OK  "
+  printf "\e[0m"
+  printf "]"
+  printf "\e[10G"
+  if [[ $1 == *" "* ]]; then
+    local text_1=${1%% *}
+    local text_2=${1#* }
+    printf "%s\e[1;37m%s\e[0m\n" "${text_1}" "${text_2}"
+  else
+    printf "%s\n" "$1"
+  fi
+}
 
 # Clear the terminal screen
 clear
@@ -78,10 +89,10 @@ clear
 # Set the console keyboard layout and font
 # loadkeys "${console_keyboard}"
 gum spin --spinner dot --title "Setting console keyboard layout" -- loadkeys "${console_keyboard}"
-printf "%s\n" "Set console keyboard layout"
+ok_text "Set console keyboard layout"
 # setfont "${console_font}"
 gum spin --spinner dot --title "Setting console font" -- setfont "${console_font}"
-printf "%s\n" "Set console font"
+ok_text "Set console font"
 
 # Verify the boot mode
 bootmode="$(cat /sys/firmware/efi/fw_platform_size)"
