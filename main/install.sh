@@ -39,12 +39,10 @@ user_passwd="narufu"
 #######################################
 
 # Set tty background color
-# echo -e "\033]P014191E"
-printf "%s\n" "\033]P014191E"
+echo -e "\033]P014191E"
 
 # Set tty text color
-# echo -e "\033]P7C1DFFF"
-printf "%s\n" "\033]P014191E"
+echo -e "\033]P7C1DFFF"
 
 # Clear the terminal screen
 clear
