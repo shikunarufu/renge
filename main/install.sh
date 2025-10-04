@@ -97,7 +97,7 @@ else
 fi
 
 # Connect to the internet
-if ! ping -c 1 archlinux.org; then
+if ! gum spin --spinner dot --title "Setting console keyboard layout" -- ping -c 1 archlinux.org; then
   printf "%s\n" "Failed to connect to the internet"
   rm --force --recursive renge
   exit
