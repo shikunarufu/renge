@@ -92,8 +92,10 @@ keyboard_font() {
   setfont "${console_font}"
 }
 export -f keyboard_font
-gum spin --spinner dot --title "Setting the console keyboard layout and font" -- bash -c keyboard_font
+gum spin --spinner "line" --title "Setting the console keyboard layout and font" -- bash -c keyboard_font
 ok_text "Set the console keyboard layout and font"
+
+line, pulse, points
 
 # Verify the boot mode
 boot() {
@@ -110,7 +112,7 @@ boot() {
   fi
 }
 export -f boot
-gum spin --spinner dot --title "Verifying the boot mode" -- bash -c boot
+gum spin --spinner "line" --title "Verifying the boot mode" -- bash -c boot
 ok_text "Verified the boot mode"
 
 # Connect to the internet
@@ -122,11 +124,11 @@ internet() {
   fi
 }
 export -f internet
-gum spin --spinner dot --title "Connecting to the internet" -- bash -c internet
+gum spin --spinner "line" --title "Connecting to the internet" -- bash -c internet
 ok_text "Connected to the internet"
 
 # Update the system clock
-gum spin --spinner dot --title "Updating the system clock" -- timedatectl set-ntp true
+gum spin --spinner "line" --title "Updating the system clock" -- timedatectl set-ntp true
 ok_text "Updated the system clock"
 
 # Partition the disks
@@ -144,7 +146,7 @@ partition() {
   partprobe /dev/"${hdd}"
 }
 export -f partition
-gum spin --spinner dot --title "Partitioning the disks" -- bash -c partition
+gum spin --spinner "line" --title "Partitioning the disks" -- bash -c partition
 ok_text "Partitioned the disks"
 
 # Format the partitions
@@ -159,7 +161,7 @@ format() {
   mkfs.fat -F 32 /dev/"${efi_system_partition}"
 }
 export -f format
-gum spin --spinner dot --title "Formatting the partitions" -- bash -c format
+gum spin --spinner "line" --title "Formatting the partitions" --spinner.foreground "#0000FF" -- bash -c format
 ok_text "Formatted the partitions"
 
 # Mount the file systems
@@ -172,7 +174,7 @@ mount_files() {
   swapon /dev/"${swap_partition}"
 }
 export -f mount_files
-gum spin --spinner dot --title "Mounting the file systems" -- bash -c mount_files
+gum spin --spinner "line" --title "Mounting the file systems" --spinner.foreground "#0000FF" -- bash -c mount_files
 ok_text "Mounted the file systems"
 
 #######################################
@@ -188,7 +190,7 @@ mirrors() {
   reflector --save /etc/pacman.d/mirrorlist --sort rate --threads 12 --latest 200 --protocol https,http
 }
 export -f mirrors
-gum spin --spinner dot --title "Selecting the mirrors" -- bash -c mirrors
+gum spin --spinner "line" --title "Selecting the mirrors" --spinner.foreground "#0000FF" -- bash -c mirrors
 ok_text "Selected the mirrors"
 
 # Parallel compilation
@@ -197,7 +199,7 @@ parallel() {
   sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 }
 export -f parallel
-gum spin --spinner dot --title "Configuring parallel compilation" -- bash -c parallel
+gum spin --spinner "line" --title "Configuring parallel compilation" --spinner.foreground "#0000FF" -- bash -c parallel
 ok_text "Configured parallel compilation"
 
 # Install essential packages
@@ -208,7 +210,7 @@ pacstrap_pkgs() {
   rm install-pacstrap-pkglist.txt
 }
 export -f pacstrap_pkgs
-gum spin --spinner dot --title "Installing essential packages" -- bash -c pacstrap_pkgs
+gum spin --spinner "line" --title "Installing essential packages" --spinner.foreground "#0000FF" -- bash -c pacstrap_pkgs
 ok_text "Installed essential packages"
 
 #######################################
@@ -216,7 +218,7 @@ ok_text "Installed essential packages"
 #######################################
 
 # Fstab
-gum spin --spinner dot --title "Generating fstab" -- genfstab -U /mnt >> /mnt/etc/fstab
+gum spin --spinner "line" --title "Generating fstab" --spinner.foreground "#0000FF" -- genfstab -U /mnt >> /mnt/etc/fstab
 ok_text "Generated fstab"
 
 # Prepare for chroot
