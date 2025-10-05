@@ -82,7 +82,7 @@ make all && sudo make install
 cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 
 # Pacman Packages
-if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt; then
+if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt; then
   echo "Failed to retrieve package list"
   rm --force --recursive /home/"${username}"/yay
   rm --force --recursive /home/"${username}"/renge
@@ -98,7 +98,7 @@ fi
 rm post-pacman-pkglist.txt
 
 # Yay Packages
-if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-yay-pkglist.txt >> post-yay-pkglist.txt; then
+if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/post-yay-pkglist.txt >> post-yay-pkglist.txt; then
   echo "Failed to retrieve (AUR) package list"
   rm --force --recursive /home/"${username}"/yay
   rm --force --recursive /home/"${username}"/renge
@@ -114,7 +114,7 @@ fi
 rm post-yay-pkglist.txt
 
 # Flatpak Packages
-if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/main/pkgs/post-flatpak-pkglist.txt >> post-flatpak-pkglist.txt; then
+if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/post-flatpak-pkglist.txt >> post-flatpak-pkglist.txt; then
   echo "Failed to retrieve (Flatpak) package list"
   rm --force --recursive /home/"${username}"/yay
   rm --force --recursive /home/"${username}"/renge
