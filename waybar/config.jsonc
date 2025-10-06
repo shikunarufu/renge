@@ -16,6 +16,7 @@
     "custom/media",
     "pulseaudio",
     "network",
+    "group/group-profile",
     "group/group-power"
   ],
   "margin-top": 6,
@@ -46,6 +47,12 @@
     "tooltip": true,
     "tooltip-format": "Lock"
   },
+  "custom/sleep": {
+    "format": "󰤄",
+    "on-click": "systemctl hybrid-sleep",
+    "tooltip": true,
+    "tooltip-format": "Sleep"
+  },
   "custom/restart": {
     "format": "",
     "on-click": "reboot",
@@ -58,11 +65,22 @@
     "tooltip": true,
     "tooltip-format": "Shut Down"
   },
-  "custom/sleep": {
-    "format": "󰤄",
-    "on-click": "systemctl hybrid-sleep",
+  "custom/profile": {
+    "format": "󰣇",
     "tooltip": true,
-    "tooltip-format": "Sleep"
+    "tooltip-format": "Power Profile"
+  },
+  "custom/vmhost": {
+    "format": "󰤄",
+    "on-click": "tuned-adm profile virtual-host",
+    "tooltip": true,
+    "tooltip-format": "Virtual Host"
+  },
+  "custom/desktop": {
+    "format": "󰤄",
+    "on-click": "tuned-adm profile desktop",
+    "tooltip": true,
+    "tooltip-format": "Desktop"
   },
   "group/group-power": {
     "orientation": "horizontal",
@@ -72,6 +90,19 @@
       "custom/sleep",
       "custom/restart",
       "custom/shutdown"
+    ],
+    "drawer": {
+      "transition-duration": 250,
+      "transition-left-to-right": true,
+      "transition-timing-function": "ease-in-out"
+    }
+  },
+  "group/group-profile": {
+    "orientation": "horizontal",
+    "modules": [
+      "custom/profile",
+      "custom/vmhost",
+      "custom/desktop"
     ],
     "drawer": {
       "transition-duration": 250,
