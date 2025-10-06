@@ -151,8 +151,8 @@ core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 
 # Install essential packages
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
-pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /mnt/renge/pkgs/install-pacstrap-pkglist.txt | sort --output=/mnt/renge/pkgs/install-pacstrap-pkglist.txt --unique
+pacstrap -K /mnt - < /mnt/renge/pkgs/install-pacstrap-pkglist.txt
 
 #######################################
 # Configure The System
@@ -246,9 +246,17 @@ rm /mnt/configure.sh
 umount -R /mnt
 ok_text "Nyanpasu~!"
 sec=15
-while [[ ${sec} -gt 0 ]]; do
+while [[ ${sec} -gt 9 ]]; do
   printf "\033[9C%s\r" "Restarting in $sec seconds"
   sleep 1
   ((sec--))
 done
+while [[ ${sec} -gt 1 ]]; do
+  printf "\033[2K"
+  printf "\033[9C%s\r" "Restarting in $sec seconds"
+  sleep 1
+  ((sec--))
+done
+printf "\033[2K"
+printf "\033[9C%s\r" "Restarting in 1 second"
 reboot
