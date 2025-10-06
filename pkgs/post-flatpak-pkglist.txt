@@ -1,3 +1,0 @@
-# Benchmarking
-io.github.radiolamp.mangojuice
-runtime/org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/23.08
