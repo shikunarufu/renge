@@ -25,7 +25,7 @@ clear
 
 # Connect to the internet
 if ! ping -c 1 archlinux.org; then
-  echo "Failed to connect to the internet"
+  printf "%s\n" "Failed to connect to the internet"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
@@ -39,15 +39,15 @@ printf "%s\n%s" "${user_passwd}" "${user_passwd}" | sudo --stdin sed --in-place 
 
 # Yay
 if ! sudo pacman -S --noconfirm --needed git base-devel; then
-  echo "Failed to install Yay dependencies"
+  printf "%s\n" "Failed to install Yay dependencies"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
 if ! git clone https://aur.archlinux.org/yay.git; then
   if ! git clone --branch yay --single-branch https://github.com/archlinux/aur.git yay; then
-    echo "Failed to clone Yay repository"
-    rm --force --recursive /home/"${username}"/yay
+    printf "%s\n" "Failed to clone Yay repository"
     rm --force --recursive /home/"${username}"/renge
+    rm --force --recursive /home/"${username}"/yay
     exit
   fi
 fi
@@ -56,24 +56,35 @@ makepkg -si --noconfirm
 yay --yay --gendb
 yay -Syu --devel --answerupgrade None --noconfirm
 yay --yay --devel --save
+rm --force --recursive /home/"${username}"/yay
 
 # Hyprland
-if ! yay -S --answerclean All --answerdiff None --noconfirm ninja gcc cmake meson libxcb xcb-proto xcb-util xcb-util-keysyms libxfixes libx11 libxcomposite libxrender libxcursor pixman wayland-protocols cairo pango libxkbcommon xcb-util-wm xorg-xwayland libinput libliftoff libdisplay-info cpio tomlplusplus hyprlang-git hyprcursor-git hyprwayland-scanner-git xcb-util-errors hyprutils-git glaze hyprgraphics-git aquamarine-git re2 hyprland-qtutils; then
-  make clean
-  make && sudo make install
-  if [ $? -eq 0 ]; then
-    echo "Installed Hyprland dependencies"
-  else
-    echo "Failed to install Hyprland dependencies"
-    rm --force --recursive /home/"${username}"/yay
-    rm --force --recursive /home/"${username}"/renge
-    exit
-  fi
-  cd /home/"${username}"
+if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/hyprland_pkglist.txt >> hyprland_pkglist.txt; then
+  printf "%s\n" "Failed to retrieve (Hyprland) package list"
+  rm --force --recursive /home/"${username}"/renge
+  exit
 fi
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' hyprland_pkglist.txt | sort --output=hyprland_pkglist.txt --unique
+if ! yay -S --answerclean All --answerdiff None --noconfirm - < hyprland_pkglist.txt; then
+  hyprland_pkglist="hyprland_pkglist.txt"
+  mkdir /home/"${username}"/AUR
+  cd AUR || exit
+  while IFS= read -r hyprland_pkgs; do
+    if ! git clone --branch "${hyprland_pkgs}" --single-branch https://github.com/archlinux/aur.git "${hyprland_pkgs}"; then
+      break
+      printf "%s\n" "Failed to install (Hyprland) packages"
+      rm --force --recursive /home/"${username}"/renge
+      rm --force --recursive /home/"${username}"/AUR
+      exit
+    fi
+    cd "$hyprland_pkgs"
+    makepkg -si --noconfirm
+  done < /home/"${username}"/"${hyprland_pkglist}"
+fi
+rm hyprland_pkglist.txt
+rm --force --recursive /home/"${username}"/AUR
 if ! git clone --recursive https://github.com/hyprwm/Hyprland; then
-  echo "Failed to clone Hyprland repository"
-  rm --force --recursive /home/"${username}"/yay
+  printf "%s\n" "Failed to clone Hyprland repository"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
@@ -83,15 +94,13 @@ cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 
 # Pacman Packages
 if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt; then
-  echo "Failed to retrieve package list"
-  rm --force --recursive /home/"${username}"/yay
+  printf "%s\n" "Failed to retrieve package list"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-pacman-pkglist.txt | sort --output=post-pacman-pkglist.txt --unique
 if ! sudo pacman -S --noconfirm --needed - < post-pacman-pkglist.txt; then
-  echo "Failed to install packages"
-  rm --force --recursive /home/"${username}"/yay
+  printf "%s\n" "Failed to install packages"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
@@ -99,15 +108,13 @@ rm post-pacman-pkglist.txt
 
 # Yay Packages
 if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/post-yay-pkglist.txt >> post-yay-pkglist.txt; then
-  echo "Failed to retrieve (AUR) package list"
-  rm --force --recursive /home/"${username}"/yay
+  printf "%s\n" "Failed to retrieve (AUR) package list"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-yay-pkglist.txt | sort --output=post-yay-pkglist.txt --unique
 if ! yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist.txt; then
-  echo "Failed to install (AUR) packages"
-  rm --force --recursive /home/"${username}"/yay
+  printf "%s\n" "Failed to install (AUR) packages"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
@@ -115,8 +122,7 @@ rm post-yay-pkglist.txt
 
 # Flatpak Packages
 # if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/post-flatpak-pkglist.txt >> post-flatpak-pkglist.txt; then
-#   echo "Failed to retrieve (Flatpak) package list"
-#   rm --force --recursive /home/"${username}"/yay
+#   printf "%s\n" "Failed to retrieve (Flatpak) package list"
 #   rm --force --recursive /home/"${username}"/renge
 #   exit
 # fi
@@ -124,8 +130,7 @@ rm post-yay-pkglist.txt
 # fp_pkg="post-flatpak-pkglist.txt"
 # while IFS= read -r app_id; do
 #   if ! flatpak install --assumeyes --noninteractive flathub "$app_id"; then
-#     echo "Failed to install (Flatpak) packages"
-#     rm --force --recursive /home/"${username}"/yay
+#     printf "%s\n" "Failed to install (Flatpak) packages"
 #     rm --force --recursive /home/"${username}"/renge
 #     exit
 #   fi
@@ -172,8 +177,7 @@ bash <(curl -sSL https://spotx-official.github.io/run.sh)
 
 # Linux GPU Control Application
 if ! sudo systemctl enable --now lactd; then
-  echo "Failed to enable lactd"
-  rm --force --recursive /home/"${username}"/yay
+  printf "%s\n" "Failed to enable lactd"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
