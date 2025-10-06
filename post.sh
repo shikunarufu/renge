@@ -59,13 +59,8 @@ yay --yay --devel --save
 rm --force --recursive /home/"${username}"/yay
 
 # Hyprland
-if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/hyprland-pkglist.txt >> hyprland-pkglist.txt; then
-  printf "%s\n" "Failed to retrieve (Hyprland) package list"
-  rm --force --recursive /home/"${username}"/renge
-  exit
-fi
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' hyprland-pkglist.txt | sort --output=hyprland-pkglist.txt --unique
-if ! yay -S --answerclean All --answerdiff None --noconfirm - < hyprland-pkglist.txt; then
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /home/"${username}"/renge/pkgs/hyprland-pkglist.txt | sort --output=/home/"${username}"/renge/pkgs/hyprland-pkglist.txt --unique
+if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${username}"/renge/pkgs/hyprland-pkglist.txt; then
   hyprland_pkglist="hyprland-pkglist.txt"
   mkdir /home/"${username}"/AUR
   cd AUR || exit
@@ -79,9 +74,8 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < hyprland-pkglist
     fi
     cd "$hyprland_pkgs"
     makepkg -si --noconfirm
-  done < /home/"${username}"/"${hyprland_pkglist}"
+  done < /home/"${username}"/renge/pkgs/"${hyprland_pkglist}"
 fi
-rm hyprland-pkglist.txt
 rm --force --recursive /home/"${username}"/AUR
 if ! git clone --recursive https://github.com/hyprwm/Hyprland; then
   printf "%s\n" "Failed to clone Hyprland repository"
@@ -93,49 +87,20 @@ make all && sudo make install
 cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 
 # Pacman Packages
-if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/post-pacman-pkglist.txt >> post-pacman-pkglist.txt; then
-  printf "%s\n" "Failed to retrieve package list"
-  rm --force --recursive /home/"${username}"/renge
-  exit
-fi
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-pacman-pkglist.txt | sort --output=post-pacman-pkglist.txt --unique
-if ! sudo pacman -S --noconfirm --needed - < post-pacman-pkglist.txt; then
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /home/"${username}"/renge/pkgs/post-pacman-pkglist.txt | sort --output=/home/"${username}"/renge/pkgs/post-pacman-pkglist.txt --unique
+if ! sudo pacman -S --noconfirm --needed - < /home/"${username}"/renge/pkgs/post-pacman-pkglist.txt; then
   printf "%s\n" "Failed to install packages"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
-rm post-pacman-pkglist.txt
 
 # Yay Packages
-if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/post-yay-pkglist.txt >> post-yay-pkglist.txt; then
-  printf "%s\n" "Failed to retrieve (AUR) package list"
-  rm --force --recursive /home/"${username}"/renge
-  exit
-fi
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-yay-pkglist.txt | sort --output=post-yay-pkglist.txt --unique
-if ! yay -S --answerclean All --answerdiff None --noconfirm - < post-yay-pkglist.txt; then
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /home/"${username}"/renge/pkgs/post-yay-pkglist.txt | sort --output=/home/"${username}"/renge/pkgs/post-yay-pkglist.txt --unique
+if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${username}"/renge/pkgs/post-yay-pkglist.txt; then
   printf "%s\n" "Failed to install (AUR) packages"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
-rm post-yay-pkglist.txt
-
-# Flatpak Packages
-# if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/post-flatpak-pkglist.txt >> post-flatpak-pkglist.txt; then
-#   printf "%s\n" "Failed to retrieve (Flatpak) package list"
-#   rm --force --recursive /home/"${username}"/renge
-#   exit
-# fi
-# grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-flatpak-pkglist.txt | sort --output=post-flatpak-pkglist.txt --unique
-# fp_pkg="post-flatpak-pkglist.txt"
-# while IFS= read -r app_id; do
-#   if ! flatpak install --assumeyes --noninteractive flathub "$app_id"; then
-#     printf "%s\n" "Failed to install (Flatpak) packages"
-#     rm --force --recursive /home/"${username}"/renge
-#     exit
-#   fi
-# done < "$fp_pkg"
-# rm post-flatpak-pkglist.txt
 
 # Foot
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
