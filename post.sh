@@ -145,8 +145,8 @@ cp --recursive /home/"${username}"/renge/starship/starship.toml /home/"${usernam
 sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland --remember"|g' /etc/greetd/config.toml
 sudo systemctl enable greetd.service
 
-# Dunst
-cp --recursive /home/"${username}"/renge/dunst /home/"${username}"/.config
+# Mako
+cp --recursive /home/"${username}"/renge/mako /home/"${username}"/.config
 
 # Waybar
 cp --recursive /home/"${username}"/renge/waybar /home/"${username}"/.config
