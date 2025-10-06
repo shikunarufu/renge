@@ -167,7 +167,8 @@ cat << EOF > /mnt/configure.sh
 
 # Prepare for installation
 sed --in-place 's/#Color/Color/g' /etc/pacman.conf
-sed --in-place 's/ParallelDownloads = 5/ParallelDownloads = 12/g' /etc/pacman.conf
+thread=$(nproc)
+sed --in-place "s/ParallelDownloads = 5/ParallelDownloads = $thread/g" /etc/pacman.conf
 core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j\$core\"/g" /etc/makepkg.conf
 
