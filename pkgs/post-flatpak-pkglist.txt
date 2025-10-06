@@ -1,9 +1,3 @@
-# Manga Reader
-info.febvre.Komikku
-
-# Screencast
-com.obsproject.Studio
-
 # Game Launcher
 com.heroicgameslauncher.hgl
 com.github.tchx84.Flatseal
