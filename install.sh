@@ -143,6 +143,7 @@ swapon /dev/"${swap_partition}"
 sed --in-place 's/#Color/Color/g' /etc/pacman.conf
 thread=$(nproc)
 sed --in-place "s/ParallelDownloads = 5/ParallelDownloads = $thread/g" /etc/pacman.conf
+sed --in-place '/#DisableSandbox/a DisableDownloadTimeout' /etc/pacman.conf
 pacman -S --noconfirm archlinux-keyring
 reflector --save /etc/pacman.d/mirrorlist --sort rate --threads $thread --latest 200 --protocol https,http
 
@@ -169,6 +170,7 @@ cat << EOF > /mnt/configure.sh
 sed --in-place 's/#Color/Color/g' /etc/pacman.conf
 thread=$(nproc)
 sed --in-place "s/ParallelDownloads = 5/ParallelDownloads = $thread/g" /etc/pacman.conf
+sed --in-place '/#DisableSandbox/a DisableDownloadTimeout' /etc/pacman.conf
 core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j\$core\"/g" /etc/makepkg.conf
 
