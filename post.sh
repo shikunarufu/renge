@@ -114,23 +114,23 @@ fi
 rm post-yay-pkglist.txt
 
 # Flatpak Packages
-if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/post-flatpak-pkglist.txt >> post-flatpak-pkglist.txt; then
-  echo "Failed to retrieve (Flatpak) package list"
-  rm --force --recursive /home/"${username}"/yay
-  rm --force --recursive /home/"${username}"/renge
-  exit
-fi
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-flatpak-pkglist.txt | sort --output=post-flatpak-pkglist.txt --unique
-fp_pkg="post-flatpak-pkglist.txt"
-while IFS= read -r app_id; do
-  if ! flatpak install --assumeyes --noninteractive flathub "$app_id"; then
-    echo "Failed to install (Flatpak) packages"
-    rm --force --recursive /home/"${username}"/yay
-    rm --force --recursive /home/"${username}"/renge
-    exit
-  fi
-done < "$fp_pkg"
-rm post-flatpak-pkglist.txt
+# if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/post-flatpak-pkglist.txt >> post-flatpak-pkglist.txt; then
+#   echo "Failed to retrieve (Flatpak) package list"
+#   rm --force --recursive /home/"${username}"/yay
+#   rm --force --recursive /home/"${username}"/renge
+#   exit
+# fi
+# grep --extended-regexp --only-matching '^[^(#|[:space:])]*' post-flatpak-pkglist.txt | sort --output=post-flatpak-pkglist.txt --unique
+# fp_pkg="post-flatpak-pkglist.txt"
+# while IFS= read -r app_id; do
+#   if ! flatpak install --assumeyes --noninteractive flathub "$app_id"; then
+#     echo "Failed to install (Flatpak) packages"
+#     rm --force --recursive /home/"${username}"/yay
+#     rm --force --recursive /home/"${username}"/renge
+#     exit
+#   fi
+# done < "$fp_pkg"
+# rm post-flatpak-pkglist.txt
 
 # Foot
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
