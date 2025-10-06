@@ -211,10 +211,8 @@ sed --in-place '93s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/
 pacman -Syu --noconfirm
 
 # Installation
-curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacman-pkglist.txt | sort --output=install-pacman-pkglist.txt --unique
-pacman -S --noconfirm --needed - < install-pacman-pkglist.txt
-rm install-pacman-pkglist.txt
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /mnt/renge/pkgs/install-pacman-pkglist.txt | sort --output=/mnt/renge/pkgs/install-pacman-pkglist.txt --unique
+pacman -S --noconfirm --needed - < /mnt/renge/pkgs/install-pacman-pkglist.txt
 
 # Boot loader
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
