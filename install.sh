@@ -259,4 +259,5 @@ while [[ ${sec} -gt 1 ]]; do
 done
 printf "\033[2K"
 printf "\033[9C%s\r" "Restarting in 1 second"
+sleep 1
 reboot
