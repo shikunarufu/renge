@@ -23,8 +23,8 @@
 # Configuration
 console_keyboard="us"
 console_font="Lat2-Terminus16"
-ssd="vda"   # sdb
-hdd="vdb"   # sda
+ssd="sdb"   # sdb/vda
+hdd="sda"   # sda/vdb
 time_zone="Asia/Manila"
 utf_locale="en_GB.UTF-8 UTF-8"
 iso_locale="en_GB ISO-8859-1"
