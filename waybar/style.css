@@ -36,6 +36,7 @@ window#waybar {
 }
 #clock,
 #group-power,
+#group-profile,
 #network,
 #pulseaudio {
   padding: 0px 7px 0px 7px;
@@ -44,14 +45,18 @@ window#waybar {
 }
 #custom-arch,
 #custom-lock,
+#custom-sleep,
 #custom-restart,
 #custom-shutdown,
-#custom-sleep {
+#custom-profile,
+#custom-vmhost,
+#custom-desktop, {
   padding: 0px 5.5px 0px 5.5px;
   background: #14191C;
   color: #CFDFE2;
 }
-#group-power {
+#group-power,
+#group-profile {
   padding: 0px 2.75px 0px 2.75px;
   background: #14191C;
   color: #CFDFE2;
