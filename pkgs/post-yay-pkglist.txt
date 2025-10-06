@@ -19,6 +19,9 @@ raw-thumbnailer
 # Text Editor
 vscodium-bin
 
+# Web Browser
+zen-browser-bin
+
 # Image Viewer
 mirage
 
@@ -41,7 +44,7 @@ p7zip-gui
 anki-bin
 
 # Steam
-ttf-ms-win11-auto
+ttf-ms-win11
 
 # Benchmarking
 phoronix-test-suite
