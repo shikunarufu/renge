@@ -220,7 +220,7 @@ rm install-pacman-pkglist.txt
 
 # Boot loader
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-sed --in-place "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet video=efifb:off pcie_acs_override=downstream,multifunction\"/g" /etc/default/grub
+sed --in-place "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet video=efifb:off pcie_acs_override=downstream,multifunction kvm_amd.sev=1\"/g" /etc/default/grub
 grub-mkconfig -o /boot/grub/grub.cfg
 
 # System services
