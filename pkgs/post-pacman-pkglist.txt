@@ -132,6 +132,10 @@ steam
 # Benchmarking
 lact
 
+# MangoJuice
+mesa-utils
+vulkan-tools
+
 # OpenRGB
 openrgb
 i2c-tools
