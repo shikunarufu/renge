@@ -23,7 +23,8 @@ greetd-tuigreet
 #######################################
 
 # Notification Daemon
-dunst
+mako
+jq
 
 # Authentication Agent
 hyprpolkitagent
@@ -74,6 +75,9 @@ archlinux-xdg-menu
 #######################################
 # Applications
 #######################################
+
+# Zen Browser
+speech-dispatcher
 
 # BitTorrent Client
 qbittorrent
