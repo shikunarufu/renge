@@ -76,6 +76,9 @@ archlinux-xdg-menu
 # Applications
 #######################################
 
+# Manga Reader
+komikku
+
 # Zen Browser
 speech-dispatcher
 
@@ -101,7 +104,10 @@ zam-plugins-lv2
 # Video Player
 haruna
 
-# OBS Studio
+# Screencast
+obs-studio
+libfdk-aac
+
 v4l2loopback-dkms
 
 # Screen Locker
