@@ -59,14 +59,14 @@ yay --yay --devel --save
 rm --force --recursive /home/"${username}"/yay
 
 # Hyprland
-if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/hyprland_pkglist.txt >> hyprland_pkglist.txt; then
+if ! curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/hyprland-pkglist.txt >> hyprland-pkglist.txt; then
   printf "%s\n" "Failed to retrieve (Hyprland) package list"
   rm --force --recursive /home/"${username}"/renge
   exit
 fi
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' hyprland_pkglist.txt | sort --output=hyprland_pkglist.txt --unique
-if ! yay -S --answerclean All --answerdiff None --noconfirm - < hyprland_pkglist.txt; then
-  hyprland_pkglist="hyprland_pkglist.txt"
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' hyprland-pkglist.txt | sort --output=hyprland-pkglist.txt --unique
+if ! yay -S --answerclean All --answerdiff None --noconfirm - < hyprland-pkglist.txt; then
+  hyprland_pkglist="hyprland-pkglist.txt"
   mkdir /home/"${username}"/AUR
   cd AUR || exit
   while IFS= read -r hyprland_pkgs; do
@@ -81,7 +81,7 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < hyprland_pkglist
     makepkg -si --noconfirm
   done < /home/"${username}"/"${hyprland_pkglist}"
 fi
-rm hyprland_pkglist.txt
+rm hyprland-pkglist.txt
 rm --force --recursive /home/"${username}"/AUR
 if ! git clone --recursive https://github.com/hyprwm/Hyprland; then
   printf "%s\n" "Failed to clone Hyprland repository"
