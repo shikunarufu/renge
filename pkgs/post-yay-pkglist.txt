@@ -50,6 +50,11 @@ anki-bin
 # Steam
 ttf-ms-win11
 
+# Game Launcher
+heroic-games-launcher-bin
+
 # Benchmarking
 phoronix-test-suite
 zenergy-dkms-git
+mangojuice
+vkbasalt
