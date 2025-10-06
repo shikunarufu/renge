@@ -151,10 +151,9 @@ core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 
 # Install essential packages
-curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacstrap-pkglist.txt >> install-pacstrap-pkglist.txt
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacstrap-pkglist.txt | sort --output=install-pacstrap-pkglist.txt --unique
-pacstrap -K /mnt - < install-pacstrap-pkglist.txt
-rm install-pacstrap-pkglist.txt
+#curl --silent --location https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacstrap-pkglist.txt >> install-pacstrap-pkglist.txt
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
+pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 
 #######################################
 # Configure The System
