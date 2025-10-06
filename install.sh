@@ -210,7 +210,7 @@ printf "%s\n" "Defaults passwd_timeout=0" >> /etc/sudoers
 
 # Repositories
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
-sed --in-place '93s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
+sed --in-place '94s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 pacman -Syu --noconfirm
 
 # Installation
