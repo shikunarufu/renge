@@ -212,8 +212,8 @@ sed --in-place '93s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/
 pacman -Syu --noconfirm
 
 # Installation
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /mnt/renge/pkgs/install-pacman-pkglist.txt | sort --output=/mnt/renge/pkgs/install-pacman-pkglist.txt --unique
-pacman -S --noconfirm --needed - < /mnt/renge/pkgs/install-pacman-pkglist.txt
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacman-pkglist.txt | sort --output=./renge/pkgs/install-pacman-pkglist.txt --unique
+pacman -S --noconfirm --needed - < ./renge/pkgs/install-pacman-pkglist.txt
 
 # Boot loader
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
