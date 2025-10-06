@@ -204,7 +204,6 @@ sudo sed --in-place 's/#unix_sock_rw_perms = \"0770\"/unix_sock_rw_perms = \"077
 sudo sed --in-place 's/#log_filters=\"1:qemu 1:libvirt 4:object 4:json 4:event 1:util\"/log_filters=\"3:qemu 1:libvirt\"/g' /etc/libvirt/libvirtd.conf
 sudo sed --in-place 's|#log_outputs=\"3:syslog:libvirtd\"|log_outputs=\"2:file:/var/log/libvirt/libvirtd.log\"|g' /etc/libvirt/libvirtd.conf
 sudo usermod --append --groups kvm,libvirt "${username}"
-# printf "%s\n" "export LIBVIRT_DEFAULT_URI='qemu:///system'" >> /home/"${username}"/.bashrc
 sudo systemctl enable libvirtd
 sudo systemctl start libvirtd
 sudo sed --in-place "s/#user = \"libvirt-qemu\"/user = \"$username\"/g" /etc/libvirt/qemu.conf
