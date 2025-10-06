@@ -215,6 +215,7 @@ pacman -Syu --noconfirm
 curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacman-pkglist.txt | sort --output=install-pacman-pkglist.txt --unique
 pacman -S --noconfirm --needed - < install-pacman-pkglist.txt
+rm --force --recursive install-pacman-pkglist.txt
 
 # Boot loader
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
