@@ -44,9 +44,6 @@ p7zip-gui
 # Flashcards
 anki-bin
 
-# Steam
-ttf-ms-win11-auto
-
 # Game Launcher
 heroic-games-launcher-bin
 
