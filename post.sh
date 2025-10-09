@@ -77,11 +77,12 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${usernam
   done < /home/"${username}"/renge/pkgs/"${hyprland_pkglist}"
 fi
 rm --force --recursive /home/"${username}"/AUR
-if ! git clone --recursive https://github.com/hyprwm/Hyprland; then
-  printf "%s\n" "Failed to clone Hyprland repository"
-  rm --force --recursive /home/"${username}"/renge
-  exit
-fi
+git clone --recursive https://github.com/hyprwm/Hyprland
+# if ! git clone --recursive https://github.com/hyprwm/Hyprland; then
+#   printf "%s\n" "Failed to clone Hyprland repository"
+#   rm --force --recursive /home/"${username}"/renge
+#   exit
+# fi
 cd Hyprland || exit
 make all && sudo make install
 cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
