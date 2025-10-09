@@ -43,6 +43,7 @@ noto-fonts-emoji
 noto-fonts-extra
 ttf-jetbrains-mono-nerd
 otf-geist-mono-nerd
+ttf-liberation
 
 # Tab-completion enhancements
 bash-completion
