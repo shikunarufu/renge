@@ -2,9 +2,6 @@
 # Essentials
 #######################################
 
-# XDG Desktop Portal
-xdg-desktop-portal-hyprland-git
-
 # App Client
 vesktop-bin
 
