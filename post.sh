@@ -159,7 +159,10 @@ fi
 #######################################
 
 # Installation of virtualization packages
-yes y | sudo pacman -S --needed virt-manager qemu-full vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf
+# yes y | sudo pacman -S --needed virt-manager qemu-full vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf
+yes y | sudo pacman -S --needed qemu-full libvirt virt-install virt-manager virt-viewer edk2-ovmf swtpm qemu-img guestfs-tools libosinfo vde2 ebtables iptables-nft nftables dnsmasq bridge-utils
+yay -S --answerclean All --answerdiff None --noconfirm tuned
+
 
 # Enable modular libvirt daemon
 for drv in qemu interface network nodedev nwfilter secret storage; do \
