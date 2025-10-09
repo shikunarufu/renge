@@ -33,6 +33,9 @@ fi
 # Allow members of group wheel sudo access without a password
 printf "%s\n%s" "${user_passwd}" "${user_passwd}" | sudo --stdin sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
+# Create default directories
+xdg-user-dirs-update
+
 #######################################
 # Installation
 #######################################
