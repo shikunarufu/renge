@@ -50,7 +50,7 @@ window#waybar {
 #custom-shutdown,
 #custom-profile,
 #custom-vmhost,
-#custom-desktop, {
+#custom-desktop {
   padding: 0px 5.5px 0px 5.5px;
   background: #14191C;
   color: #CFDFE2;
