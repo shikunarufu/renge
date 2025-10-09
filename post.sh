@@ -59,7 +59,6 @@ yay --yay --devel --save
 
 # Hyprland
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /home/"${username}"/renge/pkgs/hyprland-pkglist.txt | sort --output=/home/"${username}"/renge/pkgs/hyprland-pkglist.txt --unique
-yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${username}"/renge/pkgs/hyprland-pkglist.txt
 if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${username}"/renge/pkgs/hyprland-pkglist.txt; then
   hyprland_pkglist="hyprland-pkglist.txt"
   mkdir /home/"${username}"/AUR
