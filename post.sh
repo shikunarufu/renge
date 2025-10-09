@@ -56,10 +56,10 @@ makepkg -si --noconfirm
 yay --yay --gendb
 yay -Syu --devel --answerupgrade None --noconfirm
 yay --yay --devel --save
-rm --force --recursive /home/"${username}"/yay
 
 # Hyprland
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /home/"${username}"/renge/pkgs/hyprland-pkglist.txt | sort --output=/home/"${username}"/renge/pkgs/hyprland-pkglist.txt --unique
+yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${username}"/renge/pkgs/hyprland-pkglist.txt
 if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${username}"/renge/pkgs/hyprland-pkglist.txt; then
   hyprland_pkglist="hyprland-pkglist.txt"
   mkdir /home/"${username}"/AUR
@@ -69,6 +69,7 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${usernam
       break
       printf "%s\n" "Failed to install (Hyprland) packages"
       rm --force --recursive /home/"${username}"/renge
+      rm --force --recursive /home/"${username}"/yay
       rm --force --recursive /home/"${username}"/AUR
       exit
     fi
@@ -76,13 +77,13 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${usernam
     makepkg -si --noconfirm
   done < /home/"${username}"/renge/pkgs/"${hyprland_pkglist}"
 fi
-rm --force --recursive /home/"${username}"/AUR
-git clone --recursive https://github.com/hyprwm/Hyprland
-# if ! git clone --recursive https://github.com/hyprwm/Hyprland; then
-#   printf "%s\n" "Failed to clone Hyprland repository"
-#   rm --force --recursive /home/"${username}"/renge
-#   exit
-# fi
+if ! git clone --recursive https://github.com/hyprwm/Hyprland; then
+  printf "%s\n" "Failed to clone Hyprland repository"
+  rm --force --recursive /home/"${username}"/renge
+  rm --force --recursive /home/"${username}"/yay
+  rm --force --recursive /home/"${username}"/AUR
+  exit
+fi
 cd Hyprland || exit
 make all && sudo make install
 cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
@@ -92,6 +93,8 @@ grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /home/"${username}"/
 if ! sudo pacman -S --noconfirm --needed - < /home/"${username}"/renge/pkgs/post-pacman-pkglist.txt; then
   printf "%s\n" "Failed to install packages"
   rm --force --recursive /home/"${username}"/renge
+  rm --force --recursive /home/"${username}"/yay
+  rm --force --recursive /home/"${username}"/AUR
   exit
 fi
 
@@ -100,6 +103,8 @@ grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /home/"${username}"/
 if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${username}"/renge/pkgs/post-yay-pkglist.txt; then
   printf "%s\n" "Failed to install (AUR) packages"
   rm --force --recursive /home/"${username}"/renge
+  rm --force --recursive /home/"${username}"/yay
+  rm --force --recursive /home/"${username}"/AUR
   exit
 fi
 
@@ -145,6 +150,8 @@ bash <(curl -sSL https://spotx-official.github.io/run.sh)
 if ! sudo systemctl enable --now lactd; then
   printf "%s\n" "Failed to enable lactd"
   rm --force --recursive /home/"${username}"/renge
+  rm --force --recursive /home/"${username}"/yay
+  rm --force --recursive /home/"${username}"/AUR
   exit
 fi
 
