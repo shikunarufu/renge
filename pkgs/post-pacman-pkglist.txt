@@ -26,6 +26,9 @@ greetd-tuigreet
 mako
 jq
 
+# XDG Desktop Portal
+xdg-desktop-portal-hyprland
+
 # Authentication Agent
 hyprpolkitagent
 
