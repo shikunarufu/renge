@@ -66,18 +66,18 @@
     "tooltip-format": "Shut Down"
   },
   "custom/profile": {
-    "format": "󰣇",
+    "format": "",
     "tooltip": true,
     "tooltip-format": "Power Profile"
   },
   "custom/vmhost": {
-    "format": "󰤄",
+    "format": "",
     "on-click": "tuned-adm profile virtual-host",
     "tooltip": true,
     "tooltip-format": "Virtual Host"
   },
   "custom/desktop": {
-    "format": "󰤄",
+    "format": "",
     "on-click": "tuned-adm profile desktop",
     "tooltip": true,
     "tooltip-format": "Desktop"
