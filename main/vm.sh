@@ -43,12 +43,14 @@ else
   exit
 fi
 
-# Verify SVM mode
-svm="$(lscpu | grep --extended-regexp --word-regexp --only-matching 'svm')"
-if [[ "${svm}" == "svm" ]]; then
-  printf "%s\n" "System is booted with SVM mode enabled"
+# Verify IOMMU
+iommu="$(sudo dmesg | grep --extended-regexp 'IOMMU' | grep --extended-regexp --max-count 1 'IOMMU')"
+if [[ "${iommu}" == "[    0.000000] DMAR: IOMMU enabled" ]]; then
+  printf "%s\n" "System is booted with IOMMU enabled"
+elif [[ "${iommu}" == "[    0.000000] Warning: PCIe ACS overrides enabled; This may allow non-IOMMU protected peer-to-peer DMA" ]]; then
+  printf "%s\n" "System is booted with IOMMU enabled and has ACS override patch"
 else
-  printf "%s\n" "System may be booted with SVM mode disabled"
+  printf "%s\n" "System may be booted with IOMMU disabled"
   printf "%s\n" "Refer to your BIOS's manual"
   exit
 fi
@@ -63,14 +65,12 @@ else
   exit
 fi
 
-# Verify IOMMU
-iommu="$(sudo dmesg | grep --extended-regexp 'IOMMU' | grep --extended-regexp --max-count 1 'IOMMU')"
-if [[ "${iommu}" == "[    0.000000] DMAR: IOMMU enabled" ]]; then
-  printf "%s\n" "System is booted with IOMMU enabled"
-elif [[ "${iommu}" == "[    0.000000] Warning: PCIe ACS overrides enabled; This may allow non-IOMMU protected peer-to-peer DMA" ]]; then
-  printf "%s\n" "System is booted with IOMMU enabled and has ACS override patch"
+# Verify SVM mode
+svm="$(lscpu | grep --extended-regexp --word-regexp --only-matching 'svm')"
+if [[ "${svm}" == "svm" ]]; then
+  printf "%s\n" "System is booted with SVM mode enabled"
 else
-  printf "%s\n" "System may be booted with IOMMU disabled"
+  printf "%s\n" "System may be booted with SVM mode disabled"
   printf "%s\n" "Refer to your BIOS's manual"
   exit
 fi
@@ -111,7 +111,7 @@ sudo systemctl start libvirtd
 sudo sed --in-place "s/#user = \"libvirt-qemu\"/user = \"$username\"/g" /etc/libvirt/qemu.conf
 sudo sed --in-place "s/#group = \"libvirt-qemu\"/group = \"$username\"/g" /etc/libvirt/qemu.conf
 sudo systemctl restart libvirtd
-# sudo virsh net-autostart default
+sudo virsh net-autostart default
 
 #######################################
 # Virtual Machine Setup
@@ -119,7 +119,9 @@ sudo systemctl restart libvirtd
 
 # Overview
 # Chipset: Q35
-# Firmware: UEFI x86_64: /usr/share/edk2/x64/OVMF_CODE.4m.fd
+# Firmware:
+# UEFI x86_64: /usr/share/edk2/x64/OVMF_CODE.secboot.4m.fd (win11)
+# UEFI x86_64: /usr/share/edk2/x64/OVMF_CODE.4m.fd (win10)
 
 # CPU
 # Sockets: 1
@@ -131,6 +133,17 @@ sudo systemctl restart libvirtd
 
 # VirtIO Disk
 # Cache mode: writeback
+# Discard mode: unmap
+
+# VirtIO Drivers
+# \amd64\w10
+
+# Script
+git clone https://gitlab.com/akshaycodes/vfio-script.git
+cd vfio-script
+sudo bash vfio_script_install.sh
+# For multiple VMs, edit file in base/qemu
+# $OBJECT == "win10" || "Macos" || "FreeBSD" 
 
 # PCI
 # 28:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Navi 44 [Radeon RX 9060 XT] [1002:7590] (rev c0)
@@ -141,26 +154,34 @@ sudo systemctl restart libvirtd
 # 22:00.0 Ethernet controller [0200]: Realtek Semiconductor Co., Ltd. RTL8111/8168/8211/8411 PCI Express Gigabit Ethernet Controller [10ec:8168] (rev 15)
 # 2a:00.0 Non-Essential Instrumentation [1300]: Advanced Micro Devices, Inc. [AMD] Starship/Matisse Reserved SPP [1022:1485]
 
-# Script
-git clone https://gitlab.com/akshaycodes/vfio-script.git
-cd vfio-script
-sudo bash vfio_script_install.sh
-
 # XML File
 # ...
 # <features>
 #   ...
 #   <hyperv>
-#     ...
-#     <vendor_id state='on' value='AMD'/>
+#     <relaxed state="on"/>
+#     <vapic state="on"/>
+#     <spinlocks state="on" retries="8191"/>
+#     <vpindex state="on"/>
+#     <runtime state="on"/>
+#     <synic state="on"/>
+#     <stimer state="on">
+#       <direct state="on"/>
+#     </stimer>
+#     <reset state="on"/>
+#     <vendor_id state="on" value="AMD"/>
+#     <frequencies state="on"/>
+#     <reenlightenment state="on"/>
+#     <tlbflush state="on"/>
+#     <ipi state="on"/>
 #   </hyperv>
 #   ...
 #   <kvm>
-#     <hidden state='on'/>
+#     <hidden state="on"/>
 #   </kvm>
 # </features>
 # <cpu>
 #   ...
-#   <feature policy='require' name='topoext'/>
+#   <feature policy="require" name="topoext"/>
 # </cpu>
 # ...
