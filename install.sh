@@ -229,7 +229,6 @@ if ! systemctl enable paccache.timer; then
   fail_text "Failed to enable paccache.timer"
   exit
 fi
-xdg-user-dirs-update
 if ! systemctl enable fstrim.timer; then
   fail_text "Failed to enable fstrim.timer"
   exit
@@ -258,4 +257,4 @@ done
 printf "\033[2K"
 printf "\033[9C%s\r" "Restarting in 1 second"
 sleep 1
-# reboot
+reboot
