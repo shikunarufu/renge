@@ -96,8 +96,6 @@ komikku
 
 # Zen Browser
 hunspell-en_us
-networkmanager
-pipewire-pulse
 speech-dispatcher
 
 # BitTorrent Client
@@ -136,7 +134,6 @@ yt-dlp
 # Screencast
 obs-studio
 libfdk-aac
-mesa
 luajit
 sndio
 v4l2loopback-dkms
@@ -165,7 +162,6 @@ libpulse
 libxrandr
 ocl-icd
 sqlite
-vulkan-icd-loader
 
 # Anki
 lame
@@ -186,7 +182,6 @@ mesa-demos
 openmpi
 php-gd
 portaudio
-unzip
 lib32-libxrandr
 
 # MangoJuice
