@@ -10,6 +10,10 @@ xdg-utils
 
 # Command Shell
 fish
+groff
+pkgfile
+python
+wl-clipboard
 
 # Shell Prompt
 starship
@@ -28,6 +32,8 @@ jq
 
 # XDG Desktop Portal
 xdg-desktop-portal-hyprland
+grim
+slurp
 
 # Authentication Agent
 hyprpolkitagent
@@ -43,23 +49,26 @@ waybar
 swww
 
 # App Launcher
-rofi-wayland
+rofi
 
 # File Manager
 dolphin
+ffmpegthumbs
+filelight
+kde-cli-tools
+kdegraphics-thumbnailers
+kdenetwork-filesharing
+kdf
+kio-admin
+kompare
+konsole
+purpose
 audiocd-kio
 baloo
 dolphin-plugins
-kio-admin
 kio-gdrive
-kompare
-konsole
-ffmpegthumbs
-icoutils
-kdegraphics-thumbnailers
 kdesdk-thumbnailers
 kimageformats
-libheif
 libappimage
 qt6-imageformats
 resvg
@@ -90,10 +99,12 @@ qbittorrent
 
 # Audio Player
 strawberry
+gst-libav
+gst-plugins-bad
+gst-plugins-ugly
 
 # Spotify
 ffmpeg4.4
-libnotify
 zenity
 
 # Audio Effects
@@ -106,11 +117,14 @@ zam-plugins-lv2
 
 # Video Player
 haruna
+yt-dlp
 
 # Screencast
 obs-studio
 libfdk-aac
-
+mesa
+luajit
+sndio
 v4l2loopback-dkms
 
 # Screen Locker
@@ -126,11 +140,22 @@ kservice
 # System Information Viewer
 fastfetch
 chafa
+dconf
 ddcutil
+glib2
+hwdata
 imagemagick
+libdrm
+libelf
+libpulse
+libxrandr
+ocl-icd
+sqlite
+vulkan-icd-loader
 
 # Game Launcher
 steam
+steam-native-runtime
 
 # Benchmarking
 lact
@@ -143,7 +168,6 @@ mesa-demos
 openmpi
 php-gd
 portaudio
-sqlite
 lib32-libxrandr
 
 # MangoJuice
