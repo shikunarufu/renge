@@ -88,14 +88,23 @@ archlinux-xdg-menu
 # Applications
 #######################################
 
+# VSCodium
+gvfs
+
 # Manga Reader
 komikku
 
 # Zen Browser
+hunspell-en_us
+networkmanager
+pipewire-pulse
 speech-dispatcher
 
 # BitTorrent Client
 qbittorrent
+
+# Hyprshot
+hyprpicker
 
 # Audio Player
 strawberry
@@ -106,6 +115,11 @@ gst-plugins-ugly
 # Spotify
 ffmpeg4.4
 zenity
+
+# Puddletag
+chromaprint
+python-levenshtein
+python-lxml
 
 # Audio Effects
 easyeffects
@@ -153,6 +167,10 @@ ocl-icd
 sqlite
 vulkan-icd-loader
 
+# Anki
+lame
+mpv
+
 # Game Launcher
 steam
 steam-native-runtime
@@ -168,6 +186,7 @@ mesa-demos
 openmpi
 php-gd
 portaudio
+unzip
 lib32-libxrandr
 
 # MangoJuice
