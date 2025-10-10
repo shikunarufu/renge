@@ -49,6 +49,6 @@ heroic-games-launcher-bin
 
 # Benchmarking
 phoronix-test-suite
-zenergy-dkms-git
 mangojuice
 vkbasalt
+zenergy-dkms-git
