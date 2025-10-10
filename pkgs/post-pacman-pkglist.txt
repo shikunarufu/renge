@@ -135,6 +135,17 @@ steam
 # Benchmarking
 lact
 
+# Phoronix Test Suite
+blas
+gcc-fortran
+lapack
+mesa-demos
+openmpi
+php-gd
+portaudio
+sqlite
+lib32-libxrandr
+
 # MangoJuice
 mesa-utils
 vulkan-tools
