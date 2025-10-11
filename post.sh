@@ -120,7 +120,7 @@ cp --recursive /home/"${username}"/renge/fish /home/"${username}"/.config
 cp --recursive /home/"${username}"/renge/starship/starship.toml /home/"${username}"/.config
 
 # Greetd
-sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --cmd Hyprland --remember"|g' /etc/greetd/config.toml
+sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet exec uwsm start hyprland.desktop --remember"|g' /etc/greetd/config.toml
 sudo systemctl enable greetd.service
 
 # Mako
