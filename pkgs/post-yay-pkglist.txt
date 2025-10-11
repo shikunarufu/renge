@@ -5,6 +5,9 @@
 # App Client
 vesktop-bin
 
+# App Launcher
+walker
+
 # Dolphin
 kde-thumbnailer-apk
 raw-thumbnailer
