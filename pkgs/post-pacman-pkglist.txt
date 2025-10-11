@@ -48,9 +48,6 @@ waybar
 # Wallpaper
 swww
 
-# App Launcher
-rofi
-
 # File Manager
 dolphin
 ffmpegthumbs
