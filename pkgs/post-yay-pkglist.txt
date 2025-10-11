@@ -50,6 +50,9 @@ anki-bin
 # Game Launcher
 heroic-games-launcher-bin
 
+# LocalSend
+localsend-bin
+
 # Benchmarking
 phoronix-test-suite
 mangojuice
