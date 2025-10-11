@@ -168,9 +168,13 @@ cat << EOF > /mnt/configure.sh
 
 # Prepare for installation
 sed --in-place 's/#Color/Color/g' /etc/pacman.conf
+sed --in-place 's/#VerbosePkgLists/VerbosePkgLists/g' /etc/pacman.conf
 thread=$(nproc)
 sed --in-place "s/ParallelDownloads = 5/ParallelDownloads = $thread/g" /etc/pacman.conf
 sed --in-place '/#DisableSandbox/a DisableDownloadTimeout' /etc/pacman.conf
+sed --in-place '/DisableDownloadTimeout/a HoldPkg = pacman glibc' /etc/pacman.conf
+sed --in-place '/HoldPkg = pacman glibc/a ILoveCandy' /etc/pacman.conf
+
 core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j\$core\"/g" /etc/makepkg.conf
 
@@ -210,7 +214,8 @@ printf "%s\n" "Defaults passwd_timeout=0" >> /etc/sudoers
 
 # Repositories
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
-sed --in-place '94s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
+
+sed --in-place '96s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 pacman -Syu --noconfirm
 
 # Installation
