@@ -172,6 +172,13 @@ mpv
 steam
 steam-native-runtime
 
+# Shell Tools
+fzf
+zoxide
+ripgrep
+eza
+fd
+
 # Benchmarking
 lact
 
