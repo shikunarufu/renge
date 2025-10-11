@@ -141,9 +141,12 @@ swapon /dev/"${swap_partition}"
 
 # Select the mirrors
 sed --in-place 's/#Color/Color/g' /etc/pacman.conf
+sed --in-place 's/#VerbosePkgLists/VerbosePkgLists/g' /etc/pacman.conf
 thread=$(nproc)
 sed --in-place "s/ParallelDownloads = 5/ParallelDownloads = $thread/g" /etc/pacman.conf
 sed --in-place '/#DisableSandbox/a DisableDownloadTimeout' /etc/pacman.conf
+sed --in-place '/DisableDownloadTimeout/a HoldPkg = pacman glibc' /etc/pacman.conf
+sed --in-place '/HoldPkg = pacman glibc/a ILoveCandy' /etc/pacman.conf
 pacman -S --noconfirm archlinux-keyring
 reflector --save /etc/pacman.d/mirrorlist --sort rate --threads $thread --latest 200 --protocol https,http
 
