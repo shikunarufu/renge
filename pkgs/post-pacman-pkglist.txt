@@ -148,6 +148,10 @@ qalculate-qt
 desktop-file-utils
 kservice
 
+# System Monitor
+btop
+rocm-smi-lib
+
 # System Information Viewer
 fastfetch
 chafa
