@@ -161,18 +161,6 @@ fi
 # Virtualization
 #######################################
 
-# Check virtualization support
-virt="$(lscpu | grep --extended-regexp 'Virtualization')"
-if [[ "${virt}" == "Virtualization:                          AMD-V" ]]; then
-  printf "%s\n" "System is booted with Virtualization enabled"
-elif [[ "${virt}" == "Virtualization:                          VT-x" ]]; then
-  printf "%s\n" "System is booted with Virtualization enabled"
-else
-  printf "%s\n" "System may be booted with Virtualization disabled"
-  printf "%s\n" "Refer to your BIOS's manual"
-  exit
-fi
-
 # Verify the boot mode
 boot="$(cat /sys/firmware/efi/fw_platform_size)"
 if [[ "${boot}" == "64" ]]; then
@@ -218,17 +206,7 @@ else
 fi
 
 # Installation of virtualization packages
-yes y | sudo pacman -S --needed qemu-full libvirt virt-install virt-manager virt-viewer edk2-ovmf swtpm qemu-img guestfs-tools libosinfo vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf
-yay -S --answerclean All --answerdiff None --noconfirm tuned
-
-# Enable modular libvirt daemon
-for drv in qemu interface network nodedev nwfilter secret storage; do \
-  sudo systemctl enable virt${drv}d.service; \
-  sudo systemctl enable virt${drv}d{,-ro,-admin}.socket; \
-done
-
-# Optimize host with TuneD
-sudo systemctl enable --now tuned
+yes y | sudo pacman -S --needed virt-manager qemu-full vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf
 
 # Configuration of libvirt
 sudo sed --in-place 's/#unix_sock_group = \"libvirt\"/unix_sock_group = \"libvirt\"/g' /etc/libvirt/libvirtd.conf
@@ -254,5 +232,15 @@ yay -Scc --noconfirm
 # Allow members of group wheel sudo access with a password
 sudo sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
-# Launch Hyprland
-Hyprland
+# Reboot
+sec=15
+while [[ ${sec} -gt 1 ]]; do
+  printf "\033[2K"
+  printf "\033[9C%s\r" "Restarting in $sec seconds"
+  sleep 1
+  ((sec--))
+done
+printf "\033[2K"
+printf "\033[9C%s\r" "Restarting in 1 second"
+sleep 1
+reboot
