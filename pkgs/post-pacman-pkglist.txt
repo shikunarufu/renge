@@ -94,6 +94,9 @@ hypridle
 # XDG Desktop Menu
 archlinux-xdg-menu
 
+# On-Screen Display
+swayosd
+
 #######################################
 # Applications
 #######################################
