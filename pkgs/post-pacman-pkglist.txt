@@ -18,6 +18,17 @@ wl-clipboard
 # Shell Prompt
 starship
 
+# Shell Tools
+fzf
+zoxide
+ripgrep
+eza
+fd
+
+# Systemd Startup
+uwsm
+libnewt
+
 # Login Manager
 greetd
 greetd-tuigreet
@@ -31,7 +42,9 @@ mako
 jq
 
 # XDG Desktop Portal
+xdg-desktop-portal
 xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
 grim
 slurp
 
@@ -88,6 +101,11 @@ archlinux-xdg-menu
 # VSCodium
 gvfs
 
+# PDF Reader
+okular
+ebook-tools
+unrar
+
 # Manga Reader
 komikku
 
@@ -97,6 +115,9 @@ speech-dispatcher
 
 # BitTorrent Client
 qbittorrent
+
+# Image Viewer
+imv
 
 # Hyprshot
 hyprpicker
@@ -126,7 +147,6 @@ zam-plugins-lv2
 
 # Video Player
 haruna
-yt-dlp
 
 # Screencast
 obs-studio
@@ -172,12 +192,17 @@ mpv
 steam
 steam-native-runtime
 
-# Shell Tools
-fzf
-zoxide
-ripgrep
-eza
-fd
+# Input Method Framework
+fcitx5
+fcitx5-qt
+fcitx5-gtk
+
+# Theming
+kvantum
+kvantum-qt5
+
+# Boot
+plymouth
 
 # Benchmarking
 lact
