@@ -110,6 +110,10 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${usernam
   exit
 fi
 
+# Bin
+mkdir /home/"${username}"/.local/share/renge
+cp --recursive /home/"${username}"/renge/bin /home/"${username}"/.local/share/renge
+
 # Foot
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
 
