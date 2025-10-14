@@ -1,0 +1,4 @@
+# Fix seed selection screen lag
+mv "~/.local/share/Steam/steamapps/common/Plants Vs Zombies/PlantsVsZombies.exe" "~/.local/share/Steam/steamapps/common/Plants Vs Zombies/PlantsVsZombies.exe.bak"
+cp "~/.local/share/Steam/steamapps/compatdata/3590/pfx/drive_c/ProgramData/PopCap Games/PlantsVsZombies/popcapgame1.exe" "~/.local/share/Steam/steamapps/common/Plants Vs Zombies/"
+mv "~/.local/share/Steam/steamapps/common/Plants Vs Zombies/popcapgame1.exe" "~/.local/share/Steam/steamapps/common/Plants Vs Zombies/PlantsVsZombies.exe"
