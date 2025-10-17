@@ -1,19 +1,17 @@
-// Waybar Configuration File
 {
-  // Bar Configuration
   "layer": "bottom",
   "position": "top",
   "height": 24,
   "modules-left": [
     "clock",
     "clock#date",
-    "custom/weather"
+    "hyprland/window"
   ],
   "modules-center": [
-    "hyprland/workspaces"
   ],
   "modules-right": [
     "custom/media",
+    "hyprland/workspaces"
     "pulseaudio",
     "network",
     "group/group-profile",
@@ -23,7 +21,7 @@
   "margin-left": 6,
   "margin-right": 6,
   "spacing": 6,
-  // Module Configuration
+
   "clock": {
     "interval": "60",
     "format": " {:%H:%M}",
@@ -36,6 +34,77 @@
     "tooltip": true,
     "tooltip-format": "{:%A, %d %B %Y}"
   },
+  "hyprland/window": {
+    "format": "{class}{title}",
+    "tooltip": true,
+    "tooltip-format": "{title}",
+    "rewrite": {
+      "(.*) — Dolphin": " Dolphin",
+      "foot(.*)": " Foot",
+      "(.*)Grand Theft Auto V": "󰰫 Grand Theft Auto V",
+      "heroic(.*)": "󱢾 Heroic Games Launcher",
+      "lact(.*)": "󰢮 LACT",
+      "(.*)LACT": "󰢮 LACT",
+      "(.*)Plants vs. Zombies": "󰴈 Plants vs. Zombies",
+      "Spotify(.*)": " Spotify",
+      "steam(.*)": " Steam",
+      "(.*)Rockstar(.*)": " Rockstar Games Launcher",
+      "vesktop(.*)": " Vesktop",
+      "virt-manager(.*)": " Virtual Machine Manager",
+      "(.*)Wine configuration": " Wine",
+      "(.*) — Zen Browser": "󰺕 Zen Browser",
+      "(.*) — Zen Browser Private Browsing": "󰮤 Zen Browser"
+    }
+  },
+
+  "custom/eq": {
+    "format": "󰺢",
+    "tooltip": true,
+    "tooltip-format": "Equalizer"
+  },
+
+  "pulseaudio": {
+    "format": "{icon} {volume}%",
+    "format-muted": "",
+    "format-icons": {
+      "default": ["", "", ""]
+    },
+    "scroll-step": 5,
+    "tooltip": false
+  },
+  "custom/shp9500": {
+    "format": "",
+    "on-click": "easyeffects --load-preset SHP9500",
+    "tooltip": true,
+    "tooltip-format": "EQ: SHP9500"
+  },
+  "custom/off": {
+    "format": "⭘",
+    "on-click": "easyeffects --load-preset Off",
+    "tooltip": true,
+    "tooltip-format": "EQ: Off"
+  },
+  "group/group-audio": {
+    "orientation": "horizontal",
+    "modules": [
+      "pulseaudio",
+      "custom/shp9500",
+      "custom/off"
+    ],
+    "drawer": {
+      "transition-duration": 250,
+      "transition-left-to-right": true,
+      "transition-timing-function": "ease-in-out"
+    }
+  },
+
+
+
+
+
+
+
+
   "custom/arch": {
     "format": "󰣇",
     "tooltip": true,
@@ -65,23 +134,6 @@
     "tooltip": true,
     "tooltip-format": "Shut Down"
   },
-  "custom/profile": {
-    "format": "",
-    "tooltip": true,
-    "tooltip-format": "Power Profile"
-  },
-  "custom/vmhost": {
-    "format": "",
-    "on-click": "tuned-adm profile virtual-host",
-    "tooltip": true,
-    "tooltip-format": "Virtual Host"
-  },
-  "custom/desktop": {
-    "format": "",
-    "on-click": "tuned-adm profile desktop",
-    "tooltip": true,
-    "tooltip-format": "Desktop"
-  },
   "group/group-power": {
     "orientation": "horizontal",
     "modules": [
@@ -97,19 +149,21 @@
       "transition-timing-function": "ease-in-out"
     }
   },
-  "group/group-profile": {
-    "orientation": "horizontal",
-    "modules": [
-      "custom/profile",
-      "custom/vmhost",
-      "custom/desktop"
-    ],
-    "drawer": {
-      "transition-duration": 250,
-      "transition-left-to-right": true,
-      "transition-timing-function": "ease-in-out"
-    }
-  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   "hyprland/workspaces": {
     "active-only": false,
     "hide-active": false,
@@ -119,8 +173,19 @@
       "active": "",
       "default": "",
       "urgent": ""
+    },
+    "persistent-workspaces": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
     }
   },
+
+
+
+
   "network": {
     "interval": "60",
     "family": "ipv4_6",
@@ -130,14 +195,5 @@
     "tooltip": true,
     "tooltip-format-ethernet": "Network Connected",
     "tooltip-format-disconnected": "Network Disconnected"
-  },
-  "pulseaudio": {
-    "format": "{icon} {volume}%",
-    "format-muted": "",
-    "format-icons": {
-      "default": ["", "", ""]
-    },
-    "scroll-step": 1,
-    "tooltip": false
   }
 }
