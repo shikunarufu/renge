@@ -12,8 +12,8 @@
   "modules-right": [
     "custom/media",
     "hyprland/workspaces",
-    "group/group-audio",
     "network",
+    "group/group-audio",
     "group/group-power"
   ],
   "margin-top": 6,
