@@ -21,7 +21,6 @@
   "margin-left": 6,
   "margin-right": 6,
   "spacing": 6,
-
   "clock": {
     "interval": "60",
     "format": " {:%H:%M}",
@@ -39,7 +38,7 @@
     "tooltip": true,
     "tooltip-format": "{title}",
     "rewrite": {
-      "(.*) — Dolphin": " Dolphin",
+      "(.*)Dolphin": " Dolphin",
       "foot(.*)": " Foot",
       "(.*)Grand Theft Auto V": "󰰫 Grand Theft Auto V",
       "heroic(.*)": "󱢾 Heroic Games Launcher",
@@ -52,25 +51,42 @@
       "vesktop(.*)": " Vesktop",
       "virt-manager(.*)": " Virtual Machine Manager",
       "(.*)Wine configuration": " Wine",
-      "(.*) — Zen Browser": "󰺕 Zen Browser",
-      "(.*) — Zen Browser Private Browsing": "󰮤 Zen Browser"
+      "(.*)Zen Browser": "󰺕 Zen Browser",
+      "(.*)Zen Browser Private Browsing": "󰮤 Zen Browser"
     }
   },
-
-  "custom/eq": {
-    "format": "󰺢",
-    "tooltip": true,
-    "tooltip-format": "Equalizer"
-  },
-
-  "pulseaudio": {
-    "format": "{icon} {volume}%",
-    "format-muted": "",
+  "hyprland/workspaces": {
+    "on-click": "activate",
+    "format": "{icon}",
     "format-icons": {
-      "default": ["", "", ""]
+      "default": "",
+      "1": "1",
+      "2": "2",
+      "3": "3",
+      "4": "4",
+      "5": "5",
+      "6": "6",
+      "7": "7",
+      "8": "8",
+      "9": "9",
+      "active": "󱓻"
     },
-    "scroll-step": 5,
-    "tooltip": false
+    "persistent-workspaces": {
+      "1": [],
+      "2": [],
+      "3": [],
+      "4": [],
+      "5": []
+    }
+  },
+  "wireplumber": {
+    "format": "{icon}",
+    "format-muted": "",
+    "format-icons": ["", "", ""],
+    "scroll-step": 1.0,
+    "tooltip": true,
+    "tooltip-format": "{node_name}: {volume}%",
+    "max-volume": 100
   },
   "custom/shp9500": {
     "format": "",
@@ -87,7 +103,7 @@
   "group/group-audio": {
     "orientation": "horizontal",
     "modules": [
-      "pulseaudio",
+      "wireplumber",
       "custom/shp9500",
       "custom/off"
     ],
@@ -97,14 +113,16 @@
       "transition-timing-function": "ease-in-out"
     }
   },
-
-
-
-
-
-
-
-
+  "network": {
+    "interval": "60",
+    "family": "ipv4_6",
+    "format-ethernet": "󰛳",
+    "format-linked": "󰛵",
+    "format-disconnected": "󰲛",
+    "tooltip": true,
+    "tooltip-format-ethernet": "Network Connected",
+    "tooltip-format-disconnected": "Network Disconnected"
+  },
   "custom/arch": {
     "format": "󰣇",
     "tooltip": true,
@@ -148,52 +166,5 @@
       "transition-left-to-right": true,
       "transition-timing-function": "ease-in-out"
     }
-  },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  "hyprland/workspaces": {
-    "active-only": false,
-    "hide-active": false,
-    "all-outputs": false,
-    "format": "{icon}",
-    "format-icons": {
-      "active": "",
-      "default": "",
-      "urgent": ""
-    },
-    "persistent-workspaces": {
-      "1": [],
-      "2": [],
-      "3": [],
-      "4": [],
-      "5": []
-    }
-  },
-
-
-
-
-  "network": {
-    "interval": "60",
-    "family": "ipv4_6",
-    "format-ethernet": "󰛳",
-    "format-linked": "󰛵",
-    "format-disconnected": "󰲛",
-    "tooltip": true,
-    "tooltip-format-ethernet": "Network Connected",
-    "tooltip-format-disconnected": "Network Disconnected"
   }
 }
