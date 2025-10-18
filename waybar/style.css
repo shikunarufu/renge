@@ -7,63 +7,59 @@
   min-height: 0;
   padding: 0;
 }
-window#waybar {
-  background: transparent;
-  color: transparent;
-}
 #workspaces {
-  background: #14191C;
-  color: #CFDFE2;
+  background: #14191E;
+  color: #E0E6EB;
 }
 #workspaces button {
   padding: 0px 5.5px 0px 5.5px;
-  background: #14191C;
-  color: #CFDFE2;
+  background: #14191E;
+  color: #E0E6EB;
 }
 #workspaces button:hover {
-  background: #14191C;
-  color: #D2AF95;
   box-shadow: inherit;
   text-shadow: inherit;
 }
-#workspaces button.active {
-  background: #14191C;
-  color: #CFDFE2;
+#workspaces button.empty {
+  opacity: 0.5;
 }
-#workspaces button.urgent {
-  background: #CFDFE2;
-  color: #14191C;
-}
-#clock,
-#group-power,
-#group-profile,
-#network,
-#pulseaudio {
+#window {
   padding: 0px 7px 0px 7px;
   background: #14191C;
-  color: #CFDFE2;
+  color: #E0E6EB;
 }
+window#waybar,
+window#waybar.empty #window {
+  background: transparent;
+  color: transparent;
+}
+#clock,
+#network {
+  padding: 0px 7px 0px 7px;
+  background: #14191E;
+  color: #E0E6EB;
+}
+#wireplumber,
+#custom-shp9500,
+#custom-off,
 #custom-arch,
 #custom-lock,
 #custom-sleep,
 #custom-restart,
-#custom-shutdown,
-#custom-profile,
-#custom-vmhost,
-#custom-desktop {
+#custom-shutdown {
   padding: 0px 5.5px 0px 5.5px;
-  background: #14191C;
-  color: #CFDFE2;
+  background: #14191E;
+  color: #E0E6EB;
 }
 #group-power,
-#group-profile {
+#group-audio {
   padding: 0px 2.75px 0px 2.75px;
-  background: #14191C;
-  color: #CFDFE2;
+  background: #14191E;
+  color: #E0E6EB;
 }
 tooltip {
-  background: #14191C;
+  background: #14191E;
 }
 tooltip label {
-  color: #CFDFE2;
+  color: #E0E6EB;
 }
