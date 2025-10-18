@@ -11,10 +11,9 @@
   ],
   "modules-right": [
     "custom/media",
-    "hyprland/workspaces"
-    "pulseaudio",
+    "hyprland/workspaces",
+    "group/group-audio",
     "network",
-    "group/group-profile",
     "group/group-power"
   ],
   "margin-top": 6,
