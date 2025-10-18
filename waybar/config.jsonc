@@ -38,6 +38,7 @@
     "tooltip-format": "{title}",
     "rewrite": {
       "(.*)Dolphin": " Dolphin",
+      "(.*)Easy Effects": " Easy Effects",
       "foot(.*)": " Foot",
       "(.*)Grand Theft Auto V": "󰰫 Grand Theft Auto V",
       "heroic(.*)": "󱢾 Heroic Games Launcher",
