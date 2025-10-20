@@ -34,15 +34,21 @@ window#waybar.empty #window {
   color: transparent;
 }
 #clock,
+#mpris,
 #network {
   padding: 0px 7px 0px 7px;
   background: #14191E;
   color: #E0E6EB;
 }
+#mpris.icon {
+  border-radius: 6px 0px 0px 6px;
+  padding: 0px 0px 0px 7px;
+}
 #mpris.status {
   font-size: 12.9px;
+  margin: 0px 0px 0px -6px;
+  border-radius: 0px 6px 6px 0px;
 }
-#mpris,
 #wireplumber,
 #custom-shp9500,
 #custom-off,
@@ -55,7 +61,6 @@ window#waybar.empty #window {
   background: #14191E;
   color: #E0E6EB;
 }
-#group-media,
 #group-audio,
 #group-power {
   padding: 0px 2.75px 0px 2.75px;
