@@ -5,7 +5,8 @@
   "modules-left": [
     "clock",
     "clock#date",
-    "group/group-media",
+    "mpris#icon",
+    "mpris#status",
     "hyprland/window"
   ],
   "modules-center": [
@@ -50,7 +51,6 @@
   "mpris#status": {
     "ignored-players": ["firefox"],
 	  "format": "{title} • {artist}",
-	  "format-paused": "{title} • {artist}",
     "tooltip-format-playing": "Pause",
     "tooltip-format-paused": "Play"
   },
@@ -59,7 +59,7 @@
     "modules": [
       "mpris#icon",
       "mpris#status"
-    ]
+    ],
   },
   "hyprland/window": {
     "format": "{class}{title}",
