@@ -1,7 +1,7 @@
 * {
   border: none;
   border-radius: 6px;
-  font-family: "JetBrainsMono Nerd Font Propo";
+  font-family: "JetBrainsMono Nerd Font Propo, Noto Sans CJK JP";
   font-size: 13px;
   font-weight: bold;
   min-height: 0;
@@ -39,6 +39,10 @@ window#waybar.empty #window {
   background: #14191E;
   color: #E0E6EB;
 }
+#mpris.status {
+  font-size: 12.9px;
+}
+#mpris,
 #wireplumber,
 #custom-shp9500,
 #custom-off,
@@ -51,8 +55,9 @@ window#waybar.empty #window {
   background: #14191E;
   color: #E0E6EB;
 }
-#group-power,
-#group-audio {
+#group-media,
+#group-audio,
+#group-power {
   padding: 0px 2.75px 0px 2.75px;
   background: #14191E;
   color: #E0E6EB;
