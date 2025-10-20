@@ -5,12 +5,12 @@
   "modules-left": [
     "clock",
     "clock#date",
+    "group/group-media",
     "hyprland/window"
   ],
   "modules-center": [
   ],
   "modules-right": [
-    "custom/spotify",
     "hyprland/workspaces",
     "network",
     "group/group-audio",
@@ -32,6 +32,35 @@
     "tooltip": true,
     "tooltip-format": "{:%A, %d %B %Y}"
   },
+  "mpris#icon": {
+    "ignored-players": ["firefox"],
+	  "format": "{player_icon} {status_icon}",
+	  "format-paused": "{player_icon} {status_icon}",
+    "tooltip-format-playing": "Pause",
+    "tooltip-format-paused": "Play",
+	  "player-icons": {
+		  "spotify": "",
+      "strawberry": "󰎆"
+	  },
+	  "status-icons": {
+		  "playing": "",
+      "paused": ""
+	  }
+  },
+  "mpris#status": {
+    "ignored-players": ["firefox"],
+	  "format": "{title} • {artist}",
+	  "format-paused": "{title} • {artist}",
+    "tooltip-format-playing": "Pause",
+    "tooltip-format-paused": "Play"
+  },
+  "group/group-media": {
+    "orientation": "horizontal",
+    "modules": [
+      "mpris#icon",
+      "mpris#status"
+    ]
+  },
   "hyprland/window": {
     "format": "{class}{title}",
     "tooltip": true,
@@ -45,29 +74,16 @@
       "lact(.*)": "󰢮 LACT",
       "(.*)LACT": "󰢮 LACT",
       "(.*)Plants vs. Zombies": "󰴈 Plants vs. Zombies",
+      "(.*)Rockstar(.*)": " Rockstar Games Launcher",
       "Spotify(.*)": " Spotify",
       "steam(.*)": " Steam",
-      "(.*)Rockstar(.*)": " Rockstar Games Launcher",
+      "(.*)strawberry(.*)": "󰎆 Strawberry",
       "vesktop(.*)": " Vesktop",
       "virt-manager(.*)": " Virtual Machine Manager",
       "(.*)Wine configuration": " Wine",
       "(.*)Zen Browser": "󰺕 Zen Browser",
       "(.*)Zen Browser Private Browsing": "󰮤 Zen Browser"
     }
-  },
-  "custom/spotify": {
-    "format": "{icon} {}",
-    "escape": true,
-    "return-type": "json",
-    "max-length": 40,
-    "interval": 30,
-    "on-click": "playerctl -p spotify play-pause",
-    "on-click-right": "killall spotify",
-    "smooth-scrolling-threshold": 10,
-    "on-scroll-up" : "playerctl -p spotify next",
-    "on-scroll-down" : "playerctl -p spotify previous",
-    "exec": "$HOME/.local/share/renge/bin/media-player.py 2> /dev/null",
-    "exec-if": "pgrep spotify"
   },
   "hyprland/workspaces": {
     "on-click": "activate",
@@ -139,7 +155,6 @@
   },
   "custom/arch": {
     "format": "󰣇",
-    "on-click": "menu",
     "tooltip": true,
     "tooltip-format": "Arch Linux"
   },
