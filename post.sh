@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+
 # Shiku's Post Arch Linux Installation Script
 
 # This script automates the post-installation process of Arch Linux.
@@ -9,8 +9,8 @@
 
 # This script assumes a working internet connection is available.
 
-# Uncomment the line below to show command outputs.
-# set -x
+# Exit immediately if a command exits with a non-zero status
+set -eEo pipefail
 
 #######################################
 # Preparation
