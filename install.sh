@@ -105,7 +105,9 @@ fi
 timedatectl set-ntp true
 
 # Partition the disks
-umount --all-targets --force --recursive /mnt
+if findmnt /mnt; then
+  umount --all-targets --recursive /mnt
+fi
 sgdisk --zap-all /dev/"${ssd}"
 sgdisk --zap-all /dev/"${hdd}"
 sgdisk --set-alignment=2048 --clear /dev/"${ssd}"
