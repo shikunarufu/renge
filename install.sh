@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+
 # Shiku's Arch Linux Installation Script
 
 # This script automates the Arch Linux installation process
@@ -13,8 +13,8 @@
 # It is HIGHLY recommended to install Arch Linux 
 # manually using the official installation guide.
 
-# Uncomment the line below to show command outputs.
-# set -x
+# Exit immediately if a command exits with a non-zero status
+set -eEo pipefail
 
 #######################################
 # Preparation
