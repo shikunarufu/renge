@@ -23,8 +23,8 @@ set -eEo pipefail
 # Configuration
 console_keyboard="us"
 console_font="Lat2-Terminus16"
-ssd="sdb"   # sdb/vda
-hdd="sda"   # sda/vdb
+ssd="sdb"   # sdb | vda
+hdd="sda"   # sda | vdb
 time_zone="Asia/Manila"
 utf_locale="en_GB.UTF-8 UTF-8"
 iso_locale="en_GB ISO-8859-1"
@@ -230,7 +230,7 @@ pacman -S --noconfirm --needed - < install-pacman-pkglist.txt
 rm --force --recursive install-pacman-pkglist.txt
 
 # Boot loader
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
+grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB   # --removable
 sed --in-place "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet video=efifb:off pcie_acs_override=downstream,multifunction\"/g" /etc/default/grub
 grub-mkconfig -o /boot/grub/grub.cfg
 
