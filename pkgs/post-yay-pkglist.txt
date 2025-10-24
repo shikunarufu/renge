@@ -23,7 +23,7 @@ vscodium-bin
 zen-browser-bin
 
 # LAN File Transfer
-localsend
+localsend-bin
 
 # Screenshot
 hyprshot-git
@@ -49,9 +49,6 @@ anki-bin
 
 # Game Launcher
 heroic-games-launcher-bin
-
-# LocalSend
-localsend-bin
 
 # Benchmarking
 phoronix-test-suite
