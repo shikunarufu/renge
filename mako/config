@@ -1,0 +1,10 @@
+font=JetBrainsMono Nerd Font Propo,Noto Sans CJK JP 9
+background-color=#14191E
+text-color=#E0E6EB
+width=420
+outer-margin=6,6
+margin=0,0,5
+padding=5,8
+border-size=0
+border-radius=6
+anchor=top-right
