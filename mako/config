@@ -7,4 +7,5 @@ margin=0,0,5
 padding=5,8
 border-size=0
 border-radius=6
+default-timeout=7000
 anchor=top-right
