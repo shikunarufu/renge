@@ -1,0 +1,153 @@
+configuration {
+	modi: "drun";
+  show-icons: true;
+	drun-display-format: "{name}";
+}
+@theme "default"
+* {
+  font: "JetBrainsMono Nerd Font Propo 10";
+  background: #14191E;
+  background-alt: #14191E;
+  foreground: #E0E6EB;
+  foreground-alt: #14191E;
+  selected: #E0E6EB;
+}
+window {
+  transparency: "real";
+  location: center;
+  anchor: center;
+  fullscreen: false;
+  width: 960px;
+  x-offset: 0px;
+  y-offset: 0px;
+  border: 0px;
+  enabled: true;
+  border-radius: 6px;
+  cursor: "default";
+  padding: 0px;
+  background-color: @background;
+}
+mainbox {
+  enabled: true;
+  spacing: 0px;
+  background-color: transparent;
+  orientation: horizontal;
+  children: [ "imagebox", "listbox" ];
+}
+imagebox {
+  padding: 12px;
+  background-color: transparent;
+  background-image: url("~/Pictures/Wallpapers/desktop.png", height);
+  orientation: vertical;
+  children: [ "inputbar", "dummy" ];
+}
+listbox {
+  spacing: 12px;
+  padding: 12px;
+  background-color: transparent;
+  orientation: vertical;
+  children: [ "message", "listview" ];
+}
+dummy {
+  background-color: transparent;
+}
+inputbar {
+  enabled: true;
+  spacing: 0px;
+  padding: 12px;
+  border-radius: 6px;
+  background-color: @background-alt;
+  text-color: @foreground;
+  children: [ "textbox-prompt-colon", "entry" ];
+}
+textbox-prompt-colon {
+  enabled: true;
+  expand: false;
+  str: " ";
+  background-color: inherit;
+  text-color: inherit;
+}
+entry {
+  enabled: true;
+  background-color: inherit;
+  text-color: inherit;
+  cursor: text;
+  placeholder: "Search";
+  placeholder-color: inherit;
+}
+listview {
+  enabled: true;
+  columns: 1;
+  lines: 8;
+  cycle: true;
+  dynamic: true;
+  scrollbar: false;
+  layout: vertical;
+  reverse: false;
+  fixed-height: true;
+  fixed-columns: true;
+  border: 0px;
+  spacing: 12px;
+  padding: 0px;
+  background-color: transparent;
+  text-color: @foreground;
+  cursor: "default";
+}
+element {
+  enabled: true;
+  spacing: 12px;
+  padding: 5px;
+  border-radius: 6px;
+  background-color: transparent;
+  text-color: @foreground;
+  cursor: pointer;
+}
+element normal.normal {
+  background-color: inherit;
+  text-color: inherit;
+}
+element normal.urgent {
+  background-color: @urgent;
+  text-color: @foreground;
+}
+element normal.active {
+  background-color: @active;
+  text-color: @foreground;
+}
+element selected.normal {
+  background-color: @selected;
+  text-color: @foreground-alt;
+}
+element selected.urgent {
+  background-color: @urgent;
+  text-color: @foreground-alt;
+}
+element selected.active {
+  background-color: @urgent;
+  text-color: @foreground-alt;
+}
+element.alternate.normal {
+  background-color: inherit;
+  text-color: inherit;
+}
+element.alternate.urgent {
+  background-color: @urgent;
+  text-color: @foreground;
+}
+element.alternate.active {
+  background-color: @active;
+  text-color: @foreground;
+}
+element-icon {
+  background-color: transparent;
+  text-color: inherit;
+  size: 32px;
+  cursor: inherit;
+}
+element-text {
+  background-color: transparent;
+  text-color: inherit;
+  cursor: inherit;
+  vertical-align: 0.5;
+  horizontal-align: 0.0;
+}
