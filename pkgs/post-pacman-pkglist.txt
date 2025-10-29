@@ -196,7 +196,6 @@ mpv
 
 # Game Launcher
 steam
-steam-native-runtime
 
 # Input Method Framework
 fcitx5
