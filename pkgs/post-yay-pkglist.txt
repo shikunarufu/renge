@@ -44,6 +44,9 @@ p7zip-gui
 # Flashcards
 anki-bin
 
+# Steam
+steam-native-runtime
+
 # Game Launcher
 heroic-games-launcher-bin
 
