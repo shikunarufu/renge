@@ -152,6 +152,9 @@ cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 # SpotX
 bash <(curl -sSL https://spotx-official.github.io/run.sh)
 
+# Steam
+sudo printf "%s\n" "vm.max_map_count = 2147483642" >> /etc/sysctl.d/80-gamecompatibility.conf
+
 # Linux GPU Control Application
 if ! sudo systemctl enable --now lactd; then
   printf "%s\n" "Failed to enable lactd"
