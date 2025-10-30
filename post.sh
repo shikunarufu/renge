@@ -144,6 +144,9 @@ cp /home/"${username}"/renge/pictures/wallpapers/desktop.png /home/"${username}"
 # Rofi
 cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 
+# Imv
+cp --recursive /home/"${username}"/renge/imv /home/"${username}"/.config
+
 # Hyprshot
 mkdir --parents /home/"${username}"/Pictures/Screenshots
 
@@ -160,6 +163,9 @@ bash <(curl -sSL https://spotx-official.github.io/run.sh)
 
 # Steam
 printf "%s\n" "vm.max_map_count = 2147483642" | sudo tee --append /etc/sysctl.d/80-gamecompatibility.conf
+
+# Fcitx5
+cp --recursive /home/"${username}"/renge/fcitx5 /home/"${username}"/.config
 
 # Linux GPU Control Application
 if ! sudo systemctl enable --now lactd; then
