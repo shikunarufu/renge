@@ -64,7 +64,7 @@ yay --yay --devel --save
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /home/"${username}"/renge/pkgs/hyprland-pkglist.txt | sort --output=/home/"${username}"/renge/pkgs/hyprland-pkglist.txt --unique
 if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${username}"/renge/pkgs/hyprland-pkglist.txt; then
   hyprland_pkglist="hyprland-pkglist.txt"
-  mkdir /home/"${username}"/AUR
+  mkdir --parents /home/"${username}"/AUR
   cd AUR || exit
   while IFS= read -r hyprland_pkgs; do
     if ! git clone --branch "${hyprland_pkgs}" --single-branch https://github.com/archlinux/aur.git "${hyprland_pkgs}"; then
@@ -134,7 +134,7 @@ cp --recursive /home/"${username}"/renge/mako /home/"${username}"/.config
 cp --recursive /home/"${username}"/renge/waybar /home/"${username}"/.config
 
 # SWWW
-mkdir /home/"${username}"/Pictures/Wallpapers
+mkdir --parents /home/"${username}"/Pictures/Wallpapers
 cp /home/"${username}"/renge/pictures/wallpapers/desktop.png /home/"${username}"/Pictures/Wallpapers
 # swww img /home/"${username}"/Pictures/Wallpapers/desktop.png
 
@@ -142,10 +142,10 @@ cp /home/"${username}"/renge/pictures/wallpapers/desktop.png /home/"${username}"
 cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 
 # Hyprshot
-mkdir /home/"${username}"/Pictures/Screenshots
+mkdir --parents /home/"${username}"/Pictures/Screenshots
 
 # Fastfetch
-mkdir /home/"${username}"/Pictures/Logo
+mkdir --parents /home/"${username}"/Pictures/Logo
 cp /home/"${username}"/renge/pictures/logo/shiku.sixel /home/"${username}"/Pictures/Logo
 cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 
@@ -230,7 +230,7 @@ sudo sed --in-place "s/#user = \"libvirt-qemu\"/user = \"$username\"/g" /etc/lib
 sudo sed --in-place "s/#group = \"libvirt-qemu\"/group = \"$username\"/g" /etc/libvirt/qemu.conf
 sudo systemctl restart libvirtd
 sudo virsh net-autostart default
-mkdir /home/"${username}"/Virtualization
+mkdir --parents /home/"${username}"/Virtualization
 
 #######################################
 # Post-Installation
