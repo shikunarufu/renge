@@ -227,157 +227,22 @@ fi
 #   fi
 # fi
 
-# Virtualization
-install_vm() {
-  # Install virtualization packages
-  yes y | sudo pacman -S --needed virt-manager qemu-full vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf
-
-  # Configure libvirt
-  sudo sed --in-place 's/#unix_sock_group = \"libvirt\"/unix_sock_group = \"libvirt\"/g' /etc/libvirt/libvirtd.conf
-  sudo sed --in-place 's/#unix_sock_rw_perms = \"0770\"/unix_sock_rw_perms = \"0770\"/g' /etc/libvirt/libvirtd.conf
-  sudo sed --in-place 's/#log_filters=\"1:qemu 1:libvirt 4:object 4:json 4:event 1:util\"/log_filters=\"3:qemu 1:libvirt\"/g' /etc/libvirt/libvirtd.conf
-  sudo sed --in-place 's|#log_outputs=\"3:syslog:libvirtd\"|log_outputs=\"2:file:/var/log/libvirt/libvirtd.log\"|g' /etc/libvirt/libvirtd.conf
-  sudo usermod --append --groups kvm,libvirt "${username}"
-  sudo systemctl enable libvirtd
-  sudo systemctl start libvirtd
-  sudo sed --in-place "s/#user = \"libvirt-qemu\"/user = \"$username\"/g" /etc/libvirt/qemu.conf
-  sudo sed --in-place "s/#group = \"libvirt-qemu\"/group = \"$username\"/g" /etc/libvirt/qemu.conf
-  sudo systemctl restart libvirtd
-  sudo virsh net-autostart default
-  mkdir --parents /home/"${username}"/Virtualization
-}
-
-verify_vm() {
-  boot="$(cat /sys/firmware/efi/fw_platform_size)"
-  if [[ "${boot}" == "64" ]]; then
-    printf "%s\n" "System is booted in UEFI mode and has a 64-bit x64 UEFI"
-    iommu="$(sudo dmesg | grep --extended-regexp 'IOMMU' | grep --extended-regexp --max-count 1 'IOMMU')"
-    if [[ "${iommu}" == "[    0.000000] DMAR: IOMMU enabled" ]]; then
-      printf "%s\n" "System is booted with IOMMU enabled"
-      nx="$(sudo dmesg | grep --extended-regexp 'Execute Disable')"
-      if [[ "${nx}" == "[    0.000000] NX (Execute Disable) protection: active" ]]; then
-        printf "%s\n" "System is booted with NX mode enabled"
-        vendor="$(lscpu | grep --extended-regexp --only-matching 'AuthenticAMD')"
-        if [[ "${vendor}" == "AuthenticAMD" ]]; then
-          svm="$(lscpu | grep --extended-regexp --word-regexp --only-matching 'svm')"
-          if [[ "${svm}" == "svm" ]]; then
-            printf "%s\n" "System is booted with SVM mode enabled"
-            install_vm
-          else
-            printf "%s\n" "System may be booted with SVM mode disabled"
-            printf "%s\n" "Refer to your BIOS's manual"
-            return
-          fi
-        fi
-      else
-        printf "%s\n" "System may be booted with NX mode disabled"
-        printf "%s\n" "Refer to your BIOS's manual"
-        return
-      fi
-    elif [[ "${iommu}" == "[    0.000000] Warning: PCIe ACS overrides enabled; This may allow non-IOMMU protected peer-to-peer DMA" ]]; then
-      printf "%s\n" "System is booted with IOMMU enabled and has ACS override patch"
-      nx="$(sudo dmesg | grep --extended-regexp 'Execute Disable')"
-      if [[ "${nx}" == "[    0.000000] NX (Execute Disable) protection: active" ]]; then
-        printf "%s\n" "System is booted with NX mode enabled"
-        vendor="$(lscpu | grep --extended-regexp --only-matching 'AuthenticAMD')"
-        if [[ "${vendor}" == "AuthenticAMD" ]]; then
-          svm="$(lscpu | grep --extended-regexp --word-regexp --only-matching 'svm')"
-          if [[ "${svm}" == "svm" ]]; then
-            printf "%s\n" "System is booted with SVM mode enabled"
-            install_vm
-          else
-            printf "%s\n" "System may be booted with SVM mode disabled"
-            printf "%s\n" "Refer to your BIOS's manual"
-            return
-          fi
-        fi
-      else
-        printf "%s\n" "System may be booted with NX mode disabled"
-        printf "%s\n" "Refer to your BIOS's manual"
-        return
-      fi
-    else
-      printf "%s\n" "System may be booted with IOMMU disabled"
-      printf "%s\n" "Refer to your BIOS's manual"
-      return
-    fi
-  elif [[ "${boot}" == "32" ]]; then
-    printf "%s\n" "System is booted in UEFI mode and has a 32-bit IA32 UEFI"
-    iommu="$(sudo dmesg | grep --extended-regexp 'IOMMU' | grep --extended-regexp --max-count 1 'IOMMU')"
-    if [[ "${iommu}" == "[    0.000000] DMAR: IOMMU enabled" ]]; then
-      printf "%s\n" "System is booted with IOMMU enabled"
-      nx="$(sudo dmesg | grep --extended-regexp 'Execute Disable')"
-      if [[ "${nx}" == "[    0.000000] NX (Execute Disable) protection: active" ]]; then
-        printf "%s\n" "System is booted with NX mode enabled"
-        vendor="$(lscpu | grep --extended-regexp --only-matching 'AuthenticAMD')"
-        if [[ "${vendor}" == "AuthenticAMD" ]]; then
-          svm="$(lscpu | grep --extended-regexp --word-regexp --only-matching 'svm')"
-          if [[ "${svm}" == "svm" ]]; then
-            printf "%s\n" "System is booted with SVM mode enabled"
-            install_vm
-          else
-            printf "%s\n" "System may be booted with SVM mode disabled"
-            printf "%s\n" "Refer to your BIOS's manual"
-            return
-          fi
-        fi
-      else
-        printf "%s\n" "System may be booted with NX mode disabled"
-        printf "%s\n" "Refer to your BIOS's manual"
-        return
-      fi
-    elif [[ "${iommu}" == "[    0.000000] Warning: PCIe ACS overrides enabled; This may allow non-IOMMU protected peer-to-peer DMA" ]]; then
-      printf "%s\n" "System is booted with IOMMU enabled and has ACS override patch"
-      nx="$(sudo dmesg | grep --extended-regexp 'Execute Disable')"
-      if [[ "${nx}" == "[    0.000000] NX (Execute Disable) protection: active" ]]; then
-        printf "%s\n" "System is booted with NX mode enabled"
-        vendor="$(lscpu | grep --extended-regexp --only-matching 'AuthenticAMD')"
-        if [[ "${vendor}" == "AuthenticAMD" ]]; then
-          svm="$(lscpu | grep --extended-regexp --word-regexp --only-matching 'svm')"
-          if [[ "${svm}" == "svm" ]]; then
-            printf "%s\n" "System is booted with SVM mode enabled"
-            install_vm
-          else
-            printf "%s\n" "System may be booted with SVM mode disabled"
-            printf "%s\n" "Refer to your BIOS's manual"
-            return
-          fi
-        fi
-      else
-        printf "%s\n" "System may be booted with NX mode disabled"
-        printf "%s\n" "Refer to your BIOS's manual"
-        return
-      fi
-    else
-      printf "%s\n" "System may be booted with IOMMU disabled"
-      printf "%s\n" "Refer to your BIOS's manual"
-      return
-    fi
-  else
-    printf "%s\n" "System may be booted in BIOS (or CSM) mode"
-    printf "%s\n" "Refer to your motherboard's manual"
-    return
-  fi
-}
-
-verify_vm "$@"
-
 # Install virtualization packages
-# yes y | sudo pacman -S --needed virt-manager qemu-full vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf
+yes y | sudo pacman -S --needed virt-manager qemu-full vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf
 
 # Configure libvirt
-# sudo sed --in-place 's/#unix_sock_group = \"libvirt\"/unix_sock_group = \"libvirt\"/g' /etc/libvirt/libvirtd.conf
-# sudo sed --in-place 's/#unix_sock_rw_perms = \"0770\"/unix_sock_rw_perms = \"0770\"/g' /etc/libvirt/libvirtd.conf
-# sudo sed --in-place 's/#log_filters=\"1:qemu 1:libvirt 4:object 4:json 4:event 1:util\"/log_filters=\"3:qemu 1:libvirt\"/g' /etc/libvirt/libvirtd.conf
-# sudo sed --in-place 's|#log_outputs=\"3:syslog:libvirtd\"|log_outputs=\"2:file:/var/log/libvirt/libvirtd.log\"|g' /etc/libvirt/libvirtd.conf
-# sudo usermod --append --groups kvm,libvirt "${username}"
-# sudo systemctl enable libvirtd
-# sudo systemctl start libvirtd
-# sudo sed --in-place "s/#user = \"libvirt-qemu\"/user = \"$username\"/g" /etc/libvirt/qemu.conf
-# sudo sed --in-place "s/#group = \"libvirt-qemu\"/group = \"$username\"/g" /etc/libvirt/qemu.conf
-# sudo systemctl restart libvirtd
-# sudo virsh net-autostart default
-# mkdir --parents /home/"${username}"/Virtualization
+sudo sed --in-place 's/#unix_sock_group = \"libvirt\"/unix_sock_group = \"libvirt\"/g' /etc/libvirt/libvirtd.conf
+sudo sed --in-place 's/#unix_sock_rw_perms = \"0770\"/unix_sock_rw_perms = \"0770\"/g' /etc/libvirt/libvirtd.conf
+sudo sed --in-place 's/#log_filters=\"1:qemu 1:libvirt 4:object 4:json 4:event 1:util\"/log_filters=\"3:qemu 1:libvirt\"/g' /etc/libvirt/libvirtd.conf
+sudo sed --in-place 's|#log_outputs=\"3:syslog:libvirtd\"|log_outputs=\"2:file:/var/log/libvirt/libvirtd.log\"|g' /etc/libvirt/libvirtd.conf
+sudo usermod --append --groups kvm,libvirt "${username}"
+sudo systemctl enable libvirtd
+sudo systemctl start libvirtd
+sudo sed --in-place "s/#user = \"libvirt-qemu\"/user = \"$username\"/g" /etc/libvirt/qemu.conf
+sudo sed --in-place "s/#group = \"libvirt-qemu\"/group = \"$username\"/g" /etc/libvirt/qemu.conf
+sudo systemctl restart libvirtd
+sudo virsh net-autostart default
+mkdir --parents /home/"${username}"/Virtualization
 
 #######################################
 # Post-Installation
