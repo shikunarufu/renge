@@ -131,9 +131,9 @@ mkfs.fat -F 32 /dev/"${efi_system_partition}"
 
 # Mount the file systems
 mount /dev/"${root_partition}" /mnt
-mkdir /mnt/boot
+mkdir --parents /mnt/boot
 mount /dev/"${efi_system_partition}" /mnt/boot
-mkdir /mnt/home
+mkdir --parents /mnt/home
 mount /dev/"${home_partition}" /mnt/home
 swapon /dev/"${swap_partition}"
 
