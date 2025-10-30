@@ -169,51 +169,51 @@ fi
 #######################################
 
 # Verify the boot mode
-boot="$(cat /sys/firmware/efi/fw_platform_size)"
-if [[ "${boot}" == "64" ]]; then
-  printf "%s\n" "System is booted in UEFI mode and has a 64-bit x64 UEFI"
-elif [[ "${boot}" == "32" ]]; then
-  printf "%s\n" "System is booted in UEFI mode and has a 32-bit IA32 UEFI"
-else
-  printf "%s\n" "System may be booted in BIOS (or CSM) mode"
-  printf "%s\n" "Refer to your motherboard's manual"
-  exit
-fi
+# boot="$(cat /sys/firmware/efi/fw_platform_size)"
+# if [[ "${boot}" == "64" ]]; then
+#   printf "%s\n" "System is booted in UEFI mode and has a 64-bit x64 UEFI"
+# elif [[ "${boot}" == "32" ]]; then
+#   printf "%s\n" "System is booted in UEFI mode and has a 32-bit IA32 UEFI"
+# else
+#   printf "%s\n" "System may be booted in BIOS (or CSM) mode"
+#   printf "%s\n" "Refer to your motherboard's manual"
+#   exit
+# fi
 
 # Verify IOMMU
-iommu="$(sudo dmesg | grep --extended-regexp 'IOMMU' | grep --extended-regexp --max-count 1 'IOMMU')"
-if [[ "${iommu}" == "[    0.000000] DMAR: IOMMU enabled" ]]; then
-  printf "%s\n" "System is booted with IOMMU enabled"
-elif [[ "${iommu}" == "[    0.000000] Warning: PCIe ACS overrides enabled; This may allow non-IOMMU protected peer-to-peer DMA" ]]; then
-  printf "%s\n" "System is booted with IOMMU enabled and has ACS override patch"
-else
-  printf "%s\n" "System may be booted with IOMMU disabled"
-  printf "%s\n" "Refer to your BIOS's manual"
-  exit
-fi
+# iommu="$(sudo dmesg | grep --extended-regexp 'IOMMU' | grep --extended-regexp --max-count 1 'IOMMU')"
+# if [[ "${iommu}" == "[    0.000000] DMAR: IOMMU enabled" ]]; then
+#   printf "%s\n" "System is booted with IOMMU enabled"
+# elif [[ "${iommu}" == "[    0.000000] Warning: PCIe ACS overrides enabled; This may allow non-IOMMU protected peer-to-peer DMA" ]]; then
+#   printf "%s\n" "System is booted with IOMMU enabled and has ACS override patch"
+# else
+#   printf "%s\n" "System may be booted with IOMMU disabled"
+#   printf "%s\n" "Refer to your BIOS's manual"
+#   exit
+# fi
 
 # Verify NX mode
-nx="$(sudo dmesg | grep --extended-regexp 'Execute Disable')"
-if [[ "${nx}" == "[    0.000000] NX (Execute Disable) protection: active" ]]; then
-  printf "%s\n" "System is booted with NX mode enabled"
-else
-  printf "%s\n" "System may be booted with NX mode disabled"
-  printf "%s\n" "Refer to your BIOS's manual"
-  exit
-fi
+# nx="$(sudo dmesg | grep --extended-regexp 'Execute Disable')"
+# if [[ "${nx}" == "[    0.000000] NX (Execute Disable) protection: active" ]]; then
+#   printf "%s\n" "System is booted with NX mode enabled"
+# else
+#   printf "%s\n" "System may be booted with NX mode disabled"
+#   printf "%s\n" "Refer to your BIOS's manual"
+#   exit
+# fi
 
 # Verify SVM mode
-vendor="$(lscpu | grep --extended-regexp 'AuthenticAMD')"
-if [[ "${vendor}" == "AuthenticAMD" ]]; then
-  svm="$(lscpu | grep --extended-regexp 'svm')"
-  if [[ "${svm}" == "svm" ]]; then
-    printf "%s\n" "System is booted with SVM mode enabled"
-  else
-    printf "%s\n" "System may be booted with SVM mode disabled"
-    printf "%s\n" "Refer to your BIOS's manual"
-    exit
-  fi
-fi
+# vendor="$(lscpu | grep --extended-regexp 'AuthenticAMD')"
+# if [[ "${vendor}" == "AuthenticAMD" ]]; then
+#   svm="$(lscpu | grep --extended-regexp 'svm')"
+#   if [[ "${svm}" == "svm" ]]; then
+#     printf "%s\n" "System is booted with SVM mode enabled"
+#   else
+#     printf "%s\n" "System may be booted with SVM mode disabled"
+#     printf "%s\n" "Refer to your BIOS's manual"
+#     exit
+#   fi
+# fi
 
 # Install virtualization packages
 yes y | sudo pacman -S --needed virt-manager qemu-full vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf
