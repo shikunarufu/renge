@@ -111,7 +111,7 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${usernam
 fi
 
 # Bin
-mkdir /home/"${username}"/.local/share/renge
+mkdir --parents /home/"${username}"/.local/share/renge
 cp --recursive /home/"${username}"/renge/bin /home/"${username}"/.local/share/renge
 
 # Foot
