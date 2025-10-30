@@ -203,13 +203,16 @@ else
 fi
 
 # Verify SVM mode
-svm="$(lscpu | grep --extended-regexp --word-regexp --only-matching 'svm')"
-if [[ "${svm}" == "svm" ]]; then
-  printf "%s\n" "System is booted with SVM mode enabled"
-else
-  printf "%s\n" "System may be booted with SVM mode disabled"
-  printf "%s\n" "Refer to your BIOS's manual"
-  exit
+vendor="$(lscpu | grep --extended-regexp 'AuthenticAMD')"
+if [[ "${vendor}" == "AuthenticAMD" ]]; then
+  svm="$(lscpu | grep --extended-regexp 'svm')"
+  if [[ "${svm}" == "svm" ]]; then
+    printf "%s\n" "System is booted with SVM mode enabled"
+  else
+    printf "%s\n" "System may be booted with SVM mode disabled"
+    printf "%s\n" "Refer to your BIOS's manual"
+    exit
+  fi
 fi
 
 # Install virtualization packages
