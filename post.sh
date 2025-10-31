@@ -145,6 +145,9 @@ cp /home/"${username}"/renge/pictures/wallpapers/desktop.png /home/"${username}"
 # Rofi
 cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 
+# SwayOSD
+cp --recursive /home/"${username}"/renge/swayosd /home/"${username}"/.config
+
 # Imv
 cp --recursive /home/"${username}"/renge/imv /home/"${username}"/.config
 
