@@ -10,7 +10,7 @@ window#osd #container {
 }
 
 label {
-  font-family: 'JetBrainsMono Nerd Font Propo';
+  font-family: 'JetBrainsMono Nerd Font Propo, Noto Sans CJK JP';
   font-size: 13px;
   margin: 0px 0px 0px -8px;
   color: #E0E6EB;
