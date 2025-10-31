@@ -1,6 +1,6 @@
 function fish_greeting
   fastfetch
-  switch (random 1 32)
+  switch (random 1 42)
     case 1
       printf "Sonic's Quote: Shimmy Shimmy Yay, Shimmy Yay, Shimmy Yaaa~ (Drank) Swalla'la'la"
     case 2
@@ -64,7 +64,53 @@ function fish_greeting
     case 31
       printf "Sonic's Quote: Hey guy! Check out that vent Have you ever heard of Among Us? if we vent We can get to where we're going right away But be careful it will make us pretty sus"
     case 32
-      printf "Sonic's Quote: I just lost my dawg (yeah) look at my brother taught me how to chase the bag Get right in the field Ihad to make a bag"
+      printf "Sonic's Quote: I just lost my dawg (yeah) look at my brother taught me how to chase the bag Get right in the field I had to make a bag"
+    case 33
+      printf "Sonic's Quote: LIGMA BALLS"
+    case 34
+      printf "Sonic's Quote: PotaTo potaTo potaTo PooootaTo potaTo potaTo potayyTo PoTato poTato poTato PoTato poTato poTatoooo"
+    case 35
+      printf "Sonic's Quote: Ski-bi dibby dib yo da dub dub Ba-da-ba-da-ba-be bop ba bodda bope I'm a SCATMAN"
+    case 36
+      printf "Shadow's Quote: In 1941, during the peak years of the Looney Toones franchise a cartoon was released, named "Wabbit Twouble" where Bugs Bunny faces off with his long time rival Elmer Fudd But for just a moment to mock the foolish Elmer Bugs inflates himself to a comically bloated form A moment that lasts only 3.4 seconds in an 8 minute and 22 second long cartoon 3.4 seconds That's all the time "Big Chungus" had ever existed And yet decades later he would become more famous than Bugs Bunny Despiste being Bugs Bunny himself! You see, Sonic.. Memes control history and I shall use the power of memes to control my own destiny! Do you honestly think Chuck Jones or Mel Blanc could have expected internet trolls to deify a character that doesn't even exist? Make him far more infamous than his own true identity as Bugs Bunny? Big Chungus lives on as the dominant meme. And that, is what i intended to do I will not let myself be cursed by my recessive memes"
+    case 37
+      printf "Shadow's Quote: It is a shame out paths cross this way I hear you're a great man but.. Still, only a man. Where as i am the Ultimate Life form! Farewell Kazuma Kiryu!"
+    case 38
+      printf "Sonic's Quote: Dame da ne dame yo dame na no yo Anta ga suki de sukisugite Dore dake tsuyoi osake demo Yugamanai omoide ga baka mitai"
+    case 39
+      printf "Sonic's Quote: Sorry i don't use tinder I meet girls the old way Never"
+    case 40
+      printf "Sonic's Quote: Vous êtes faussement heureux vous troquez vos valeurs Lui, il est tout mon monde et bien plus que ça Seule, je crie son nom quand vient le désarroi"
+    case 41
+      printf "Sonic's Quote: Certified lover boy certified pedOfile"
+    case 42
+      printf "Sonic's Quote: Champagne flutes aaand Dinner suites thaaat Keep your focus Away from the cheating hands tell me Does that sexy Gown say what she's Got in store for her man? So we roll the dice"
+    case 43
+      printf "Sonic's Quote: Shawty's like a melody in my head That I can't keep out, got me singing like Na-na-na-na, every day It's like my iPod stuck on replay"
+    case 44
+      printf "Sonic's Quote: Ma-ia-hii ma-ya-hoo ma-ya-haa ma-ya-haa haa"
+    case 45
+      printf "Sonic's Quote: I'm the Globglogabgalab The shwabble-dabble-wabble-gabble"
+    case 46
+      printf "Sonic's Quote: YO PHONE LINGING YO PHONE LINGING BIG BOY PICK UP YO PHONE WHY YOU NO PICK UP YO PHONE YO PHONE LINGING YO PHONE GOING TO GO TO VOICEMAIL GOODBYE"
+    case 47
+      printf "Sonic's Quote: Alcohol is cool But have you ever had someone care about you? me neither pass the bottle"
+    case 48
+      printf "Sonic's Quote: I said right foot creep ooh, I'm walking with that heater Look around, stay low"
+    case 49
+      printf "Sonic's Quote: O II A O II A I O II A O II A I O II A O II A I O II A O II A I"
+    case 50
+      printf "Tails's Quote: Chipi-chipi, chapa-chapa Dubi-dubi, daba-daba Mágico mi dubi-dubi boom boom, boom, boom"
+    case 51
+      printf "Sonic's Quote: nish nay n*gga nay nay n*gga n*gga nay nay nay n*gga nay nay n*gga n*gga nay nay"
+    case 52
+      printf "Sonic's Quote: 広がる闇の中交わし合った革命の契い誰にも邪魔させるわけにはい"
+    case 53
+      printf "Sonic's Quote: THE ONE PIECE IS REAAAAAAL Can we get much higher So high Oh, oh, oh Oh, oh, oh Can we get much higher"
+    case 54
+      printf "Sonic's Quote: And every second i waste is more than i can take I've become so numb"
+    case 55
+      printf "Sonic's Quote: Helikopter, helikopter Para kofer, para kofer"
   end
   printf "\n\n"
 end
