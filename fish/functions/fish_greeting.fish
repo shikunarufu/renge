@@ -1,6 +1,6 @@
 function fish_greeting
   fastfetch
-  switch (random 1 42)
+  switch (random 1 55)
     case 1
       printf "Sonic's Quote: Shimmy Shimmy Yay, Shimmy Yay, Shimmy Yaaa~ (Drank) Swalla'la'la"
     case 2
