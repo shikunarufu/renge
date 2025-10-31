@@ -106,37 +106,13 @@ element normal.normal {
   background-color: inherit;
   text-color: inherit;
 }
-element normal.urgent {
-  background-color: @urgent;
-  text-color: @foreground;
-}
-element normal.active {
-  background-color: @active;
-  text-color: @foreground;
-}
 element selected.normal {
   background-color: @selected;
-  text-color: @foreground-alt;
-}
-element selected.urgent {
-  background-color: @urgent;
-  text-color: @foreground-alt;
-}
-element selected.active {
-  background-color: @urgent;
   text-color: @foreground-alt;
 }
 element.alternate.normal {
   background-color: inherit;
   text-color: inherit;
-}
-element.alternate.urgent {
-  background-color: @urgent;
-  text-color: @foreground;
-}
-element.alternate.active {
-  background-color: @active;
-  text-color: @foreground;
 }
 element-icon {
   background-color: transparent;
