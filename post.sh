@@ -145,6 +145,9 @@ cp /home/"${username}"/renge/pictures/wallpapers/desktop.png /home/"${username}"
 # Rofi
 cp --recursive /home/"${username}"/renge/rofi /home/"${username}"/.config
 
+# Dolphin
+xdg-mime default org.kde.dolphin.desktop inode/directory
+
 # SwayOSD
 cp --recursive /home/"${username}"/renge/swayosd /home/"${username}"/.config
 
