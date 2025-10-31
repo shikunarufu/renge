@@ -1,46 +1,32 @@
-window#osd {
+window {
+  border: none;
   border-radius: 6px;
-  border: 2px solid @outline;
-  background: alpha(@surface_container_low, 0.4);
+  background: #14191E;
 }
 
 window#osd #container {
-  margin: 6px;
-  padding: 2px;
-  background: transparent;
+  padding: 0px 0px 0px 0px;
+  margin: -4px 0px;
 }
 
-window#osd image {
-  -gtk-icon-transform: scale(0.7);
+label {
+  font-family: 'JetBrainsMono Nerd Font Propo';
+  font-size: 13px;
+  margin: 0px 0px 0px -8px;
+  color: #E0E6EB;
 }
 
-window#osd image,
-window#osd label {
-  color: @primary;
+image {
+  margin: 0px -10px 0px 0px;
+  color: #E0E6EB;
+  -gtk-icon-transform: scale(0.4);
 }
 
-window#osd progressbar:disabled,
-window#osd image:disabled {
-  opacity: 0.5;
+progressbar {
+  border-radius: 6px;
+  min-height: 3px;
 }
 
-window#osd progressbar {
-  min-height: 6px;
-  border-radius: 999px;
-  background: transparent;
-  border: none;
-}
-
-window#osd trough {
-  min-height: inherit;
-  border-radius: inherit;
-  border: none;
-  background: alpha(@primary_container, 0.5);
-}
-
-window#osd progress {
-  min-height: inherit;
-  border-radius: inherit;
-  border: none;
-  background: @primary;
+progress {
+  background-color: #E0E6EB;
 }
