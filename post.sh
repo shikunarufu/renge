@@ -125,6 +125,7 @@ cp --recursive /home/"${username}"/renge/starship/starship.toml /home/"${usernam
 
 # Universal Wayland Session Manager
 cp --recursive /home/"${username}"/renge/uwsm /home/"${username}"/.config
+cp --recursive /home/"${username}"/renge/environment.d /home/"${username}"/.config
 
 # Greetd
 sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet exec uwsm start hyprland.desktop --remember"|g' /etc/greetd/config.toml
