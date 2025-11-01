@@ -47,6 +47,9 @@ anki-bin
 # Game Launcher
 heroic-games-launcher-bin
 
+# Plymouth
+plymouth-theme-seal-3-git
+
 # Benchmarking
 phoronix-test-suite
 mangojuice
