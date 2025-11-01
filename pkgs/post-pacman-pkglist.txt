@@ -212,7 +212,7 @@ kvantum
 kvantum-qt5
 
 # Boot
-plymouth
+# plymouth
 
 # Benchmarking
 lact
