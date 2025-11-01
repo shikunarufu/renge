@@ -183,6 +183,8 @@ printf "%s\n" "vm.max_map_count = 2147483642" | sudo tee --append /etc/sysctl.d/
 cp --recursive /home/"${username}"/renge/fcitx5 /home/"${username}"/.config
 
 # Plymouth
+sudo sed --in-place "s/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck plymouth)/g" /etc/mkinitcpio.conf
+sudo mkinitcpio -P
 sudo plymouth-set-default-theme -R seal_3
 
 # Linux GPU Control Application
