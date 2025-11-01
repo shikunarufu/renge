@@ -2,6 +2,10 @@
 # Hyprland
 #######################################
 
+# LazyVim
+lazygit
+tree-sitter-cli
+
 # Terminal Emulator
 foot
 foot-terminfo
@@ -24,7 +28,6 @@ zoxide
 ripgrep
 eza
 fd
-lazygit
 
 # Systemd Startup
 uwsm
