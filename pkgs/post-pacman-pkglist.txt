@@ -24,6 +24,7 @@ zoxide
 ripgrep
 eza
 fd
+lazygit
 
 # Systemd Startup
 uwsm
