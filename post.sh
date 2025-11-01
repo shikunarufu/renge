@@ -110,6 +110,14 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${usernam
   exit
 fi
 
+# LazyVim
+mv ~/.config/nvim{,.bak}
+mv ~/.local/share/nvim{,.bak}
+mv ~/.local/state/nvim{,.bak}
+mv ~/.cache/nvim{,.bak}
+git clone https://github.com/LazyVim/starter ~/.config/nvim
+rm -rf ~/.config/nvim/.git
+
 # Bin
 mkdir --parents /home/"${username}"/.local/share/renge
 cp --recursive /home/"${username}"/renge/bin /home/"${username}"/.local/share/renge
