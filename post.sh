@@ -183,8 +183,7 @@ printf "%s\n" "vm.max_map_count = 2147483642" | sudo tee --append /etc/sysctl.d/
 cp --recursive /home/"${username}"/renge/fcitx5 /home/"${username}"/.config
 
 # Plymouth
-sudo cp -r seal-3 /usr/share/plymouth/themes/
-sudo plymouth-set-default-theme -R seal-3
+sudo plymouth-set-default-theme -R seal_3
 
 # Linux GPU Control Application
 if ! sudo systemctl enable --now lactd; then
