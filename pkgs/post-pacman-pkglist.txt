@@ -5,6 +5,7 @@
 # LazyVim
 lazygit
 tree-sitter-cli
+shellcheck
 
 # Terminal Emulator
 foot
