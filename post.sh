@@ -183,9 +183,10 @@ printf "%s\n" "vm.max_map_count = 2147483642" | sudo tee --append /etc/sysctl.d/
 cp --recursive /home/"${username}"/renge/fcitx5 /home/"${username}"/.config
 
 # Theming
+mkdir --parents /home/"${username}"/.config/Kvantum
+tar --extract --directory ~/.config/Kvantum --file /home/"${username}"/renge/kvantum/whitesur.tar.xz
 mkdir --parents /home/"${username}"/.icons
 tar --extract --directory ~/.icons --file /home/"${username}"/renge/hyprcursor/sweet-cursors.tar.xz
-mv ~/.icons/Sweet-cursors ~/.icons/sweet-cursors
 
 # Plymouth
 # sudo sed --in-place "s/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck plymouth)/g" /etc/mkinitcpio.conf
