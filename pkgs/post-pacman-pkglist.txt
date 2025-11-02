@@ -210,6 +210,7 @@ fcitx5-gtk
 # Theming
 kvantum
 kvantum-qt5
+qt6-tools
 nwg-look
 
 # Boot
