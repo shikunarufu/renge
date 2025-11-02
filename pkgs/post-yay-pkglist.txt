@@ -47,6 +47,9 @@ anki-bin
 # Game Launcher
 heroic-games-launcher-bin
 
+# Theming
+qt6ct-kde
+
 # Plymouth
 # plymouth-theme-seal-3-git
 
