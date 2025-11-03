@@ -116,7 +116,7 @@ mv ~/.local/share/nvim{,.bak}
 mv ~/.local/state/nvim{,.bak}
 mv ~/.cache/nvim{,.bak}
 git clone https://github.com/LazyVim/starter ~/.config/nvim
-rm -rf ~/.config/nvim/.git
+rm --force --recursive ~/.config/nvim/.git
 
 # Bin
 mkdir --parents /home/"${username}"/.local/share/renge
@@ -201,6 +201,129 @@ if ! sudo systemctl enable --now lactd; then
   rm --force --recursive /home/"${username}"/AUR
   exit
 fi
+
+# Desktop Entries
+mkdir --parents ~/.local/share/applications
+cp --recursive /usr/share/applications/ardour8.desktop ~/.local/share/applications/ardour8.desktop
+cp --recursive /usr/share/applications/assistant.desktop ~/.local/share/applications/assistant.desktop
+cp --recursive /usr/share/applications/avahi-discover.desktop ~/.local/share/applications/avahi-discover.desktop
+cp --recursive /usr/share/applications/bssh.desktop ~/.local/share/applications/bssh.desktop
+cp --recursive /usr/share/applications/btop.desktop ~/.local/share/applications/btop.desktop
+cp --recursive /usr/share/applications/bvnc.desktop ~/.local/share/applications/bvnc.desktop
+cp --recursive /usr/share/applications/calf.desktop ~/.local/share/applications/calf.desktop
+cp --recursive /usr/share/applications/cmake-gui.desktop ~/.local/share/applications/cmake-gui.desktop
+cp --recursive /usr/share/applications/codium.desktop ~/.local/share/applications/codium.desktop
+cp --recursive /usr/share/applications/designer.desktop ~/.local/share/applications/designer.desktop
+cp --recursive /usr/share/applications/fcitx5-configtool.desktop ~/.local/share/applications/fcitx5-configtool.desktop
+cp --recursive /usr/share/applications/footclient.desktop ~/.local/share/applications/footclient.desktop
+cp --recursive /usr/share/applications/foot-server.desktop ~/.local/share/applications/foot-server.desktop
+cp --recursive /usr/share/applications/linguist.desktop ~/.local/share/applications/linguist.desktop
+cp --recursive /usr/share/applications/lstopo.desktop ~/.local/share/applications/lstopo.desktop
+cp --recursive /usr/share/applications/org.fcitx.Fcitx5.desktop ~/.local/share/applications/org.fcitx.Fcitx5.desktop
+cp --recursive /usr/share/applications/org.kde.filelight.desktop ~/.local/share/applications/org.kde.filelight.desktop
+cp --recursive /usr/share/applications/org.kde.kdf.desktop ~/.local/share/applications/org.kde.kdf.desktop
+cp --recursive /usr/share/applications/org.kde.kompare.desktop ~/.local/share/applications/org.kde.kompare.desktop
+cp --recursive /usr/share/applications/org.kde.konsole.desktop ~/.local/share/applications/org.kde.konsole.desktop
+cp --recursive /usr/share/applications/org.kde.kwikdisk.desktop ~/.local/share/applications/org.kde.kwikdisk.desktop
+cp --recursive /usr/share/applications/phoronix-test-suite.desktop ~/.local/share/applications/phoronix-test-suite.desktop
+cp --recursive /usr/share/applications/qdbusviewer.desktop ~/.local/share/applications/qdbusviewer.desktop
+cp --recursive /usr/share/applications/qv4l2.desktop ~/.local/share/applications/qv4l2.desktop
+cp --recursive /usr/share/applications/qvidcap.desktop ~/.local/share/applications/qvidcap.desktop
+cp --recursive /usr/share/applications/rofi.desktop ~/.local/share/applications/rofi.desktop
+cp --recursive /usr/share/applications/rofi-theme-selector.desktop ~/.local/share/applications/rofi-theme-selector.desktop
+cp --recursive /usr/share/applications/uuctl.desktop ~/.local/share/applications/uuctl.desktop
+cp --recursive /usr/share/applications/xgps.desktop ~/.local/share/applications/xgps.desktop
+cp --recursive /usr/share/applications/xgpsspeed.desktop ~/.local/share/applications/xgpsspeed.desktop
+sudo rm --force --recursive /usr/share/applications/ardour8.desktop
+sudo rm --force --recursive /usr/share/applications/assistant.desktop
+sudo rm --force --recursive /usr/share/applications/avahi-discover.desktop
+sudo rm --force --recursive /usr/share/applications/bssh.desktop
+sudo rm --force --recursive /usr/share/applications/btop.desktop
+sudo rm --force --recursive /usr/share/applications/bvnc.desktop
+sudo rm --force --recursive /usr/share/applications/calf.desktop
+sudo rm --force --recursive /usr/share/applications/cmake-gui.desktop
+sudo rm --force --recursive /usr/share/applications/codium.desktop
+sudo rm --force --recursive /usr/share/applications/designer.desktop
+sudo rm --force --recursive /usr/share/applications/fcitx5-configtool.desktop
+sudo rm --force --recursive /usr/share/applications/footclient.desktop
+sudo rm --force --recursive /usr/share/applications/foot-server.desktop
+sudo rm --force --recursive /usr/share/applications/linguist.desktop
+sudo rm --force --recursive /usr/share/applications/lstopo.desktop
+sudo rm --force --recursive /usr/share/applications/org.fcitx.Fcitx5.desktop
+sudo rm --force --recursive /usr/share/applications/org.kde.filelight.desktop
+sudo rm --force --recursive /usr/share/applications/org.kde.kdf.desktop
+sudo rm --force --recursive /usr/share/applications/org.kde.kompare.desktop
+sudo rm --force --recursive /usr/share/applications/org.kde.konsole.desktop
+sudo rm --force --recursive /usr/share/applications/org.kde.kwikdisk.desktop
+sudo rm --force --recursive /usr/share/applications/phoronix-test-suite.desktop
+sudo rm --force --recursive /usr/share/applications/qdbusviewer.desktop
+sudo rm --force --recursive /usr/share/applications/qv4l2.desktop
+sudo rm --force --recursive /usr/share/applications/qvidcap.desktop
+sudo rm --force --recursive /usr/share/applications/rofi.desktop
+sudo rm --force --recursive /usr/share/applications/rofi-theme-selector.desktop
+sudo rm --force --recursive /usr/share/applications/uuctl.desktop
+sudo rm --force --recursive /usr/share/applications/xgps.desktop
+sudo rm --force --recursive /usr/share/applications/xgpsspeed.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/ardour8.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/assistant.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/avahi-discover.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/bssh.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/btop.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/bvnc.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/calf.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/cmake-gui.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/codium.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/designer.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/fcitx5-configtool.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/footclient.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/foot-server.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/linguist.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/lstopo.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/org.fcitx.Fcitx5.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/org.kde.filelight.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/org.kde.kdf.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/org.kde.kompare.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/org.kde.konsole.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/org.kde.kwikdisk.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/phoronix-test-suite.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/qdbusviewer.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/qv4l2.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/qvidcap.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/rofi.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/rofi-theme-selector.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/uuctl.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/xgps.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/xgpsspeed.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/ardour8.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/assistant.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/avahi-discover.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/bssh.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/btop.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/bvnc.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/calf.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/cmake-gui.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/codium.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/designer.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/fcitx5-configtool.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/footclient.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/foot-server.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/linguist.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/lstopo.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.fcitx.Fcitx5.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.kde.filelight.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.kde.kdf.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.kde.kompare.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.kde.konsole.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.kde.kwikdisk.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/phoronix-test-suite.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/qdbusviewer.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/qv4l2.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/qvidcap.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/rofi.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/rofi-theme-selector.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/uuctl.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/xgps.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/xgpsspeed.desktop
 
 #######################################
 # Virtualization
