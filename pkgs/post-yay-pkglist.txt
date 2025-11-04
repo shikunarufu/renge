@@ -38,9 +38,6 @@ lib32-obs-vkcapture
 # Hyprlock
 ttf-google-sans
 
-# Archiving and Compression Tool
-p7zip-gui
-
 # Flashcards
 anki-bin
 
