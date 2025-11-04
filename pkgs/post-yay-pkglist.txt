@@ -51,7 +51,7 @@ heroic-games-launcher-bin
 qt6ct-kde
 
 # Plymouth
-# plymouth-theme-seal-3-git
+plymouth-theme-seal-3-git
 
 # Benchmarking
 phoronix-test-suite
