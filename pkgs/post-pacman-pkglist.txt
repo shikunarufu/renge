@@ -172,9 +172,8 @@ hyprlock
 # Calculator
 qalculate-qt
 
-# p7zip-gui
-desktop-file-utils
-kservice
+# Archiving and Compression Tool
+xarchiver
 
 # System Monitor
 btop
