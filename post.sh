@@ -210,7 +210,6 @@ cp --recursive /usr/share/applications/bvnc.desktop ~/.local/share/applications/
 cp --recursive /usr/share/applications/calf.desktop ~/.local/share/applications/calf.desktop
 cp --recursive /usr/share/applications/cmake-gui.desktop ~/.local/share/applications/cmake-gui.desktop
 cp --recursive /usr/share/applications/codium.desktop ~/.local/share/applications/codium.desktop
-cp --recursive /usr/share/applications/codium-url-handler.desktop ~/.local/share/applications/codium-url-handler.desktop
 cp --recursive /usr/share/applications/designer.desktop ~/.local/share/applications/designer.desktop
 cp --recursive /usr/share/applications/fcitx5-configtool.desktop ~/.local/share/applications/fcitx5-configtool.desktop
 cp --recursive /usr/share/applications/foot-server.desktop ~/.local/share/applications/foot-server.desktop
@@ -243,7 +242,6 @@ sudo rm --force --recursive /usr/share/applications/bvnc.desktop
 sudo rm --force --recursive /usr/share/applications/calf.desktop
 sudo rm --force --recursive /usr/share/applications/cmake-gui.desktop
 sudo rm --force --recursive /usr/share/applications/codium.desktop
-sudo rm --force --recursive /usr/share/applications/codium-url-handler.desktop
 sudo rm --force --recursive /usr/share/applications/designer.desktop
 sudo rm --force --recursive /usr/share/applications/fcitx5-configtool.desktop
 sudo rm --force --recursive /usr/share/applications/foot-server.desktop
@@ -276,7 +274,6 @@ sudo ln --symbolic /dev/null /usr/share/applications/bvnc.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/calf.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/cmake-gui.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/codium.desktop
-sudo ln --symbolic /dev/null /usr/share/applications/codium-url-handler.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/designer.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/fcitx5-configtool.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/foot-server.desktop
@@ -309,7 +306,6 @@ printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/bvnc.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/calf.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/cmake-gui.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/codium.desktop
-printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/codium-url-handler.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/designer.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/fcitx5-configtool.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/foot-server.desktop
