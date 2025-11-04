@@ -214,7 +214,7 @@ qt6-tools
 nwg-look
 
 # Boot
-# plymouth
+plymouth
 
 # Benchmarking
 lact
