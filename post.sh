@@ -189,9 +189,9 @@ mkdir --parents /home/"${username}"/.icons
 tar --extract --directory ~/.icons --file /home/"${username}"/renge/hyprcursor/sweet-cursors.tar.xz
 
 # Plymouth
-# sudo sed --in-place "s/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck plymouth)/g" /etc/mkinitcpio.conf
-# sudo mkinitcpio -P
-# sudo plymouth-set-default-theme -R seal_3
+sudo sed --in-place "s/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck plymouth)/g" /etc/mkinitcpio.conf
+sudo mkinitcpio -P
+sudo plymouth-set-default-theme -R seal_3
 
 # Linux GPU Control Application
 if ! sudo systemctl enable --now lactd; then
@@ -215,10 +215,12 @@ cp --recursive /usr/share/applications/cmake-gui.desktop ~/.local/share/applicat
 cp --recursive /usr/share/applications/codium.desktop ~/.local/share/applications/codium.desktop
 cp --recursive /usr/share/applications/designer.desktop ~/.local/share/applications/designer.desktop
 cp --recursive /usr/share/applications/fcitx5-configtool.desktop ~/.local/share/applications/fcitx5-configtool.desktop
-cp --recursive /usr/share/applications/footclient.desktop ~/.local/share/applications/footclient.desktop
 cp --recursive /usr/share/applications/foot-server.desktop ~/.local/share/applications/foot-server.desktop
+cp --recursive /usr/share/applications/footclient.desktop ~/.local/share/applications/footclient.desktop
+cp --recursive /usr/share/applications/kbd-layout-viewer5.desktop ~/.local/share/applications/kbd-layout-viewer5.desktop
 cp --recursive /usr/share/applications/linguist.desktop ~/.local/share/applications/linguist.desktop
 cp --recursive /usr/share/applications/lstopo.desktop ~/.local/share/applications/lstopo.desktop
+cp --recursive /usr/share/applications/org.fcitx.fcitx5-migrator.desktop ~/.local/share/applications/org.fcitx.fcitx5-migrator.desktop
 cp --recursive /usr/share/applications/org.fcitx.Fcitx5.desktop ~/.local/share/applications/org.fcitx.Fcitx5.desktop
 cp --recursive /usr/share/applications/org.kde.filelight.desktop ~/.local/share/applications/org.kde.filelight.desktop
 cp --recursive /usr/share/applications/org.kde.kdf.desktop ~/.local/share/applications/org.kde.kdf.desktop
@@ -245,10 +247,12 @@ sudo rm --force --recursive /usr/share/applications/cmake-gui.desktop
 sudo rm --force --recursive /usr/share/applications/codium.desktop
 sudo rm --force --recursive /usr/share/applications/designer.desktop
 sudo rm --force --recursive /usr/share/applications/fcitx5-configtool.desktop
-sudo rm --force --recursive /usr/share/applications/footclient.desktop
 sudo rm --force --recursive /usr/share/applications/foot-server.desktop
+sudo rm --force --recursive /usr/share/applications/footclient.desktop
+sudo rm --force --recursive /usr/share/applications/kbd-layout-viewer5.desktop
 sudo rm --force --recursive /usr/share/applications/linguist.desktop
 sudo rm --force --recursive /usr/share/applications/lstopo.desktop
+sudo rm --force --recursive /usr/share/applications/org.fcitx.fcitx5-migrator.desktop
 sudo rm --force --recursive /usr/share/applications/org.fcitx.Fcitx5.desktop
 sudo rm --force --recursive /usr/share/applications/org.kde.filelight.desktop
 sudo rm --force --recursive /usr/share/applications/org.kde.kdf.desktop
@@ -275,10 +279,12 @@ sudo ln --symbolic /dev/null /usr/share/applications/cmake-gui.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/codium.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/designer.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/fcitx5-configtool.desktop
-sudo ln --symbolic /dev/null /usr/share/applications/footclient.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/foot-server.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/footclient.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/kbd-layout-viewer5.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/linguist.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/lstopo.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/org.fcitx.fcitx5-migrator.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/org.fcitx.Fcitx5.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/org.kde.filelight.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/org.kde.kdf.desktop
@@ -305,10 +311,12 @@ printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/cmake-gui.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/codium.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/designer.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/fcitx5-configtool.desktop
-printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/footclient.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/foot-server.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/footclient.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/kbd-layout-viewer5.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/linguist.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/lstopo.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.fcitx.fcitx5-migrator.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.fcitx.Fcitx5.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.kde.filelight.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.kde.kdf.desktop
