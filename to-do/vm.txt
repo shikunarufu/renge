@@ -99,7 +99,7 @@ mkdir /home/"${username}"/Virtualization
 # Threads: 2
 
 # Memory
-# Allocation: 13312 MB
+# Allocation: 8192 MB
 
 # VirtIO Disk
 # Cache mode: writeback
