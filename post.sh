@@ -111,12 +111,9 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${usernam
 fi
 
 # LazyVim
-mv ~/.config/nvim{,.bak}
-mv ~/.local/share/nvim{,.bak}
-mv ~/.local/state/nvim{,.bak}
-mv ~/.cache/nvim{,.bak}
-git clone https://github.com/LazyVim/starter ~/.config/nvim
-rm --force --recursive ~/.config/nvim/.git
+mkdir --parents /home/"${username}"/.config/nvim
+git clone https://github.com/LazyVim/starter /home/"${username}"/.config/nvim
+rm --force --recursive /home/"${username}"/.config/nvim/.git
 
 # Bin
 mkdir --parents /home/"${username}"/.local/share/renge
@@ -203,7 +200,7 @@ if ! sudo systemctl enable --now lactd; then
 fi
 
 # Desktop Entries
-mkdir --parents ~/.local/share/applications
+mkdir --parents /home/"${username}"/.local/share/applications
 cp --recursive /usr/share/applications/ardour8.desktop ~/.local/share/applications/ardour8.desktop
 cp --recursive /usr/share/applications/assistant.desktop ~/.local/share/applications/assistant.desktop
 cp --recursive /usr/share/applications/avahi-discover.desktop ~/.local/share/applications/avahi-discover.desktop
