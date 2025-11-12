@@ -6,6 +6,7 @@
 hyprland
 cpio
 hyprland-protocols
+polkit
 
 # LazyVim
 lazygit
