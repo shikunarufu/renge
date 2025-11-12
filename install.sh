@@ -150,7 +150,7 @@ sed --in-place '/#DisableSandbox/a DisableDownloadTimeout' /etc/pacman.conf
 sed --in-place '/DisableDownloadTimeout/a HoldPkg = pacman glibc' /etc/pacman.conf
 sed --in-place '/HoldPkg = pacman glibc/a ILoveCandy' /etc/pacman.conf
 pacman -S --noconfirm archlinux-keyring
-reflector --save /etc/pacman.d/mirrorlist --sort rate --threads $thread --latest 200 --protocol https,http
+reflector --sort rate --latest 200 --score 50 --fastest 5 --protocol https,http --save /etc/pacman.d/mirrorlist
 
 # Parallel compilation
 core=$(grep --count ^processor /proc/cpuinfo)
