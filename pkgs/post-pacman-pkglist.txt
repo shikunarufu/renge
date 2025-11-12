@@ -1,6 +1,11 @@
 #######################################
-# Hyprland
+# Wayland Compositor
 #######################################
+
+# Hyprland
+hyprland
+cpio
+hyprland-protocols
 
 # LazyVim
 lazygit
