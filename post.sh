@@ -174,7 +174,8 @@ cp /home/"${username}"/renge/pictures/logo/shiku.sixel /home/"${username}"/Pictu
 cp --recursive /home/"${username}"/renge/fastfetch /home/"${username}"/.config
 
 # SpotX
-bash <(curl -sSL https://spotx-official.github.io/run.sh)
+# bash <(curl -sSL https://spotx-official.github.io/run.sh)
+/home/"${username}"/renge/to-do/apps/spotx.sh
 
 # Steam
 printf "%s\n" "vm.max_map_count = 2147483642" | sudo tee --append /etc/sysctl.d/80-gamecompatibility.conf
