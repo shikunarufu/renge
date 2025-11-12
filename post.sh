@@ -189,7 +189,7 @@ mkdir --parents /home/"${username}"/.icons
 tar --extract --directory ~/.icons --file /home/"${username}"/renge/hyprcursor/sweet-cursors.tar.xz
 
 # Plymouth
-sudo sed --in-place "s/HOOKS=\(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck\)/HOOKS=\(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck plymouth\)/g" /etc/mkinitcpio.conf
+sudo sed --in-place 's/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck)/HOOKS=(base udev autodetect microcode modconf kms keyboard keymap consolefont block filesystems fsck plymouth)/g' /etc/mkinitcpio.conf
 sudo mkinitcpio -P
 sudo plymouth-set-default-theme -R seal_3
 
