@@ -135,7 +135,8 @@ cp --recursive /home/"${username}"/renge/uwsm /home/"${username}"/.config
 cp --recursive /home/"${username}"/renge/environment.d /home/"${username}"/.config
 
 # Greetd
-sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet exec uwsm start hyprland.desktop --remember"|g' /etc/greetd/config.toml
+# sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet exec uwsm start hyprland.desktop --remember"|g' /etc/greetd/config.toml
+sudo sed --in-place 's|command = "agreety --cmd /bin/sh"|command = "tuigreet --time --remember --asterisks --cmd 'uwsm start hyprland-uwsm.desktop'"|g' /etc/greetd/config.toml
 sudo systemctl enable greetd.service
 
 # Mako
