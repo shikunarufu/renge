@@ -88,7 +88,6 @@ yay --yay --devel --save
 # fi
 # cd Hyprland || exit
 # make all && sudo make install
-# cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 
 # Pacman Packages
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /home/"${username}"/renge/pkgs/post-pacman-pkglist.txt | sort --output=/home/"${username}"/renge/pkgs/post-pacman-pkglist.txt --unique
@@ -110,14 +109,17 @@ if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${usernam
   exit
 fi
 
+# Bin
+mkdir --parents /home/"${username}"/.local/share/renge
+cp --recursive /home/"${username}"/renge/bin /home/"${username}"/.local/share/renge
+
+# Hyprland
+cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
+
 # LazyVim
 mkdir --parents /home/"${username}"/.config/nvim
 git clone https://github.com/LazyVim/starter /home/"${username}"/.config/nvim
 rm --force --recursive /home/"${username}"/.config/nvim/.git
-
-# Bin
-mkdir --parents /home/"${username}"/.local/share/renge
-cp --recursive /home/"${username}"/renge/bin /home/"${username}"/.local/share/renge
 
 # Foot
 cp --recursive /home/"${username}"/renge/foot /home/"${username}"/.config
