@@ -60,35 +60,6 @@ yay --yay --gendb
 yay -Syu --devel --answerupgrade None --noconfirm
 yay --yay --devel --save
 
-# Hyprland
-# grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /home/"${username}"/renge/pkgs/hyprland-pkglist.txt | sort --output=/home/"${username}"/renge/pkgs/hyprland-pkglist.txt --unique
-# if ! yay -S --answerclean All --answerdiff None --noconfirm - < /home/"${username}"/renge/pkgs/hyprland-pkglist.txt; then
-#   hyprland_pkglist="hyprland-pkglist.txt"
-#   mkdir --parents /home/"${username}"/AUR
-#   cd AUR || exit
-#   while IFS= read -r hyprland_pkgs; do
-#     if ! git clone --branch "${hyprland_pkgs}" --single-branch https://github.com/archlinux/aur.git "${hyprland_pkgs}"; then
-#       break
-#       printf "%s\n" "Failed to install (Hyprland) packages"
-#       rm --force --recursive /home/"${username}"/renge
-#       rm --force --recursive /home/"${username}"/yay
-#       rm --force --recursive /home/"${username}"/AUR
-#       exit
-#     fi
-#     cd "$hyprland_pkgs"
-#     makepkg -si --noconfirm
-#   done < /home/"${username}"/renge/pkgs/"${hyprland_pkglist}"
-# fi
-# if ! git clone --recursive https://github.com/hyprwm/Hyprland; then
-#   printf "%s\n" "Failed to clone Hyprland repository"
-#   rm --force --recursive /home/"${username}"/renge
-#   rm --force --recursive /home/"${username}"/yay
-#   rm --force --recursive /home/"${username}"/AUR
-#   exit
-# fi
-# cd Hyprland || exit
-# make all && sudo make install
-
 # Pacman Packages
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' /home/"${username}"/renge/pkgs/post-pacman-pkglist.txt | sort --output=/home/"${username}"/renge/pkgs/post-pacman-pkglist.txt --unique
 if ! sudo pacman -S --noconfirm --needed - < /home/"${username}"/renge/pkgs/post-pacman-pkglist.txt; then
