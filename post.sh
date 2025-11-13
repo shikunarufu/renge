@@ -192,6 +192,7 @@ cp --recursive /usr/share/applications/footclient.desktop ~/.local/share/applica
 cp --recursive /usr/share/applications/kbd-layout-viewer5.desktop ~/.local/share/applications/kbd-layout-viewer5.desktop
 cp --recursive /usr/share/applications/linguist.desktop ~/.local/share/applications/linguist.desktop
 cp --recursive /usr/share/applications/lstopo.desktop ~/.local/share/applications/lstopo.desktop
+cp --recursive /usr/share/applications/mpv.desktop ~/.local/share/applications/mpv.desktop
 cp --recursive /usr/share/applications/org.fcitx.fcitx5-migrator.desktop ~/.local/share/applications/org.fcitx.fcitx5-migrator.desktop
 cp --recursive /usr/share/applications/org.fcitx.Fcitx5.desktop ~/.local/share/applications/org.fcitx.Fcitx5.desktop
 cp --recursive /usr/share/applications/org.kde.filelight.desktop ~/.local/share/applications/org.kde.filelight.desktop
@@ -224,6 +225,7 @@ sudo rm --force --recursive /usr/share/applications/footclient.desktop
 sudo rm --force --recursive /usr/share/applications/kbd-layout-viewer5.desktop
 sudo rm --force --recursive /usr/share/applications/linguist.desktop
 sudo rm --force --recursive /usr/share/applications/lstopo.desktop
+sudo rm --force --recursive /usr/share/applications/mpv.desktop
 sudo rm --force --recursive /usr/share/applications/org.fcitx.fcitx5-migrator.desktop
 sudo rm --force --recursive /usr/share/applications/org.fcitx.Fcitx5.desktop
 sudo rm --force --recursive /usr/share/applications/org.kde.filelight.desktop
@@ -256,6 +258,7 @@ sudo ln --symbolic /dev/null /usr/share/applications/footclient.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/kbd-layout-viewer5.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/linguist.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/lstopo.desktop
+sudo ln --symbolic /dev/null /usr/share/applications/mpv.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/org.fcitx.fcitx5-migrator.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/org.fcitx.Fcitx5.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/org.kde.filelight.desktop
@@ -288,6 +291,7 @@ printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/footclient.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/kbd-layout-viewer5.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/linguist.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/lstopo.desktop
+printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/mpv.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.fcitx.fcitx5-migrator.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.fcitx.Fcitx5.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/org.kde.filelight.desktop
