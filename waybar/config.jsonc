@@ -107,7 +107,8 @@
       "(.*)Select Folder": " Select Folder",
       "(.*)Open File": " Open File",
       "(.*)Open Folder": " Open Folder",
-      "(.*)Save As": " Save As"
+      "(.*)Save As": " Save As",
+      "(.*)Save a File": " Save A File"
     }
   },
   "hyprland/workspaces": {
