@@ -87,6 +87,13 @@ cp --recursive /home/"${username}"/renge/bin /home/"${username}"/.local/share/re
 # Hyprland
 cp --recursive /home/"${username}"/renge/hypr /home/"${username}"/.config
 
+# NeoVim
+mkdir --parents /home/"${username}"/.local/share/applications
+cp --recursive /usr/share/applications/nvim.desktop /home/"${username}"/.local/share/applications/nvim.desktop
+sed --in-place '80d' /home/"${username}"/.local/share/applications/nvim.desktop
+sed --in-place 's/Exec=nvim %F/Exec=foot -e nvim %F/g' /home/"${username}"/.local/share/applications/nvim.desktop
+sed --in-place 's/Terminal=true/Terminal=false/g' /home/"${username}"/.local/share/applications/nvim.desktop
+
 # LazyVim
 mkdir --parents /home/"${username}"/.config/nvim
 git clone https://github.com/LazyVim/starter /home/"${username}"/.config/nvim
@@ -175,7 +182,6 @@ if ! sudo systemctl enable --now lactd; then
 fi
 
 # Desktop Entries
-mkdir --parents /home/"${username}"/.local/share/applications
 cp --recursive /usr/share/applications/ardour8.desktop ~/.local/share/applications/ardour8.desktop
 cp --recursive /usr/share/applications/assistant.desktop ~/.local/share/applications/assistant.desktop
 cp --recursive /usr/share/applications/avahi-discover.desktop ~/.local/share/applications/avahi-discover.desktop
