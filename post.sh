@@ -188,7 +188,6 @@ cp --recursive /usr/share/applications/avahi-discover.desktop ~/.local/share/app
 cp --recursive /usr/share/applications/bssh.desktop ~/.local/share/applications/bssh.desktop
 cp --recursive /usr/share/applications/btop.desktop ~/.local/share/applications/btop.desktop
 cp --recursive /usr/share/applications/bvnc.desktop ~/.local/share/applications/bvnc.desktop
-cp --recursive /usr/share/applications/calf.desktop ~/.local/share/applications/calf.desktop
 cp --recursive /usr/share/applications/cmake-gui.desktop ~/.local/share/applications/cmake-gui.desktop
 cp --recursive /usr/share/applications/codium.desktop ~/.local/share/applications/codium.desktop
 cp --recursive /usr/share/applications/designer.desktop ~/.local/share/applications/designer.desktop
@@ -221,7 +220,6 @@ sudo rm --force --recursive /usr/share/applications/avahi-discover.desktop
 sudo rm --force --recursive /usr/share/applications/bssh.desktop
 sudo rm --force --recursive /usr/share/applications/btop.desktop
 sudo rm --force --recursive /usr/share/applications/bvnc.desktop
-sudo rm --force --recursive /usr/share/applications/calf.desktop
 sudo rm --force --recursive /usr/share/applications/cmake-gui.desktop
 sudo rm --force --recursive /usr/share/applications/codium.desktop
 sudo rm --force --recursive /usr/share/applications/designer.desktop
@@ -254,7 +252,6 @@ sudo ln --symbolic /dev/null /usr/share/applications/avahi-discover.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/bssh.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/btop.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/bvnc.desktop
-sudo ln --symbolic /dev/null /usr/share/applications/calf.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/cmake-gui.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/codium.desktop
 sudo ln --symbolic /dev/null /usr/share/applications/designer.desktop
@@ -287,7 +284,6 @@ printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/avahi-discover.des
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/bssh.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/btop.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/bvnc.desktop
-printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/calf.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/cmake-gui.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/codium.desktop
 printf "%s\n" "NoDisplay=true" >> ~/.local/share/applications/designer.desktop
