@@ -139,6 +139,7 @@
     "format-muted": "",
     "format-icons": ["", "", ""],
     "scroll-step": 1.0,
+    "on-click": "pavucontrol",
     "tooltip": true,
     "tooltip-format": "{node_name}: {volume}%",
     "max-volume": 100
