@@ -181,6 +181,13 @@ if ! sudo systemctl enable --now lactd; then
   exit
 fi
 
+# OpenRGB
+sudo modprobe i2c-dev
+sudo modprobe i2c-piix4
+sudo chmod 777 /dev/i2c-8
+sudo chmod 777 /dev/i2c-9
+sudo chmod 777 /dev/i2c-10
+
 # Desktop Entries
 cp --recursive /usr/share/applications/ardour8.desktop ~/.local/share/applications/ardour8.desktop
 cp --recursive /usr/share/applications/assistant.desktop ~/.local/share/applications/assistant.desktop
