@@ -68,7 +68,7 @@
     "rewrite": {
       "(.*)Anki": " Anki",
       "(.*)Dolphin": " Dolphin",
-      "(.*)Easy Effects": " Easy Effects",
+      "easyeffects(.*)": " Easy Effects",
       "foot(.*)": " Foot",
       "(.*)nwg-look": " GTK Settings",
       "(.*)Grand Theft Auto V": "󰰫 Grand Theft Auto V",
