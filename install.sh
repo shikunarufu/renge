@@ -13,20 +13,20 @@ ping -c 1 ping.archlinux.org
 # Update the system clock
 timedatectl
 
+# Prepare the disks
+umount --all-targets --recursive \mnt
+sgdisk --zap-all /dev/vda
+sgdisk --zap-all /dev/vdb
+sgdisk --zap-all /dev/vdc
+sgdisk --set-alignment=2048 --clear /dev/vda
+sgdisk --set-alignment=2048 --clear /dev/vdb
+sgdisk --set-alignment=2048 --clear /dev/vdc
+
 # Partition the disks
-wipefs --all /dev/vda
-dd if=/dev/zero of=/dev/vda bs=1M count=100 status=progress
-parted --script /dev/vda mklabel gpt
-parted --script --align optimal /dev/vda mkpart "" fat32 0% 4096Mib
-parted --script --align optimal /dev/vda mkpart "" btrfs 4096Mib 100%
-wipefs --all /dev/vdb
-dd if=/dev/zero of=/dev/vdb bs=1M count=100 status=progress
-parted --script /dev/vdb mklabel gpt
-parted --script --align optimal /dev/vdb mkpart "" btrfs 0% 100%
-wipefs --all /dev/vdc
-dd if=/dev/zero of=/dev/vdc bs=1M count=100 status=progress
-parted --script /dev/vdc mklabel gpt
-parted --script --align optimal /dev/vdc mkpart "" btrfs 0% 100%
+sgdisk --new=1::+4096Mib --typecode=1:ef00 /dev/vda  # Partition 1 (Boot Partition)
+sgdisk --new=2::-0 --typecode=1:8300 /dev/vda        # Partition 2 (Root Partition)
+sgdisk --new=3::-0 --typecode=1:8300 /dev/vdb        # Partition 3
+sgdisk --new=4::-0 --typecode=1:8300 /dev/vdc        # Partition 4
 
 # Format the partitions
 mkfs.fat -F 32 /dev/vda1
@@ -35,13 +35,16 @@ mkfs.btrfs /dev/vdb1
 mkfs.btrfs /dev/vdc1
 
 # Create the subvolumes
-mount /dev/vda2 /mnt
+mount -t btrfs /dev/vda2 /mnt
 btrfs subvolume create /mnt/@
 btrfs subvolume create /mnt/@home
+btrfs subvolume set-default /mnt/@
 umount /mnt
 
 # Mount the file systems
-mount --options compress=zstd,subvol=@ /dev/vda2 /mnt
+mount --options noatime,compress=zstd,ssd,commit=120,subvol=@ /dev/vda2 /mnt
 mkdir --parents /mnt/home
-mount --options compress=zstd,subvol=@home /mnt/home
-mount --mkdir /dev/vda1 /mnt/boot
+mount --options noatime,compress=zstd,commit=,subvol=@home /dev/vdb1 /mnt/home
+mkdir --parents /mnt/boot
+boot_uuid=$(blkid -s UUID -o value /dev/vda1)
+mount --uuid "${boot_uuid}" /mnt/boot/
