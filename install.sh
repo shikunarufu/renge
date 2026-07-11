@@ -15,7 +15,7 @@ pacman-key --lsign-key F3B607488DB35A47
 
 # Install CachyOS repositories
 pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
-'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst' \
+'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst'
 
 # Set the console keyboard layout
 loadkeys us
@@ -154,3 +154,12 @@ sed --in-place '81 a \\' /etc/pacman.conf
 sed --in-place '82 a [cachyos-extra-v3]' /etc/pacman.conf
 sed --in-place '83 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
 sed --in-place '84 a \\' /etc/pacman.conf
+
+# Parallel compilation
+core=$(grep --count ^processor /proc/cpuinfo)
+sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
+
+# Install essential packages
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt \
+  | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
+pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
