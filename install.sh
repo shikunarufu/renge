@@ -142,12 +142,12 @@ sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
 sed --in-place '96s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 
 # Append CachyOS repositories
-sed --in-place '75 a [cachyos-v3]' /etc/pacman.conf
-sed --in-place '76 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-sed --in-place '77 a \\' /etc/pacman.conf
-sed --in-place '78 a [cachyos-core-v3]' /etc/pacman.conf
-sed --in-place '79 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-sed --in-place '80 a \\' /etc/pacman.conf
-sed --in-place '81 a [cachyos-extra-v3]' /etc/pacman.conf
-sed --in-place '82 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-sed --in-place '83 a \\' /etc/pacman.conf
+sed --in-place '76 a [cachyos-v3]' /etc/pacman.conf
+sed --in-place '77 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '78 a \\' /etc/pacman.conf
+sed --in-place '79 a [cachyos-core-v3]' /etc/pacman.conf
+sed --in-place '80 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '81 a \\' /etc/pacman.conf
+sed --in-place '82 a [cachyos-extra-v3]' /etc/pacman.conf
+sed --in-place '83 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '84 a \\' /etc/pacman.conf
