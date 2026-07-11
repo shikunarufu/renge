@@ -6,17 +6,17 @@
 ping -c 1 ping.archlinux.org
 
 # Update Arch Linux keyring
-pacman --sync --refresh
-pacman --sync --noconfirm archlinux-keyring
+# pacman --sync --refresh
+# pacman --sync --noconfirm archlinux-keyring
 
 # Install CachyOS keyring
-pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
-pacman-key --lsign-key F3B607488DB35A47
+# pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
+# pacman-key --lsign-key F3B607488DB35A47
 
 # Install CachyOS repositories
-pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
-'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst'
-pacman --sync --refresh
+# pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
+# 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst'
+# pacman --sync --refresh
 
 # Set the console keyboard layout
 loadkeys us
@@ -35,7 +35,7 @@ timedatectl set-ntp true
 pacman --sync --noconfirm --needed rate-mirrors
 country="$(curl --ipv4 ifconfig.io/country_code)"
 rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root arch
-rate-mirrors --save=/etc/pacman.d/cachyos-mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root cachyos
+# rate-mirrors --save=/etc/pacman.d/cachyos-mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root cachyos
 
 #######################################
 # Prepare the disks
@@ -146,15 +146,15 @@ sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
 sed --in-place '96s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 
 # Append CachyOS repositories
-sed --in-place '76 a [cachyos-v3]' /etc/pacman.conf
-sed --in-place '77 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-sed --in-place '78 a \\' /etc/pacman.conf
-sed --in-place '79 a [cachyos-core-v3]' /etc/pacman.conf
-sed --in-place '80 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-sed --in-place '81 a \\' /etc/pacman.conf
-sed --in-place '82 a [cachyos-extra-v3]' /etc/pacman.conf
-sed --in-place '83 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-sed --in-place '84 a \\' /etc/pacman.conf
+# sed --in-place '76 a [cachyos-v3]' /etc/pacman.conf
+# sed --in-place '77 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+# sed --in-place '78 a \\' /etc/pacman.conf
+# sed --in-place '79 a [cachyos-core-v3]' /etc/pacman.conf
+# sed --in-place '80 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+# sed --in-place '81 a \\' /etc/pacman.conf
+# sed --in-place '82 a [cachyos-extra-v3]' /etc/pacman.conf
+# sed --in-place '83 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+# sed --in-place '84 a \\' /etc/pacman.conf
 
 # Parallel compilation
 core=$(grep --count ^processor /proc/cpuinfo)
