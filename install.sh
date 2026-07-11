@@ -1,4 +1,6 @@
 #!/bin/bash
+#
+# Renge (Arch Linux Installation Script)
 
 # Verify the internet connection
 ping -c 1 ping.archlinux.org
@@ -30,8 +32,9 @@ timedatectl set-ntp true
 
 # Select the mirrors
 pacman --sync --noconfirm --needed rate-mirrors
-country=$(curl --ipv4 ifconfig.io/country_code)
-rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="$country" --allow-root arch
+country="$(curl --ipv4 ifconfig.io/country_code)"
+rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root arch
+rate-mirrors --save=/etc/pacman.d/cachyos-v3-mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root cachyos
 
 #######################################
 # Prepare the disks
@@ -121,7 +124,7 @@ mkdir --parents /mnt/boot
 mount --options noatime,compress=zstd,commit=120,subvol=@var /dev/vdb1 /mnt/var
 mount --options noatime,compress=zstd,commit=120,subvol=@home /dev/vdb2 /mnt/home
 mount --options noatime,compress=zstd,ssd,commit=120,subvol=@data /dev/vdc1 /mnt/data
-boot_uuid=$(blkid -s UUID -o value /dev/vda1)
+boot_uuid="$(blkid -s UUID -o value /dev/vda1)"
 mount --uuid "${boot_uuid}" /mnt/boot/
 
 #######################################
@@ -133,7 +136,7 @@ sed --in-place 's/#Color/Color/g' /etc/pacman.conf
 sed --in-place '/Color/a ILoveCandy' /etc/pacman.conf
 sed --in-place 's/CheckSpace/#CheckSpace/g' /etc/pacman.conf
 sed --in-place 's/#VerbosePkgLists/VerbosePkgLists/g' /etc/pacman.conf
-thread=$(nproc)
+thread="$(nproc)"
 sed --in-place "s/ParallelDownloads = 5/ParallelDownloads = $thread/g" /etc/pacman.conf
 sed --in-place '/#DisableSandboxSyscalls/a DisableDownloadTimeout' /etc/pacman.conf
 
