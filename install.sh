@@ -22,7 +22,7 @@ timedatectl set-ntp true
 # Select the mirrors
 pacman --sync --noconfirm --needed rate-mirrors
 cc=$(curl --ipv4 ifconfig.io/country_code)
-rate-mirrors cachyos --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="$cc" --allow-root --max-delay=21600
+rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="$cc" --allow-root cachyos --max-delay=21600
 
 #######################################
 # Prepare the disks
