@@ -75,13 +75,13 @@ winetricks
 vulkan-tools
 gamescope
 goverlay
-heroic-games-launcher
 lib32-mangohud
 mangohud
 steam
 wqy-zenhei
 # proton-cachyos-slr
 # wine-cachyos-opt
+# heroic-games-launcher
 
 # User directories
 xdg-user-dirs
