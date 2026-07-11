@@ -13,6 +13,9 @@ ping -c 1 ping.archlinux.org
 # Update the system clock
 timedatectl
 
+# Update keyrings
+pacman -S --noconfirm archlinux-keyring
+
 #######################################
 # Prepare the disks
 #######################################
