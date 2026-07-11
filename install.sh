@@ -35,7 +35,7 @@ timedatectl set-ntp true
 pacman --sync --noconfirm --needed rate-mirrors
 country="$(curl --ipv4 ifconfig.io/country_code)"
 rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root arch
-rate-mirrors --save=/etc/pacman.d/cachyos-v3-mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root cachyos
+rate-mirrors --save=/etc/pacman.d/cachyos-mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root cachyos
 
 #######################################
 # Prepare the disks
