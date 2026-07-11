@@ -1,7 +1,6 @@
 # Basic
 base
 base-devel
-linux
 linux-firmware
 
 # Linux Zen Kernel
@@ -12,6 +11,7 @@ linux-zen-headers
 amd-ucode
 
 # Userspace Utility
+btrfs-progs
 exfatprogs
 ntfs-3g
 
@@ -28,3 +28,107 @@ texinfo
 
 # Keyring
 archlinux-keyring
+
+# Boot loader
+limine
+efibootmgr
+
+# pacman
+pacman-contrib
+
+# Mirrors
+rate-mirrors
+
+# Arch Build System
+git
+
+# Display drivers
+mesa
+lib32-mesa
+vulkan-radeon
+lib32-vulkan-radeon
+
+# Gaming
+alsa-plugins
+giflib
+glfw
+gst-plugins-base-libs
+lib32-alsa-plugins
+lib32-giflib
+lib32-gtk3
+lib32-libjpeg-turbo
+lib32-libva
+lib32-mpg123
+lib32-ocl-icd
+lib32-opencl-icd-loader
+lib32-openal
+libjpeg-turbo
+libva
+libxslt
+mpg123
+opencl-icd-loader
+openal
+proton-cachyos-slr
+umu-launcher
+protontricks
+ttf-liberation
+wine-cachyos-opt
+winetricks
+vulkan-tools
+gamescope
+goverlay
+heroic-games-launcher
+lib32-mangohud
+mangohud
+steam
+wqy-zenhei
+
+# User directories
+xdg-user-dirs
+
+# Sound system
+alsa-firmware
+alsa-plugins
+alsa-utils
+pavucontrol
+pipewire-pulse
+wireplumber
+pipewire-alsa
+
+# File index and search
+plocate
+
+# Fonts
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+noto-fonts-extra
+ttf-jetbrains-mono-nerd
+otf-geist-mono-nerd
+ttf-liberation
+
+# Tab-completion enhancements
+bash-completion
+
+# Compressed files
+7zip
+tar
+zip
+unzip
+
+# Java
+jdk-openjdk
+jre-openjdk
+jre-openjdk-headless
+openjdk-doc
+openjdk-src
+jre17-openjdk-headless
+jre17-openjdk
+jdk17-openjdk
+openjdk17-src
+openjdk17-doc
+jre21-openjdk-headless
+jre21-openjdk
+jdk21-openjdk
+openjdk21-src
+openjdk21-doc
