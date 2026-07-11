@@ -16,6 +16,7 @@ pacman-key --lsign-key F3B607488DB35A47
 # Install CachyOS repositories
 pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst'
+pacman --sync --refresh
 
 # Set the console keyboard layout
 loadkeys us
