@@ -68,11 +68,9 @@ libxslt
 mpg123
 opencl-icd-loader
 openal
-proton-cachyos-slr
 umu-launcher
 protontricks
 ttf-liberation
-wine-cachyos-opt
 winetricks
 vulkan-tools
 gamescope
@@ -82,6 +80,8 @@ lib32-mangohud
 mangohud
 steam
 wqy-zenhei
+# proton-cachyos-slr
+# wine-cachyos-opt
 
 # User directories
 xdg-user-dirs
