@@ -12,7 +12,7 @@ pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
 pacman-key --lsign-key F3B607488DB35A47
 
 # Install CachyOS repositories
-pacman --upgrade 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
+pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst' \
 
 # Set the console keyboard layout
@@ -135,7 +135,6 @@ sed --in-place 's/CheckSpace/#CheckSpace/g' /etc/pacman.conf
 sed --in-place 's/#VerbosePkgLists/VerbosePkgLists/g' /etc/pacman.conf
 thread=$(nproc)
 sed --in-place "s/ParallelDownloads = 5/ParallelDownloads = $thread/g" /etc/pacman.conf
-sed --in-place '/#DisableSandbox/a DisableDownloadTimeout' /etc/pacman.conf
 
 # Append multilib repository
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
