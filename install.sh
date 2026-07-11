@@ -23,24 +23,18 @@ sgdisk --set-alignment=2048 --clear /dev/vdb
 sgdisk --set-alignment=2048 --clear /dev/vdc
 
 # Partition the disks
-sgdisk --new=1::+4096MiB --typecode=1:ef00 /dev/vda # partition 1: UEFI boot
-sgdisk --new=2::-0 --typecode=2:8300 /dev/vda # partition 2: root
-sgdisk --new=1::+12G --typecode=1:8300 /dev/vdb # partition 3: var
-sgdisk --new=2::-0 --typecode=2:8300 /dev/vdb # partition 4: home
-sgdisk --new=1::-0 --typecode=1:8300 /dev/vdc # partition 5: data
+sgdisk --new=1::+4096MiB --typecode=1:ef00 --change-name=1:'boot' /dev/vda # partition 1: UEFI boot
+sgdisk --new=2::-0 --typecode=2:8300 --change-name=2:'root' /dev/vda # partition 2: root
+sgdisk --new=1::+12G --typecode=1:8300 --change-name=1:'var' /dev/vdb # partition 3: var
+sgdisk --new=2::-0 --typecode=2:8300 --change-name=2:'home' /dev/vdb # partition 4: home
+sgdisk --new=1::-0 --typecode=1:8300 --change-name=1:'data' /dev/vdc # partition 5: data
 
 # Format the partitions
-wipefs --all --force /dev/vda1
-wipefs --all --force /dev/vda2
-wipefs --all --force /dev/vdb1
-wipefs --all --force /dev/vdb2
-wipefs --all --force /dev/vdc1
-
 mkfs.fat -F 32 /dev/vda1
-mkfs.btrfs /dev/vda2
-mkfs.btrfs /dev/vdb1
-mkfs.btrfs /dev/vdb2
-mkfs.btrfs /dev/vdc1
+mkfs.btrfs --force /dev/vda2
+mkfs.btrfs --force /dev/vdb1
+mkfs.btrfs --force /dev/vdb2
+mkfs.btrfs --force /dev/vdc1
 
 # Create the subvolumes
 mount -t btrfs /dev/vda2 /mnt
