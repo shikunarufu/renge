@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# Set the console keyboard layout and font
+# Update keyrings
+pacman --sync --noconfirm archlinux-keyring
+
+# Set the console keyboard layout
 loadkeys us
+
+# Set the console font
+pacman --sync --noconfirm --needed pacman-contrib terminus-font
 setfont Lat2-Terminus16
 
 # Verify the boot mode
@@ -11,14 +17,19 @@ cat /sys/firmware/efi/fw_platform_size
 ping -c 1 ping.archlinux.org
 
 # Update the system clock
-timedatectl
+timedatectl set-ntp true
 
-# Update keyrings
-pacman -S --noconfirm archlinux-keyring
+# Select the mirrors
+pacman --sync --noconfirm --needed rate-mirrors
+cc=$(curl --ipv4 ifconfig.io/country_code)
+rate-mirrors cachyos --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="$cc" --allow-root --max-delay=21600
 
 #######################################
 # Prepare the disks
 #######################################
+
+# Install prerequisite packages
+pacman --sync --noconfirm btrfs-progs
 
 # Unmount all disks
 umount --all-targets --recursive /mnt || true
