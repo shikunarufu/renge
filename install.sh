@@ -135,6 +135,7 @@ sed --in-place 's/CheckSpace/#CheckSpace/g' /etc/pacman.conf
 sed --in-place 's/#VerbosePkgLists/VerbosePkgLists/g' /etc/pacman.conf
 thread=$(nproc)
 sed --in-place "s/ParallelDownloads = 5/ParallelDownloads = $thread/g" /etc/pacman.conf
+sed --in-place '/#DisableSandboxSyscalls/a DisableDownloadTimeout' /etc/pacman.conf
 
 # Append multilib repository
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
