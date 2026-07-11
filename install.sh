@@ -1,7 +1,19 @@
 #!/bin/bash
 
-# Update keyrings
+# Verify the internet connection
+ping -c 1 ping.archlinux.org
+
+# Update Arch Linux keyring
+pacman --sync --refresh
 pacman --sync --noconfirm archlinux-keyring
+
+# Install CachyOS keyring
+pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
+pacman-key --lsign-key F3B607488DB35A47
+
+# Install CachyOS repositories
+pacman --upgrade 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
+'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst' \
 
 # Set the console keyboard layout
 loadkeys us
@@ -13,16 +25,13 @@ setfont Lat2-Terminus16
 # Verify the boot mode
 cat /sys/firmware/efi/fw_platform_size
 
-# Verify the internet connection
-ping -c 1 ping.archlinux.org
-
 # Update the system clock
 timedatectl set-ntp true
 
 # Select the mirrors
 pacman --sync --noconfirm --needed rate-mirrors
-cc=$(curl --ipv4 ifconfig.io/country_code)
-rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="$cc" --allow-root cachyos
+country=$(curl --ipv4 ifconfig.io/country_code)
+rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="$country" --allow-root arch
 
 #######################################
 # Prepare the disks
@@ -114,3 +123,31 @@ mount --options noatime,compress=zstd,commit=120,subvol=@home /dev/vdb2 /mnt/hom
 mount --options noatime,compress=zstd,ssd,commit=120,subvol=@data /dev/vdc1 /mnt/data
 boot_uuid=$(blkid -s UUID -o value /dev/vda1)
 mount --uuid "${boot_uuid}" /mnt/boot/
+
+#######################################
+# Installation
+#######################################
+
+# Configure pacman
+sed --in-place 's/#Color/Color/g' /etc/pacman.conf
+sed --in-place '/Color/a ILoveCandy' /etc/pacman.conf
+sed --in-place 's/CheckSpace/#CheckSpace/g' /etc/pacman.conf
+sed --in-place 's/#VerbosePkgLists/VerbosePkgLists/g' /etc/pacman.conf
+thread=$(nproc)
+sed --in-place "s/ParallelDownloads = 5/ParallelDownloads = $thread/g" /etc/pacman.conf
+sed --in-place '/#DisableSandbox/a DisableDownloadTimeout' /etc/pacman.conf
+
+# Append multilib repository
+sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
+sed --in-place '96s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
+
+# Append CachyOS repositories
+sed --in-place '74 a [cachyos-v3]' /etc/pacman.conf
+sed --in-place '75 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '76 a \\' /etc/pacman.conf
+sed --in-place '77 a [cachyos-core-v3]' /etc/pacman.conf
+sed --in-place '78 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '79 a \\' /etc/pacman.conf
+sed --in-place '80 a [cachyos-extra-v3]' /etc/pacman.conf
+sed --in-place '81 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '82 a \\' /etc/pacman.conf
