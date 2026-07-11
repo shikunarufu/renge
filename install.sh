@@ -30,6 +30,12 @@ sgdisk --new=2::-0 --typecode=2:8300 /dev/vdb # partition 4: home
 sgdisk --new=1::-0 --typecode=1:8300 /dev/vdc # partition 5: data
 
 # Format the partitions
+wipefs --all --force /dev/vda1
+wipefs --all --force /dev/vda2
+wipefs --all --force /dev/vdb1
+wipefs --all --force /dev/vdb2
+wipefs --all --force /dev/vdc1
+
 mkfs.fat -F 32 /dev/vda1
 mkfs.btrfs /dev/vda2
 mkfs.btrfs /dev/vdb1
