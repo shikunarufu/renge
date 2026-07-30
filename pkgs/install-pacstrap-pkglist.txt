@@ -14,11 +14,7 @@ amd-ucode
 btrfs-progs
 dosfstools
 exfatprogs
-f2fs-tools
 e2fsprogs
-jfsutils
-nilfs-utils
-xfsprogs
 
 # LVM
 lvm2
