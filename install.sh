@@ -7,21 +7,23 @@
 #######################################
 
 # System Configuration
-BOOT_DISK=/dev/sdc # SSD/NVMe
-ROOT_DISK=/dev/sdc # SSD/NVMe
-VAR_DISK=/dev/sda  # HDD
-HOME_DISK=/dev/sda # HDD
-DATA_DISK=/dev/sdb # SSD/NVMe
+boot_disk=/dev/sdc # SSD/NVMe
+root_disk=/dev/sdc # SSD/NVMe
+var_disk=/dev/sda  # HDD
+home_disk=/dev/sda # HDD
+home_disk=/dev/sdb # SSD/NVMe
 
 # Check for virtualization
 if systemd-detect-virt --quiet --vm; then
   # Set variables for virtualization
-  BOOT_DISK=/dev/vda
-  ROOT_DISK=/dev/vda
-  VAR_DISK=/dev/vdb
-  HOME_DISK=/dev/vdb
-  DATA_DISK=/dev/vdc
+  boot_disk=/dev/vda
+  root_disk=/dev/vda
+  var_disk=/dev/vdb
+  home_disk=/dev/vdb
+  home_disk=/dev/vdc
 fi
+
+export BOOT_DISK=$boot_disk
 
 # User Information
 userinfo () {
@@ -42,6 +44,7 @@ userinfo () {
     '2. Must NOT contain spaces and special characters.' \
     '3. Maximum character length is 32.'
   done
+  clear
   export USERNAME=$username
 
   # Password
@@ -68,7 +71,6 @@ sysinfo () {
   while true
   do
     read -r -p "Enter Name of Machine: " name_of_machine
-    # hostname regex (!!couldn't find spec for computer name!!)
     if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
     then
       break
@@ -80,7 +82,7 @@ sysinfo () {
     '1. Must start with a letter.' \
     '2. Must NOT contain spaces and special characters (except: underscore, dot, and hyphen).' \
     '3. Must end with a letter or a number.' \
-    '4. Maximum character length is 64.'
+    '4. Maximum character length is 63.'
   done
   export NAME_OF_MACHINE=$name_of_machine
 }
@@ -116,7 +118,9 @@ if ! systemd-detect-virt --quiet --vm; then
 fi
 
 # Set the console keyboard layout
-loadkeys us
+keymap="us"
+export KEYMAP=$keymap
+loadkeys "${keymap}"
 
 # Set the console font
 pacman --sync --noconfirm --needed pacman-contrib terminus-font
@@ -149,33 +153,33 @@ pacman --sync --noconfirm gptfdisk btrfs-progs glibc
 umount --all-targets --recursive /mnt || true
 
 # Destroy GPT and MBR data structure on all disks
-sgdisk --zap-all "$ROOT_DISK"
-sgdisk --zap-all "$HOME_DISK"
-sgdisk --zap-all "$DATA_DISK"
+sgdisk --zap-all "$root_disk"
+sgdisk --zap-all "$home_disk"
+sgdisk --zap-all "$home_disk"
 
 # Set sector alignment multiple to 2048 and clear all partition data
-sgdisk --set-alignment=2048 --clear "$ROOT_DISK"
-sgdisk --set-alignment=2048 --clear "$HOME_DISK"
-sgdisk --set-alignment=2048 --clear "$DATA_DISK"
+sgdisk --set-alignment=2048 --clear "$root_disk"
+sgdisk --set-alignment=2048 --clear "$home_disk"
+sgdisk --set-alignment=2048 --clear "$home_disk"
 
 #######################################
 # Partition the disks
 #######################################
 
 # Partition 1: UEFI Boot
-sgdisk --new=1::+4096MiB --typecode=1:ef00 --change-name=1:'boot' "$BOOT_DISK"
+sgdisk --new=1::+4096MiB --typecode=1:ef00 --change-name=1:'boot' "$boot_disk"
 
 # Partition 2: Root
-sgdisk --new=2::-0 --typecode=2:8300 --change-name=2:'root' "$ROOT_DISK"
+sgdisk --new=2::-0 --typecode=2:8300 --change-name=2:'root' "$root_disk"
 
 # Partition 3: Var
-sgdisk --new=1::+12G --typecode=1:8300 --change-name=1:'var' "$VAR_DISK"
+sgdisk --new=1::+12G --typecode=1:8300 --change-name=1:'var' "$var_disk"
 
 # Partition 4: Home
-sgdisk --new=2::-0 --typecode=2:8300 --change-name=2:'home' "$HOME_DISK"
+sgdisk --new=2::-0 --typecode=2:8300 --change-name=2:'home' "$home_disk"
 
 # Partition 5: Data
-sgdisk --new=1::-0 --typecode=1:8300 --change-name=1:'data' "$DATA_DISK"
+sgdisk --new=1::-0 --typecode=1:8300 --change-name=1:'data' "$home_disk"
 
 #######################################
 # Format the partitions
@@ -191,37 +195,37 @@ nvme_check() {
 }
 
 # Set variables for format
-BOOT_PART=$(nvme_check "$BOOT_DISK" 1)
-ROOT_PART=$(nvme_check "$ROOT_DISK" 2)
-VAR_PART=$(nvme_check "$VAR_DISK" 1)
-HOME_PART=$(nvme_check "$HOME_DISK" 2)
-DATA_PART=$(nvme_check "$DATA_DISK" 1)
+boot_part=$(nvme_check "$boot_disk" 1)
+root_part=$(nvme_check "$root_disk" 2)
+var_part=$(nvme_check "$var_disk" 1)
+home_part=$(nvme_check "$home_disk" 2)
+data_part=$(nvme_check "$home_disk" 1)
 
-mkfs.fat -F 32 -n "boot" "${BOOT_PART}"
-mkfs.btrfs --force --label "root" "${ROOT_PART}"
-mkfs.btrfs --force --label "var" "${VAR_PART}"
-mkfs.btrfs --force --label "home" "${HOME_PART}"
-mkfs.btrfs --force --label "data" "${DATA_PART}"
+mkfs.fat -F 32 -n "boot" "${boot_part}"
+mkfs.btrfs --force --label "root" "${root_part}"
+mkfs.btrfs --force --label "var" "${var_part}"
+mkfs.btrfs --force --label "home" "${home_part}"
+mkfs.btrfs --force --label "data" "${data_part}"
 
 #######################################
 # Create the subvolumes
 #######################################
 
-mount -t btrfs "${ROOT_PART}" /mnt
+mount -t btrfs "${root_part}" /mnt
 btrfs subvolume create /mnt/@
 # Set @ as default subvolume so genfstab records subvolid=256 (not 5)
 btrfs subvolume set-default /mnt/@
 umount /mnt
 
-mount -t btrfs "${VAR_PART}" /mnt
+mount -t btrfs "${var_part}" /mnt
 btrfs subvolume create /mnt/@var
 umount /mnt
 
-mount -t btrfs "${HOME_PART}" /mnt
+mount -t btrfs "${home_part}" /mnt
 btrfs subvolume create /mnt/@home
 umount /mnt
 
-mount -t btrfs "${DATA_PART}" /mnt
+mount -t btrfs "${data_part}" /mnt
 btrfs subvolume create /mnt/@data
 umount /mnt
 
@@ -230,7 +234,7 @@ umount /mnt
 #######################################
 
 # Mount @ subvolume
-mount --options noatime,compress=zstd,ssd,commit=120,subvol=@ "${ROOT_PART}" /mnt
+mount --options noatime,compress=zstd,ssd,commit=120,subvol=@ "${root_part}" /mnt
 
 # Create directories for subvolumes
 mkdir --parents /mnt/var
@@ -239,11 +243,11 @@ mkdir --parents /mnt/data
 mkdir --parents /mnt/boot
 
 # Mount all subvolumes
-mount --options noatime,compress=zstd,commit=120,subvol=@var "${VAR_PART}" /mnt/var
-mount --options noatime,compress=zstd,commit=120,subvol=@home "${HOME_PART}" /mnt/home
-mount --options noatime,compress=zstd,ssd,commit=120,subvol=@data "${DATA_PART}" /mnt/data
-BOOT_UUID="$(blkid -s UUID -o value "$BOOT_PART")"
-mount --uuid "${BOOT_UUID}" /mnt/boot/
+mount --options noatime,compress=zstd,commit=120,subvol=@var "${var_part}" /mnt/var
+mount --options noatime,compress=zstd,commit=120,subvol=@home "${home_part}" /mnt/home
+mount --options noatime,compress=zstd,ssd,commit=120,subvol=@data "${data_part}" /mnt/data
+boot_uuid="$(blkid -s UUID -o value "$boot_part")"
+mount --uuid "${boot_uuid}" /mnt/boot/
 
 #######################################
 # Installation
@@ -276,6 +280,9 @@ if ! systemd-detect-virt --quiet --vm; then
   sed --in-place '84 a \\' /etc/pacman.conf
 fi
 
+# Refresh repositories
+pacman --sync --refresh
+
 # Parallel compilation
 core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
@@ -289,5 +296,83 @@ pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 # Configure the system
 #######################################
 
-# Fstab
+# Generate fstab file
 genfstab -U /mnt >> /mnt/etc/fstab
+
+# Change root into new system
+arch-chroot -S /mnt /bin/bash -c <<EOF
+
+# Set time zone
+time_zone="$(curl --fail --max-time 5 --silent https://ipapi.co/timezone)"
+ln --force --symbolic /usr/share/zoneinfo/"${time_zone}" /etc/localtime
+hwclock --systohc
+
+# Generate locales
+locale="en_GB.UTF-8"
+sed --in-place "s/^#${locale}/${locale}/" /etc/locale.gen
+locale-gen
+
+# Set system locale
+echo "LANG=${locale}" > /etc/locale.conf
+
+# Set console keyboard layout and font
+echo "KEYMAP=${KEYMAP}" > /etc/vconsole.conf
+
+# Network configuration
+systemctl enable NetworkManager
+
+# Set hostname
+echo "${NAME_OF_MACHINE}" > /etc/hostname
+
+# Set root password
+echo "${PASSWORD}" | passwd
+
+# Configure pacman
+sed --in-place 's/#Color/Color/g' /etc/pacman.conf
+sed --in-place '/Color/a ILoveCandy' /etc/pacman.conf
+sed --in-place 's/CheckSpace/#CheckSpace/g' /etc/pacman.conf
+sed --in-place 's/#VerbosePkgLists/VerbosePkgLists/g' /etc/pacman.conf
+thread="$(nproc)"
+sed --in-place "s/ParallelDownloads = 5/ParallelDownloads = $thread/g" /etc/pacman.conf
+sed --in-place '/#DisableSandboxSyscalls/a DisableDownloadTimeout' /etc/pacman.conf
+
+# Append multilib repository
+sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
+sed --in-place '96s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
+
+# Check for virtualization
+if ! systemd-detect-virt --quiet --vm; then
+  # Append CachyOS repositories
+  sed --in-place '76 a [cachyos-v3]' /etc/pacman.conf
+  sed --in-place '77 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+  sed --in-place '78 a \\' /etc/pacman.conf
+  sed --in-place '79 a [cachyos-core-v3]' /etc/pacman.conf
+  sed --in-place '80 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+  sed --in-place '81 a \\' /etc/pacman.conf
+  sed --in-place '82 a [cachyos-extra-v3]' /etc/pacman.conf
+  sed --in-place '83 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+  sed --in-place '84 a \\' /etc/pacman.conf
+fi
+
+# Refresh repositories
+pacman --sync --refresh
+
+# Parallel compilation
+core=$(grep --count ^processor /proc/cpuinfo)
+sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
+
+# Install boot loader
+pacman --sync --noconfirm --needed limine efibootmgr
+
+mkdir -p /boot/EFI/arch-limine
+cp /usr/share/limine/BOOTX64.EFI /boot/EFI/arch-limine/
+
+efibootmgr \
+--create \
+--disk "${BOOT_DISK}" \
+--part 1 \
+--label "Arch Linux Limine Boot Loader" \
+--loader '\EFI\arch-limine\BOOTX64.EFI' \
+--unicode
+
+EOF
