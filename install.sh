@@ -11,7 +11,7 @@ boot_disk=/dev/sdc # SSD/NVMe
 root_disk=/dev/sdc # SSD/NVMe
 var_disk=/dev/sda  # HDD
 home_disk=/dev/sda # HDD
-home_disk=/dev/sdb # SSD/NVMe
+data_disk=/dev/sdb # SSD/NVMe
 
 # Check for virtualization
 if systemd-detect-virt --quiet --vm; then
@@ -20,7 +20,7 @@ if systemd-detect-virt --quiet --vm; then
   root_disk=/dev/vda
   var_disk=/dev/vdb
   home_disk=/dev/vdb
-  home_disk=/dev/vdc
+  data_disk=/dev/vdc
 fi
 
 export BOOT_DISK=$boot_disk
@@ -155,12 +155,12 @@ umount --all-targets --recursive /mnt || true
 # Destroy GPT and MBR data structure on all disks
 sgdisk --zap-all "$root_disk"
 sgdisk --zap-all "$home_disk"
-sgdisk --zap-all "$home_disk"
+sgdisk --zap-all "$data_disk"
 
 # Set sector alignment multiple to 2048 and clear all partition data
 sgdisk --set-alignment=2048 --clear "$root_disk"
 sgdisk --set-alignment=2048 --clear "$home_disk"
-sgdisk --set-alignment=2048 --clear "$home_disk"
+sgdisk --set-alignment=2048 --clear "$data_disk"
 
 #######################################
 # Partition the disks
@@ -179,7 +179,7 @@ sgdisk --new=1::+12G --typecode=1:8300 --change-name=1:'var' "$var_disk"
 sgdisk --new=2::-0 --typecode=2:8300 --change-name=2:'home' "$home_disk"
 
 # Partition 5: Data
-sgdisk --new=1::-0 --typecode=1:8300 --change-name=1:'data' "$home_disk"
+sgdisk --new=1::-0 --typecode=1:8300 --change-name=1:'data' "$data_disk"
 
 #######################################
 # Format the partitions
@@ -199,7 +199,7 @@ boot_part=$(nvme_check "$boot_disk" 1)
 root_part=$(nvme_check "$root_disk" 2)
 var_part=$(nvme_check "$var_disk" 1)
 home_part=$(nvme_check "$home_disk" 2)
-data_part=$(nvme_check "$home_disk" 1)
+data_part=$(nvme_check "$data_disk" 1)
 
 mkfs.fat -F 32 -n "boot" "${boot_part}"
 mkfs.btrfs --force --label "root" "${root_part}"
@@ -300,7 +300,7 @@ pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Change root into new system
-arch-chroot -S /mnt /bin/bash -c <<EOF
+arch-chroot -S /mnt /bin/bash <<EOF
 
 # Set time zone
 time_zone="$(curl --fail --max-time 5 --silent https://ipapi.co/timezone)"
@@ -325,7 +325,7 @@ systemctl enable NetworkManager
 echo "${NAME_OF_MACHINE}" > /etc/hostname
 
 # Set root password
-echo "${PASSWORD}" | passwd
+echo "${PASSWORD}" | chpasswd
 
 # Configure pacman
 sed --in-place 's/#Color/Color/g' /etc/pacman.conf
