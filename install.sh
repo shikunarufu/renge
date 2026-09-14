@@ -385,7 +385,7 @@ efibootmgr \
 
 # Configure bootloader
 root_uuid="$(blkid -s UUID -o value "$ROOT_PART")"
-  cat << LIMINE_EOF > /boot/EFI/arch-limine/limine.conf
+  cat << LIMINE_EOF > /boot/limine.conf
   timeout: 5
 
   /Arch Linux
