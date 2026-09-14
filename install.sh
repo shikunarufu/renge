@@ -305,6 +305,9 @@ pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 # Generate fstab file
 genfstab -U /mnt >> /mnt/etc/fstab
 
+# Mount EFI file systems
+mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+
 # Change root into new system
 arch-chroot -S /mnt /bin/bash << 'EOF'
 
