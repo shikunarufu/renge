@@ -327,7 +327,7 @@ ln --force --symbolic /usr/share/zoneinfo/"${time_zone}" /etc/localtime
 hwclock --systohc
 
 # Generate locales
-locale="en_GB.UTF-8"
+locale="en_GB.UTF-8 UTF-8"
 sed --in-place 's/^#${locale}/${locale}/' /etc/locale.gen
 locale-gen
 
