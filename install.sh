@@ -306,20 +306,20 @@ pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Change root into new system
-arch-chroot -S /mnt /bin/bash << 'EOF'
+arch-chroot -S /mnt /bin/bash << EOF
 
 # Set time zone
 time_zone="$(curl --fail --max-time 5 --silent https://ipapi.co/timezone)"
-ln --force --symbolic /usr/share/zoneinfo/"${time_zone}" /etc/localtime
+ln --force --symbolic /usr/share/zoneinfo/"$(time_zone)" /etc/localtime
 hwclock --systohc
 
 # Generate locales
 locale="en_GB.UTF-8 UTF-8"
-sed --in-place 's/#${locale}/${locale}/g' /etc/locale.gen
+sed --in-place 's/#$(locale)/$(locale)/g' /etc/locale.gen
 locale-gen
 
 # Set system locale
-echo "LANG=${locale}" > /etc/locale.conf
+echo "LANG=$(locale)" > /etc/locale.conf
 
 # Set console keyboard layout and font
 echo "KEYMAP=${KEYMAP}" > /etc/vconsole.conf
@@ -391,7 +391,7 @@ root_uuid="$(blkid -s UUID -o value "$ROOT_PART")"
   /Arch Linux
       protocol: linux
       path: boot():/vmlinuz-linux
-      cmdline: root=UUID=${root_uuid} rw
+      cmdline: root=UUID=$(root_uuid) rw
       module_path: boot():/initramfs-linux.img
 LIMINE_EOF
 
