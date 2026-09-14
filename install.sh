@@ -306,7 +306,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 # Configure Limine
 limine_config () {
   root_uuid="$(blkid -s UUID -o value "$root_part")"
-  cat <<EOF >/boot/EFI/arch-limine/limine.conf
+  cat << 'EOF' > /boot/EFI/arch-limine/limine.conf
   timeout: 5
 
   /Arch Linux
