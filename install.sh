@@ -56,9 +56,9 @@ userinfo () {
   do
     printf '%s\n' 'Note: Characters are hidden.'
     read -rs -p "Enter Password: " PASSWORD1
-    printf '%s\n'
+    printf '\n'
     read -rs -p "Re-enter Password: " PASSWORD2
-    printf '%s\n'
+    printf '\n'
     if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
       break
     else
@@ -305,9 +305,6 @@ pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 # Generate fstab file
 genfstab -U /mnt >> /mnt/etc/fstab
 
-# Mount EFI file systems
-mount -t efivarfs efivarfs /sys/firmware/efi/efivars
-
 # Change root into new system
 arch-chroot -S /mnt /bin/bash << 'EOF'
 
@@ -388,8 +385,8 @@ efibootmgr \
 
 # Configure bootloader
 root_uuid="$(blkid -s UUID -o value "$ROOT_PART")"
-  cat << LIMINE_EOF > /boot/limine.conf
-  timeout: 5
+  cat << LIMINE_EOF > /boot/EFI/arch-limine/limine.conf
+  timeout: 3
 
   /Arch Linux
       protocol: linux
