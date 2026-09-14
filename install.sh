@@ -26,6 +26,7 @@ if systemd-detect-virt --quiet --vm; then
   data_disk=/dev/vdc
 fi
 
+# Export variables
 export BOOT_DISK=$boot_disk
 
 # User Information
@@ -108,17 +109,14 @@ ping -c 1 ping.archlinux.org
 pacman --sync --refresh
 pacman --sync --noconfirm archlinux-keyring
 
-# Check for virtualization
-if ! systemd-detect-virt --quiet --vm; then
-  # Install CachyOS keyring
-  pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
-  pacman-key --lsign-key F3B607488DB35A47
+# Install CachyOS keyring
+pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
+pacman-key --lsign-key F3B607488DB35A47
 
-  # Install CachyOS repositories
-  pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
-  'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst'
-  pacman --sync --refresh
-fi
+# Install CachyOS repositories
+pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
+'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst'
+pacman --sync --refresh
 
 # Set the console keyboard layout
 keymap="us"
@@ -139,11 +137,7 @@ timedatectl set-ntp true
 pacman --sync --noconfirm --needed rate-mirrors
 country="$(curl --ipv4 ifconfig.io/country_code)"
 rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root arch
-
-# Check for virtualization
-if ! systemd-detect-virt --quiet --vm; then
-  rate-mirrors --save=/etc/pacman.d/cachyos-mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root cachyos
-fi
+rate-mirrors --save=/etc/pacman.d/cachyos-mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root cachyos
 
 #######################################
 # Prepare the disks
@@ -269,19 +263,16 @@ sed --in-place '/#DisableSandboxSyscalls/a DisableDownloadTimeout' /etc/pacman.c
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
 sed --in-place '96s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 
-# Check for virtualization
-if ! systemd-detect-virt --quiet --vm; then
-  # Append CachyOS repositories
-  sed --in-place '76 a [cachyos-v3]' /etc/pacman.conf
-  sed --in-place '77 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-  sed --in-place '78 a \\' /etc/pacman.conf
-  sed --in-place '79 a [cachyos-core-v3]' /etc/pacman.conf
-  sed --in-place '80 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-  sed --in-place '81 a \\' /etc/pacman.conf
-  sed --in-place '82 a [cachyos-extra-v3]' /etc/pacman.conf
-  sed --in-place '83 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-  sed --in-place '84 a \\' /etc/pacman.conf
-fi
+# Append CachyOS repositories
+sed --in-place '76 a [cachyos-v3]' /etc/pacman.conf
+sed --in-place '77 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '78 a \\' /etc/pacman.conf
+sed --in-place '79 a [cachyos-core-v3]' /etc/pacman.conf
+sed --in-place '80 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '81 a \\' /etc/pacman.conf
+sed --in-place '82 a [cachyos-extra-v3]' /etc/pacman.conf
+sed --in-place '83 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '84 a \\' /etc/pacman.conf
 
 # Refresh repositories
 pacman --sync --refresh
@@ -312,7 +303,7 @@ hwclock --systohc
 
 # Generate locales
 locale="en_GB.UTF-8"
-sed --in-place "s/^#${locale}/${locale}/" /etc/locale.gen
+sed --in-place "s/^#${locale}/${locale}/g" /etc/locale.gen
 locale-gen
 
 # Set system locale
@@ -343,19 +334,16 @@ sed --in-place '/#DisableSandboxSyscalls/a DisableDownloadTimeout' /etc/pacman.c
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
 sed --in-place '96s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 
-# Check for virtualization
-if ! systemd-detect-virt --quiet --vm; then
-  # Append CachyOS repositories
-  sed --in-place '76 a [cachyos-v3]' /etc/pacman.conf
-  sed --in-place '77 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-  sed --in-place '78 a \\' /etc/pacman.conf
-  sed --in-place '79 a [cachyos-core-v3]' /etc/pacman.conf
-  sed --in-place '80 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-  sed --in-place '81 a \\' /etc/pacman.conf
-  sed --in-place '82 a [cachyos-extra-v3]' /etc/pacman.conf
-  sed --in-place '83 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
-  sed --in-place '84 a \\' /etc/pacman.conf
-fi
+# Append CachyOS repositories
+sed --in-place '76 a [cachyos-v3]' /etc/pacman.conf
+sed --in-place '77 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '78 a \\' /etc/pacman.conf
+sed --in-place '79 a [cachyos-core-v3]' /etc/pacman.conf
+sed --in-place '80 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '81 a \\' /etc/pacman.conf
+sed --in-place '82 a [cachyos-extra-v3]' /etc/pacman.conf
+sed --in-place '83 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
+sed --in-place '84 a \\' /etc/pacman.conf
 
 # Refresh repositories
 pacman --sync --refresh
@@ -367,6 +355,7 @@ sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 # Install boot loader
 pacman --sync --noconfirm --needed limine efibootmgr
 
+# Deploy boot loader
 mkdir -p /boot/EFI/arch-limine
 cp /usr/share/limine/BOOTX64.EFI /boot/EFI/arch-limine/
 
