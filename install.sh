@@ -306,7 +306,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 # Configure Limine
 limine_config () {
   root_uuid="$(blkid -s UUID -o value "$root_part")"
-  cat << 'EOF' > /boot/EFI/arch-limine/limine.conf
+  cat << EOF > /boot/EFI/arch-limine/limine.conf
   timeout: 5
 
   /Arch Linux
@@ -314,7 +314,7 @@ limine_config () {
       path: boot():/vmlinuz-linux
       cmdline: root=UUID=${root_uuid} rw
       module_path: boot():/initramfs-linux.img
-  EOF
+EOF
 }
 export -f limine_config
 
