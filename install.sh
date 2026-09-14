@@ -253,10 +253,6 @@ mount --options noatime,compress=zstd,ssd,commit=120,subvol=@data "${data_part}"
 boot_uuid="$(blkid -s UUID -o value "$boot_part")"
 mount --uuid "${boot_uuid}" /mnt/boot/
 
-# Export root UUID
-root_uuid="$(blkid -s UUID -o value "$root_part")"
-export ROOT_UUID=$root_uuid
-
 #######################################
 # Installation
 #######################################
@@ -307,6 +303,21 @@ pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 # Generate fstab file
 genfstab -U /mnt >> /mnt/etc/fstab
 
+# Configure Limine
+limine_config () {
+  root_uuid="$(blkid -s UUID -o value "$root_part")"
+  cat <<EOF >/boot/EFI/arch-limine/limine.conf
+  timeout: 5
+
+  /Arch Linux
+      protocol: linux
+      path: boot():/vmlinuz-linux
+      cmdline: root=UUID=${root_uuid} rw
+      module_path: boot():/initramfs-linux.img
+  EOF
+}
+export -f limine_config
+
 # Change root into new system
 arch-chroot -S /mnt /bin/bash <<EOF
 
@@ -317,7 +328,7 @@ hwclock --systohc
 
 # Generate locales
 locale="en_GB.UTF-8"
-sed --in-place "s/^#${locale}/${locale}/g" /etc/locale.gen
+sed --in-place 's/^#${locale}/${locale}/' /etc/locale.gen
 locale-gen
 
 # Set system locale
@@ -376,6 +387,7 @@ pacman --sync --noconfirm --needed limine efibootmgr
 mkdir -p /boot/EFI/arch-limine
 cp /usr/share/limine/BOOTX64.EFI /boot/EFI/arch-limine/
 
+# Add entry for bootloader
 efibootmgr \
 --create \
 --disk "${BOOT_DISK}" \
@@ -384,15 +396,7 @@ efibootmgr \
 --loader '\EFI\arch-limine\BOOTX64.EFI' \
 --unicode
 
-# Configure boot loader
-cat <<EOF >/boot/EFI/arch-limine/limine.conf
-timeout: 5
-
-/Arch Linux
-    protocol: linux
-    path: boot():/vmlinuz-linux
-    cmdline: root=UUID=${ROOT_UUID} rw
-    module_path: boot():/initramfs-linux.img
-EOF
+# Configure bootloader
+limine_config
 
 EOF
