@@ -205,8 +205,6 @@ var_part=$(nvme_check "$var_disk" 1)
 home_part=$(nvme_check "$home_disk" 2)
 data_part=$(nvme_check "$data_disk" 1)
 
-export ROOT_PART=$root_part
-
 mkfs.fat -F 32 -n "boot" "${boot_part}"
 mkfs.btrfs --force --label "root" "${root_part}"
 mkfs.btrfs --force --label "var" "${var_part}"
@@ -305,21 +303,25 @@ pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 # Generate fstab file
 genfstab -U /mnt >> /mnt/etc/fstab
 
+# Export variable
+export ROOT_PART=$root_part
+
 # Change root into new system
-arch-chroot -S /mnt /bin/bash << EOF
+env KEYMAP="${KEYMAP}" NAME_OF_MACHINE="${NAME_OF_MACHINE}" PASSWORD="${PASSWORD}" BOOT_DISK="${BOOT_DISK}" ROOT_PART="${ROOT_PART}" \
+arch-chroot -S /mnt /bin/bash << 'EOF'
 
 # Set time zone
 time_zone="$(curl --fail --max-time 5 --silent https://ipapi.co/timezone)"
-ln --force --symbolic /usr/share/zoneinfo/"$(time_zone)" /etc/localtime
+ln --force --symbolic /usr/share/zoneinfo/"${time_zone}" /etc/localtime
 hwclock --systohc
 
 # Generate locales
 locale="en_GB.UTF-8 UTF-8"
-sed --in-place 's/#$(locale)/$(locale)/g' /etc/locale.gen
+sed --in-place "s/#${locale}/${locale}/g" /etc/locale.gen
 locale-gen
 
 # Set system locale
-echo "LANG=$(locale)" > /etc/locale.conf
+echo "LANG=${locale}" > /etc/locale.conf
 
 # Set console keyboard layout and font
 echo "KEYMAP=${KEYMAP}" > /etc/vconsole.conf
@@ -391,7 +393,7 @@ root_uuid="$(blkid -s UUID -o value "$ROOT_PART")"
   /Arch Linux
       protocol: linux
       path: boot():/vmlinuz-linux
-      cmdline: root=UUID=$(root_uuid) rw
+      cmdline: root=UUID=${root_uuid} rw
       module_path: boot():/initramfs-linux.img
 LIMINE_EOF
 
