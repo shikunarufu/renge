@@ -398,6 +398,6 @@ efibootmgr \
 --unicode
 
 # Configure bootloader
-cp /limine.conf /boot/EFI/arch-limine/
+mv /limine.conf /boot/EFI/arch-limine/
 
 EOF
