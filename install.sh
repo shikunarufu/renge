@@ -3,9 +3,9 @@
 # Renge (Arch Linux Installation Script)
 
 # Log all actions
-exec 3>&1 4>&2
-trap 'exec 2>&4 1>&3' 0 1 2 3
-exec 1>log.out 2>&1
+# exec 3>&1 4>&2
+# trap 'exec 2>&4 1>&3' 0 1 2 3
+# exec 1>log.out 2>&1
 
 # Exit immediately if a command exits with a non-zero status
 set -eEo pipefail
@@ -466,6 +466,13 @@ sed --in-place 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/su
 sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 printf "%s\n" "Defaults passwd_timeout=0" >> /etc/sudoers
 
+#######################################
+# Graphical user interface
+#######################################
+
+# Display server
+pacman -S --noconfirm --needed wayland
+
 # Cleanup
 sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
@@ -479,3 +486,14 @@ EOF
 
 # Unmount all partitions
 umount -R /mnt
+
+# Restart system
+sec=15
+while [[ ${sec} -gt 1 ]]; do
+  printf "\r\e[K%s" "Restarting in $sec seconds"
+  sleep 1
+  ((sec--))
+done
+printf "\r\e[K%s\n" "Restarting in 1 second"
+sleep 1
+reboot
