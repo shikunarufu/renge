@@ -340,31 +340,31 @@ root_uuid="$(blkid -s UUID -o value "$root_part")"
 # Check for virtualization
 if ! systemd-detect-virt --quiet --vm; then
   cat << EOF > /mnt/limine.conf
-  timeout: 3
+timeout: 3
 
-  /+Arch Linux
-    //linux-cachyos
-    protocol: linux
-    path: boot():/vmlinuz-linux-cachyos
-    cmdline: root=UUID=${root_uuid} rw
-    module_path: boot():/initramfs-linux-cachyos.img
+/+Arch Linux
+  //linux-cachyos
+  protocol: linux
+  path: boot():/vmlinuz-linux-cachyos
+  cmdline: root=UUID=${root_uuid} rw
+  module_path: boot():/initramfs-linux-cachyos.img
 
-    //linux-zen
-    protocol: linux
-    path: boot():/vmlinuz-linux-zen
-    cmdline: root=UUID=${root_uuid} rw
-    module_path: boot():/initramfs-linux-zen.img
+  //linux-zen
+  protocol: linux
+  path: boot():/vmlinuz-linux-zen
+  cmdline: root=UUID=${root_uuid} rw
+  module_path: boot():/initramfs-linux-zen.img
 EOF
 else
   cat << EOF > /mnt/limine.conf
-  timeout: 3
+timeout: 3
 
-  /+Arch Linux
-    //linux-zen
-    protocol: linux
-    path: boot():/vmlinuz-linux-zen
-    cmdline: root=UUID=${root_uuid} rw
-    module_path: boot():/initramfs-linux-zen.img
+/+Arch Linux
+  //linux-zen
+  protocol: linux
+  path: boot():/vmlinuz-linux-zen
+  cmdline: root=UUID=${root_uuid} rw
+  module_path: boot():/initramfs-linux-zen.img
 EOF
 fi
 
