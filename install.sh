@@ -297,31 +297,43 @@ grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install
 pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 
 #######################################
+# Bootloader
+#######################################
+
+# Configure bootloader
+root_uuid="$(blkid -s UUID -o value "$root_part")"
+cat << EOF > limine.conf
+timeout: 3
+
+/Arch Linux
+    protocol: linux
+    path: boot():/vmlinuz-linux
+    cmdline: root=UUID=${root_uuid} rw
+    module_path: boot():/initramfs-linux.img
+EOF
+
+#######################################
 # Configure the system
 #######################################
 
 # Generate fstab file
 genfstab -U /mnt >> /mnt/etc/fstab
 
-# Export variable
-export ROOT_PART=$root_part
-
 # Change root into new system
-env KEYMAP="${KEYMAP}" NAME_OF_MACHINE="${NAME_OF_MACHINE}" PASSWORD="${PASSWORD}" BOOT_DISK="${BOOT_DISK}" ROOT_PART="${ROOT_PART}" \
-arch-chroot -S /mnt /bin/bash << 'EOF'
+arch-chroot -S /mnt /bin/bash << EOF
 
 # Set time zone
 time_zone="$(curl --fail --max-time 5 --silent https://ipapi.co/timezone)"
-ln --force --symbolic /usr/share/zoneinfo/"${time_zone}" /etc/localtime
+ln --force --symbolic /usr/share/zoneinfo/"$(time_zone)" /etc/localtime
 hwclock --systohc
 
 # Generate locales
 locale="en_GB.UTF-8 UTF-8"
-sed --in-place "s/#${locale}/${locale}/g" /etc/locale.gen
+sed --in-place 's/#$(locale)/$(locale)/g' /etc/locale.gen
 locale-gen
 
 # Set system locale
-echo "LANG=${locale}" > /etc/locale.conf
+echo "LANG=$(locale)" > /etc/locale.conf
 
 # Set console keyboard layout and font
 echo "KEYMAP=${KEYMAP}" > /etc/vconsole.conf
@@ -386,15 +398,6 @@ efibootmgr \
 --unicode
 
 # Configure bootloader
-root_uuid="$(blkid -s UUID -o value "$ROOT_PART")"
-  cat << LIMINE_EOF > /boot/EFI/arch-limine/limine.conf
-  timeout: 3
-
-  /Arch Linux
-      protocol: linux
-      path: boot():/vmlinuz-linux
-      cmdline: root=UUID=${root_uuid} rw
-      module_path: boot():/initramfs-linux.img
-LIMINE_EOF
+cp /mnt/renge/limine.conf /boot/EFI/arch-limine/
 
 EOF
