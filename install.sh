@@ -2,6 +2,11 @@
 #
 # Renge (Arch Linux Installation Script)
 
+# Log all actions
+exec 3>&1 4>&2
+trap 'exec 2>&4 1>&3' 0 1 2 3
+exec 1>log.out 2>&1
+
 # Exit immediately if a command exits with a non-zero status
 set -eEo pipefail
 
@@ -31,6 +36,23 @@ export BOOT_DISK=$boot_disk
 
 # User Information
 userinfo () {
+  # Root Password
+  while true
+  do
+    printf '%s\n' 'Note: Characters are hidden.'
+    read -rs -p "Enter Root Password: " ROOT_PASSWORD1
+    printf '\n'
+    read -rs -p "Re-enter Root Password: " ROOT_PASSWORD2
+    printf '\n'
+    if [[ "$ROOT_PASSWORD1" == "$ROOT_PASSWORD2" ]]; then
+      break
+    else
+      clear
+      printf '%s\n' 'Passwords do not match!'
+    fi
+  done
+  export ROOT_PASSWORD=$ROOT_PASSWORD1
+
   # Username
   while true
   do
@@ -50,22 +72,22 @@ userinfo () {
   clear
   export USERNAME=$username
 
-  # Password
+  # User Password
   while true
   do
     printf '%s\n' 'Note: Characters are hidden.'
-    read -rs -p "Enter Password: " PASSWORD1
+    read -rs -p "Enter User Password: " USER_PASSWORD1
     printf '\n'
-    read -rs -p "Re-enter Password: " PASSWORD2
+    read -rs -p "Re-enter User Password: " USER_PASSWORD2
     printf '\n'
-    if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
+    if [[ "$USER_PASSWORD1" == "$USER_PASSWORD2" ]]; then
       break
     else
       clear
       printf '%s\n' 'Passwords do not match!'
     fi
   done
-  export PASSWORD=$PASSWORD1
+  export USER_PASSWORD=$USER_PASSWORD1
 }
 
 # System Information
@@ -321,6 +343,12 @@ if ! systemd-detect-virt --quiet --vm; then
   timeout: 3
 
   /+Arch Linux
+    //linux-cachyos
+    protocol: linux
+    path: boot():/vmlinuz-linux-cachyos
+    cmdline: root=UUID=${root_uuid} rw
+    module_path: boot():/initramfs-linux-cachyos.img
+
     //linux-zen
     protocol: linux
     path: boot():/vmlinuz-linux-zen
@@ -332,12 +360,6 @@ else
   timeout: 3
 
   /+Arch Linux
-    //linux-cachyos
-    protocol: linux
-    path: boot():/vmlinuz-linux-cachyos
-    cmdline: root=UUID=${root_uuid} rw
-    module_path: boot():/initramfs-linux-cachyos.img
-
     //linux-zen
     protocol: linux
     path: boot():/vmlinuz-linux-zen
@@ -379,7 +401,7 @@ systemctl enable NetworkManager
 echo "${NAME_OF_MACHINE}" > /etc/hostname
 
 # Set root password
-echo "${USERNAME}:${PASSWORD}" | chpasswd
+echo "root:${ROOT_PASSWORD}" | chpasswd
 
 # Configure pacman
 sed --in-place 's/#Color/Color/g' /etc/pacman.conf
@@ -434,4 +456,24 @@ efibootmgr \
 # Configure bootloader
 mv /limine.conf /boot/EFI/arch-limine/
 
+# Exit chroot environment
+exit
 EOF
+
+#######################################
+# Post-installation
+#######################################
+
+# Unmount all partitions
+umount -R /mnt
+
+# Restart system
+sec=15
+while [[ ${sec} -gt 1 ]]; do
+  printf "\r\e[K%s" "Restarting in $sec seconds"
+  sleep 1
+  ((sec--))
+done
+printf "\r\e[K%s\n" "Restarting in 1 second"
+sleep 1
+reboot
