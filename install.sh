@@ -302,7 +302,7 @@ pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 
 # Configure bootloader
 root_uuid="$(blkid -s UUID -o value "$root_part")"
-cat << EOF > limine.conf
+cat << EOF > /mnt/limine.conf
 timeout: 3
 
 /Arch Linux
@@ -398,6 +398,6 @@ efibootmgr \
 --unicode
 
 # Configure bootloader
-cp /mnt/limine.conf /boot/EFI/arch-limine/
+cp /limine.conf /boot/EFI/arch-limine/
 
 EOF
