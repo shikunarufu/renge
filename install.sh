@@ -385,11 +385,12 @@ hwclock --systohc
 
 # Generate locales
 locale="en_GB.UTF-8 UTF-8"
-sed --in-place 's/#$(locale)/$(locale)/g' /etc/locale.gen
+sed --in-place 's/#en_GB.UTF-8 UTF-8/en_GB.UTF-8 UTF-8/g' /etc/locale.gen
+sed --in-place 's/#en_GB ISO-8859-1/en_GB ISO-8859-1/g' /etc/locale.gen
 locale-gen
 
 # Set system locale
-echo "LANG=$(locale)" > /etc/locale.conf
+echo "LANG=en_GB.UTF-8" > /etc/locale.conf
 
 # Set console keyboard layout and font
 echo "KEYMAP=${KEYMAP}" > /etc/vconsole.conf
@@ -455,6 +456,18 @@ efibootmgr \
 
 # Configure bootloader
 mv /limine.conf /boot/EFI/arch-limine/
+
+# User management
+useradd --create-home --groups wheel --shell /bin/bash "${USERNAME}"
+echo "${USERNAME}:${USER_PASSWORD}" | chpasswd
+
+# Security
+sed --in-place 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
+sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+printf "%s\n" "Defaults passwd_timeout=0" >> /etc/sudoers
+
+# Cleanup
+sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 
 # Exit chroot environment
 exit
