@@ -302,7 +302,7 @@ pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 
 # Configure bootloader
 root_uuid="$(blkid -s UUID -o value "$root_part")"
-cat << EOF > limine.conf
+cat << EOF > /renge/limine.conf
 timeout: 3
 
 /Arch Linux
@@ -345,7 +345,7 @@ systemctl enable NetworkManager
 echo "${NAME_OF_MACHINE}" > /etc/hostname
 
 # Set root password
-echo "${PASSWORD}" | chpasswd
+echo "{USERNAME}:${PASSWORD}" | chpasswd
 
 # Configure pacman
 sed --in-place 's/#Color/Color/g' /etc/pacman.conf
