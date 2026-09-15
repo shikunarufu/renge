@@ -36,8 +36,7 @@ userinfo () {
   do
     printf '%s\n' 'Note: Uppercase letters are automatically converted to lowercase letters.'
     read -r -p "Enter Username: " username
-    if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]
-    then
+    if [[ "${username,,}" =~ ^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$ ]]; then
       break
     fi
     clear
@@ -75,8 +74,7 @@ sysinfo () {
   while true
   do
     read -r -p "Enter Name of Machine: " name_of_machine
-    if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]
-    then
+    if [[ "${name_of_machine,,}" =~ ^[a-z][a-z0-9_.-]{0,62}[a-z0-9]$ ]]; then
       break
     fi
     clear
@@ -193,7 +191,7 @@ sgdisk --new=1::-0 --typecode=1:8300 --change-name=1:'data' "$data_disk"
 nvme_check() {
   if [[ "$1" =~ nvme ]]; then
     echo "${1}p${2}"
-      else
+  else
     echo "${1}${2}"
   fi
 }
@@ -292,9 +290,23 @@ core=$(grep --count ^processor /proc/cpuinfo)
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
 
 # Install essential packages
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt \
-  | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
-pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
+# grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt \
+#   | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
+# pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
+
+# Check for virtualization
+if ! systemd-detect-virt --quiet --vm; then
+  # Install essential packages
+  { grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt; \
+  printf '%s\n' 'linux-cachyos' 'linux-cachyos-headers'; } \
+    | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
+  pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
+else
+  # Install essential packages
+  grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt \
+    | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
+  pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
+fi
 
 #######################################
 # Bootloader
@@ -302,15 +314,37 @@ pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 
 # Configure bootloader
 root_uuid="$(blkid -s UUID -o value "$root_part")"
-cat << EOF > /mnt/limine.conf
-timeout: 3
 
-/Arch Linux
+# Check for virtualization
+if ! systemd-detect-virt --quiet --vm; then
+  cat << EOF > /mnt/limine.conf
+  timeout: 3
+
+  /+Arch Linux
+    //linux-zen
     protocol: linux
-    path: boot():/vmlinuz-linux
+    path: boot():/vmlinuz-linux-zen
     cmdline: root=UUID=${root_uuid} rw
-    module_path: boot():/initramfs-linux.img
+    module_path: boot():/initramfs-linux-zen.img
 EOF
+else
+  cat << EOF > /mnt/limine.conf
+  timeout: 3
+
+  /+Arch Linux
+    //linux-cachyos
+    protocol: linux
+    path: boot():/vmlinuz-linux-cachyos
+    cmdline: root=UUID=${root_uuid} rw
+    module_path: boot():/initramfs-linux-cachyos.img
+
+    //linux-zen
+    protocol: linux
+    path: boot():/vmlinuz-linux-zen
+    cmdline: root=UUID=${root_uuid} rw
+    module_path: boot():/initramfs-linux-zen.img
+EOF
+fi
 
 #######################################
 # Configure the system
@@ -345,7 +379,7 @@ systemctl enable NetworkManager
 echo "${NAME_OF_MACHINE}" > /etc/hostname
 
 # Set root password
-echo "{USERNAME}:${PASSWORD}" | chpasswd
+echo "${USERNAME}:${PASSWORD}" | chpasswd
 
 # Configure pacman
 sed --in-place 's/#Color/Color/g' /etc/pacman.conf
