@@ -51,6 +51,7 @@ userinfo () {
       printf '%s\n' 'Passwords do not match!'
     fi
   done
+  clear
   export ROOT_PASSWORD=$ROOT_PASSWORD1
 
   # Username
