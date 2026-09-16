@@ -503,6 +503,13 @@ mv /limine.conf /boot/EFI/arch-limine/
 # Graphical user interface
 #######################################
 
+# scenefx (mangowm dependency)
+runuser --login "${USERNAME}" --command='
+  git clone https://aur.archlinux.org/scenefx0.5.git /home/"${USERNAME}"/aur/scenefx0.5
+  cd /home/"${USERNAME}"/aur/scenefx0.5
+  makepkg --syncdeps --install --noconfirm
+'
+
 # Window manager
 runuser --login "${USERNAME}" --command='
   git clone https://aur.archlinux.org/mangowm-git.git /home/"${USERNAME}"/aur/mangowm-git
