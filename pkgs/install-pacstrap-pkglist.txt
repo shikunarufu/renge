@@ -16,9 +16,6 @@ dosfstools
 exfatprogs
 e2fsprogs
 
-# LVM
-lvm2
-
 # Firmwares
 alsa-firmware
 sof-firmware
