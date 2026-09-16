@@ -475,9 +475,10 @@ sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$thread\"/g" /etc/makepkg.con
 sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $thread -z -)/g" /etc/makepkg.conf
 
 # Install essential packages
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacman-pkglist.txt \
-  | sort --output=./renge/pkgs/install-pacman-pkglist.txt --unique
-pacman --sync --noconfirm --needed - < ./renge/pkgs/install-pacman-pkglist.txt
+curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacman-pkglist.txt | sort --output=install-pacman-pkglist.txt --unique
+pacman -S --noconfirm --needed - < install-pacman-pkglist.txt
+rm --force --recursive install-pacman-pkglist.txt
 
 # Deploy boot loader
 mkdir -p /boot/EFI/arch-limine
