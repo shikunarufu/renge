@@ -311,7 +311,7 @@ pacman --sync --refresh
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$thread\"/g" /etc/makepkg.conf
 
 # Multiple cores on compression
-sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $thread -z -)/g" /etc/makepkg.conf
+sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=$thread -z -)/g" /etc/makepkg.conf
 
 # Virtualization check to install CachyOS kernel
 if ! systemd-detect-virt --quiet --vm; then
@@ -472,7 +472,10 @@ fi
 sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$thread\"/g" /etc/makepkg.conf
 
 # Multiple cores on compression
-sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $thread -z -)/g" /etc/makepkg.conf
+sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=$thread -z -)/g" /etc/makepkg.conf
+
+# Create AUR directory
+mkdir --parents /home/"${USERNAME}"/aur
 
 # Install essential packages
 curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
@@ -481,7 +484,7 @@ pacman -S --noconfirm --needed - < install-pacman-pkglist.txt
 rm --force --recursive install-pacman-pkglist.txt
 
 # Deploy boot loader
-mkdir -p /boot/EFI/arch-limine
+mkdir --parents /boot/EFI/arch-limine
 cp /usr/share/limine/BOOTX64.EFI /boot/EFI/arch-limine/
 
 # Add entry for bootloader
@@ -501,7 +504,9 @@ mv /limine.conf /boot/EFI/arch-limine/
 #######################################
 
 # Window manager
-git clone https://aur.archlinux.org/dwl.git
+git clone https://aur.archlinux.org/mangowm-git.git /home/"${USERNAME}"/aur
+cd /home/"${USERNAME}"/aur/mangowm-git
+makepkg --syncdeps --install --noconfirm
 
 # User directories
 xdg-user-dirs-update
