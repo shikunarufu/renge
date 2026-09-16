@@ -475,7 +475,7 @@ sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$thread\"/g" /etc/makepkg.con
 sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=$thread -z -)/g" /etc/makepkg.conf
 
 # Create AUR directory
-runuser -u "${USERNAME}" mkdir --parents /home/"${USERNAME}"/aur
+runuser --user="${USERNAME}" mkdir --parents /home/"${USERNAME}"/aur
 
 # Install essential packages
 curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
@@ -517,8 +517,22 @@ runuser --login "${USERNAME}" --command='
   makepkg --syncdeps --install --noconfirm
 '
 
+# Configure mangowm
+runuser --user="${USERNAME}" --command='
+  mkdir --parents /home/"${USERNAME}"/.config/mango
+  cp /home/"${USERNAME}"/renge/mango/config.conf /home/"${USERNAME}"/.config/mango/config.conf
+'
+
+# Sound system
+amixer sset Master unmute
+amixer sset Speaker unmute
+amixer sset Headphone unmute
+
 # User directories
 xdg-user-dirs-update
+
+# Solid state drives
+systemctl enable fstrim.timer
 
 # Cleanup
 sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
