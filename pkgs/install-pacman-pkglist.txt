@@ -1,15 +1,18 @@
 # Boot loader
-grub
+limine
 efibootmgr
 
 # pacman
 pacman-contrib
 
 # Mirrors
-reflector
+rate-mirrors
 
 # Arch Build System
 git
+
+# Display server
+wayland
 
 # Display drivers
 mesa
@@ -25,18 +28,16 @@ xdg-user-dirs
 # Sound system
 pipewire
 lib32-pipewire
-pipewire-docs
 wireplumber
 pipewire-audio
 pipewire-alsa
 pipewire-pulse
-pipewire-jack
-lib32-pipewire-jack
 
 # File index and search
 plocate
 
 # Fonts
+terminus-font
 noto-fonts
 noto-fonts-cjk
 noto-fonts-emoji
@@ -51,5 +52,4 @@ bash-completion
 # Compressed files
 7zip
 tar
-zip
 unzip
