@@ -504,9 +504,9 @@ mv /limine.conf /boot/EFI/arch-limine/
 #######################################
 
 # Window manager
-git clone https://aur.archlinux.org/mangowm-git.git /home/"${USERNAME}"/aur
+git clone https://aur.archlinux.org/mangowm-git.git /home/"${USERNAME}"/aur/mangowm-git
 cd /home/"${USERNAME}"/aur/mangowm-git
-makepkg --syncdeps --install --noconfirm
+runuser --user="${USERNAME}" makepkg --syncdeps --install --noconfirm
 
 # User directories
 xdg-user-dirs-update
