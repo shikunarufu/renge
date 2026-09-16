@@ -33,6 +33,14 @@ pipewire-audio
 pipewire-alsa
 pipewire-pulse
 
+# Benchmarking
+mangohud
+lib32-mangohud
+goverlay
+
+# Overclocking
+lact
+
 # File index and search
 plocate
 
