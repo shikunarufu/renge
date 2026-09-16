@@ -21,9 +21,8 @@ var_disk=/dev/sda  # HDD
 home_disk=/dev/sda # HDD
 data_disk=/dev/sdb # SSD/NVMe
 
-# Check for virtualization
+# Virtualization check to set VM variables
 if systemd-detect-virt --quiet --vm; then
-  # Set variables for virtualization
   boot_disk=/dev/vda
   root_disk=/dev/vda
   var_disk=/dev/vdb
@@ -130,7 +129,7 @@ ping -c 1 ping.archlinux.org
 pacman --sync --refresh
 pacman --sync --noconfirm archlinux-keyring
 
-# Check for virtualization
+# Virtualization check to install CachyOS keyring and repositories
 if ! systemd-detect-virt --quiet --vm; then
   # Install CachyOS keyring
   pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
@@ -162,7 +161,7 @@ pacman --sync --noconfirm --needed rate-mirrors
 country="$(curl --ipv4 ifconfig.io/country_code)"
 rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root arch
 
-# Check for virtualization
+# Virtualization check to optimize CachyOS mirrors
 if ! systemd-detect-virt --quiet --vm; then
   rate-mirrors --save=/etc/pacman.d/cachyos-mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root cachyos
 fi
@@ -291,7 +290,7 @@ sed --in-place '/#DisableSandboxSyscalls/a DisableDownloadTimeout' /etc/pacman.c
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
 sed --in-place '96s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 
-# Check for virtualization
+# VM check for CachyOS repositories
 if ! systemd-detect-virt --quiet --vm; then
   # Append CachyOS repositories
   sed --in-place '76 a [cachyos-v3]' /etc/pacman.conf
@@ -309,15 +308,12 @@ fi
 pacman --sync --refresh
 
 # Parallel compilation
-core=$(grep --count ^processor /proc/cpuinfo)
-sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
+sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$thread\"/g" /etc/makepkg.conf
 
-# Install essential packages
-# grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt \
-#   | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
-# pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
+# Multiple cores on compression
+sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $thread -z -)/g" /etc/makepkg.conf
 
-# Check for virtualization
+# Virtualization check to install CachyOS kernel
 if ! systemd-detect-virt --quiet --vm; then
   # Install essential packages
   { grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt; \
@@ -338,7 +334,7 @@ fi
 # Configure bootloader
 root_uuid="$(blkid -s UUID -o value "$root_part")"
 
-# Check for virtualization
+# Virtualization check to prepare configuration file for bootloader
 if ! systemd-detect-virt --quiet --vm; then
   cat << EOF > /mnt/limine.conf
 timeout: 3
@@ -405,7 +401,24 @@ echo "${NAME_OF_MACHINE}" > /etc/hostname
 # Set root password
 echo "root:${ROOT_PASSWORD}" | chpasswd
 
-# Configure pacman
+#######################################
+# System administration
+#######################################
+
+# Users and groups
+useradd --create-home --groups wheel --shell /bin/bash "${USERNAME}"
+echo "${USERNAME}:${USER_PASSWORD}" | chpasswd
+
+# Security
+sed --in-place 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
+sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+printf "%s\n" "Defaults passwd_timeout=0" >> /etc/sudoers
+
+#######################################
+# Package management
+#######################################
+
+# pacman
 sed --in-place 's/#Color/Color/g' /etc/pacman.conf
 sed --in-place '/Color/a ILoveCandy' /etc/pacman.conf
 sed --in-place 's/CheckSpace/#CheckSpace/g' /etc/pacman.conf
@@ -414,12 +427,26 @@ thread="$(nproc)"
 sed --in-place "s/ParallelDownloads = 5/ParallelDownloads = $thread/g" /etc/pacman.conf
 sed --in-place '/#DisableSandboxSyscalls/a DisableDownloadTimeout' /etc/pacman.conf
 
-# Append multilib repository
+# Update keyrings
+pacman --sync --refresh
+pacman --sync --noconfirm archlinux-keyring
+
+# Virtualization check to install CachyOS keyring
+if ! systemd-detect-virt --quiet --vm; then
+  pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
+  pacman-key --lsign-key F3B607488DB35A47
+fi
+
+# Repositories
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
 sed --in-place '96s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 
-# Check for virtualization
-if ! systemd-detect-virt --quiet --vm; then
+# Virtualization check to install and append CachyOS repositories
+if ! systemd-detect-virt --quiet --vm; then # Check for virtualization
+  # Install CachyOS repositories
+  pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
+  'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst'
+
   # Append CachyOS repositories
   sed --in-place '76 a [cachyos-v3]' /etc/pacman.conf
   sed --in-place '77 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
@@ -435,12 +462,22 @@ fi
 # Refresh repositories
 pacman --sync --refresh
 
-# Parallel compilation
-core=$(grep --count ^processor /proc/cpuinfo)
-sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$core\"/g" /etc/makepkg.conf
+# Virtualization check to optimize CachyOS mirrors
+if ! systemd-detect-virt --quiet --vm; then
+  pacman --sync --noconfirm --needed rate-mirrors
+  rate-mirrors --save=/etc/pacman.d/cachyos-mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root cachyos
+fi
 
-# Install boot loader
-pacman --sync --noconfirm --needed limine efibootmgr
+# Parallel compilation
+sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$thread\"/g" /etc/makepkg.conf
+
+# Multiple cores on compression
+sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c -T $thread -z -)/g" /etc/makepkg.conf
+
+# Install essential packages
+grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacman-pkglist.txt \
+  | sort --output=./renge/pkgs/install-pacman-pkglist.txt --unique
+pacman --sync --noconfirm --needed - < ./renge/pkgs/install-pacman-pkglist.txt
 
 # Deploy boot loader
 mkdir -p /boot/EFI/arch-limine
@@ -458,21 +495,15 @@ efibootmgr \
 # Configure bootloader
 mv /limine.conf /boot/EFI/arch-limine/
 
-# User management
-useradd --create-home --groups wheel --shell /bin/bash "${USERNAME}"
-echo "${USERNAME}:${USER_PASSWORD}" | chpasswd
-
-# Security
-sed --in-place 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
-sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-printf "%s\n" "Defaults passwd_timeout=0" >> /etc/sudoers
-
 #######################################
 # Graphical user interface
 #######################################
 
-# Display server
-pacman -S --noconfirm --needed wayland
+# Window manager
+git clone https://aur.archlinux.org/dwl.git
+
+# User directories
+xdg-user-dirs-update
 
 # Cleanup
 sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
