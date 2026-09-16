@@ -475,7 +475,7 @@ sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$thread\"/g" /etc/makepkg.con
 sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=$thread -z -)/g" /etc/makepkg.conf
 
 # Create AUR directory
-sudo -u "${USERNAME}" mkdir --parents /home/"${USERNAME}"/aur
+runuser -u "${USERNAME}" mkdir --parents /home/"${USERNAME}"/aur
 
 # Install essential packages
 curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
@@ -504,9 +504,11 @@ mv /limine.conf /boot/EFI/arch-limine/
 #######################################
 
 # Window manager
-sudo -u "${USERNAME}" git clone https://aur.archlinux.org/mangowm-git.git /home/"${USERNAME}"/aur/mangowm-git
-sudo -u "${USERNAME}" cd /home/"${USERNAME}"/aur/mangowm-git
-sudo -u "${USERNAME}" makepkg --syncdeps --install --noconfirm
+runuser --login "${USERNAME}" --command='
+  git clone https://aur.archlinux.org/mangowm-git.git /home/"${USERNAME}"/aur/mangowm-git
+  cd /home/"${USERNAME}"/aur/mangowm-git
+  makepkg --syncdeps --install --noconfirm
+'
 
 # User directories
 xdg-user-dirs-update
