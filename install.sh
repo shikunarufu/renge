@@ -478,9 +478,6 @@ sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$thread\"/g" /etc/makepkg.con
 # Multiple cores on compression
 sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=$thread -z -)/g" /etc/makepkg.conf
 
-# Create AUR directory
-runuser --user="${USERNAME}" mkdir --parents /home/"${USERNAME}"/aur
-
 # Install essential packages
 curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacman-pkglist.txt | sort --output=install-pacman-pkglist.txt --unique
@@ -506,20 +503,6 @@ mv /limine.conf /boot/EFI/arch-limine/
 #######################################
 # Graphical user interface
 #######################################
-
-# scenefx (mangowm dependency)
-runuser --login "${USERNAME}" --command='
-  git clone https://aur.archlinux.org/scenefx0.5.git /home/"${USERNAME}"/aur/scenefx0.5
-  cd /home/"${USERNAME}"/aur/scenefx0.5
-  makepkg --syncdeps --install --noconfirm
-'
-
-# Window manager
-runuser --login "${USERNAME}" --command='
-  git clone https://aur.archlinux.org/mangowm-git.git /home/"${USERNAME}"/aur/mangowm-git
-  cd /home/"${USERNAME}"/aur/mangowm-git
-  makepkg --syncdeps --install --noconfirm
-'
 
 # Configure mangowm
 runuser --user="${USERNAME}" mkdir --parents /home/"${USERNAME}"/.config/mango
