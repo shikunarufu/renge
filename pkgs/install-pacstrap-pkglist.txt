@@ -6,6 +6,8 @@ linux-firmware
 # Linux Zen Kernel
 linux-zen
 linux-zen-headers
+linux-cachyos
+linux-cachyos-headers
 
 # CPU Microcode
 amd-ucode
