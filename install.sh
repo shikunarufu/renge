@@ -3,9 +3,9 @@
 # Renge (Arch Linux Installation Script)
 
 # Log all actions
-# exec 3>&1 4>&2
-# trap 'exec 2>&4 1>&3' 0 1 2 3
-# exec 1>log.out 2>&1
+exec 3>&1 4>&2
+trap 'exec 2>&4 1>&3' 0 1 2 3
+exec 1>log.out 2>&1
 
 # Exit immediately if a command exits with a non-zero status
 set -eEo pipefail
@@ -338,29 +338,35 @@ root_uuid="$(blkid -s UUID -o value "$root_part")"
 if ! systemd-detect-virt --quiet --vm; then
   cat << EOF > /mnt/limine.conf
 timeout: 3
+default_entry: Arch Linux/linux-cachyos
+remember_last_entry: yes
+interface_resolution: 1920x1080
 
 /+Arch Linux
   //linux-cachyos
   protocol: linux
   path: boot():/vmlinuz-linux-cachyos
-  cmdline: root=UUID=${root_uuid} rw
+  cmdline: root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs
   module_path: boot():/initramfs-linux-cachyos.img
 
   //linux-zen
   protocol: linux
   path: boot():/vmlinuz-linux-zen
-  cmdline: root=UUID=${root_uuid} rw
+  cmdline: root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs
   module_path: boot():/initramfs-linux-zen.img
 EOF
 else
   cat << EOF > /mnt/limine.conf
 timeout: 3
+default_entry: Arch Linux/linux-zen
+remember_last_entry: yes
+interface_resolution: 1920x1080
 
 /+Arch Linux
   //linux-zen
   protocol: linux
   path: boot():/vmlinuz-linux-zen
-  cmdline: root=UUID=${root_uuid} rw
+  cmdline: root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs
   module_path: boot():/initramfs-linux-zen.img
 EOF
 fi
@@ -547,14 +553,3 @@ EOF
 
 # Unmount all partitions
 umount -R /mnt
-
-# Restart system
-sec=15
-while [[ ${sec} -gt 1 ]]; do
-  printf "\r\e[K%s" "Restarting in $sec seconds"
-  sleep 1
-  ((sec--))
-done
-printf "\r\e[K%s\n" "Restarting in 1 second"
-sleep 1
-reboot
