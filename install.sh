@@ -536,8 +536,7 @@ makepkg --syncdeps --install --noconfirm
 '
 
 # Configure mangowm
-runuser --user="${USERNAME}" -- mkdir --parents /home/"${USERNAME}"/.config/mango
-runuser --user="${USERNAME}" -- cp /mnt/renge/mango/config.conf /home/"${USERNAME}"/.config/mango/config.conf
+runuser --user="${USERNAME}" -- cp --recursive /mnt/renge/mango /home/"${username}"/.config
 
 # Sound system
 amixer sset Master unmute
