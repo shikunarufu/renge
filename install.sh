@@ -3,9 +3,9 @@
 # Renge (Arch Linux Installation Script)
 
 # Log all actions
-exec 3>&1 4>&2
-trap 'exec 2>&4 1>&3' 0 1 2 3
-exec 1>log.out 2>&1
+# exec 3>&1 4>&2
+# trap 'exec 2>&4 1>&3' 0 1 2 3
+# exec 1>log.out 2>&1
 
 # Exit immediately if a command exits with a non-zero status
 set -eEo pipefail
@@ -324,7 +324,7 @@ sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=$thread -z
 # Install essential packages
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt \
 | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
-pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
+pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt || true
 
 #######################################
 # Chroot Preparation
@@ -532,3 +532,14 @@ EOF
 
 # Unmount all partitions
 umount -R /mnt
+
+# Restart system
+sec=15
+while [[ ${sec} -gt 1 ]]; do
+  printf "\r\e[K%s" "Restarting in $sec seconds"
+  sleep 1
+  ((sec--))
+done
+printf "\r\e[K%s\n" "Restarting in 1 second"
+sleep 1
+reboot
