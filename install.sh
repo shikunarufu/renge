@@ -8,7 +8,7 @@
 # exec 1>log.out 2>&1
 
 # Exit immediately if a command exits with a non-zero status
-set -eEo pipefail
+# set -eEo pipefail
 
 #######################################
 # Configure the installation
@@ -134,7 +134,7 @@ pacman-key --lsign-key F3B607488DB35A47
 
 # Install CachyOS repository packages
 pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
-'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist-27-1-any.pkg.tar.zst' \
+'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist-27-1-any.pkg.tar.zst'
 
 # Virtualization check to install CachyOS x86-64-v3 repository packages
 if ! systemd-detect-virt --quiet --vm; then
@@ -324,7 +324,7 @@ sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=$thread -z
 # Install essential packages
 grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt \
 | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
-pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt || true
+pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 
 #######################################
 # Chroot Preparation
@@ -433,7 +433,7 @@ sed --in-place '96s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/
 
 # Install CachyOS repository packages
 pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
-'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist-27-1-any.pkg.tar.zst' \
+'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist-27-1-any.pkg.tar.zst'
 
 # Virtualization check to install CachyOS x86-64-v3 repository packages
 if ! systemd-detect-virt --quiet --vm; then
