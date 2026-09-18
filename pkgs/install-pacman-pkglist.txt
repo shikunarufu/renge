@@ -38,7 +38,6 @@ pipewire-pulse
 
 # Web browser
 libnotify
-onnxruntime-opt-rocm
 speech-dispatcher
 xdg-desktop-portal
 
