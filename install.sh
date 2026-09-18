@@ -3,12 +3,12 @@
 # Renge (Arch Linux Installation Script)
 
 # Log all actions
-exec 3>&1 4>&2
-trap 'exec 2>&4 1>&3' 0 1 2 3
-exec 1>log.out 2>&1
+# exec 3>&1 4>&2
+# trap 'exec 2>&4 1>&3' 0 1 2 3
+# exec 1>log.out 2>&1
 
 # Exit immediately if a command exits with a non-zero status
-# set -eEo pipefail
+set -eEo pipefail
 
 #######################################
 # Configure the installation
@@ -128,17 +128,15 @@ ping -c 1 ping.archlinux.org
 # Update Arch Linux keyring
 pacman --sync --refresh --noconfirm --needed archlinux-keyring
 
-# Install CachyOS keyring
-pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
-pacman-key --lsign-key F3B607488DB35A47
-
-# Install CachyOS repository packages
-pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
-'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist-27-1-any.pkg.tar.zst'
-
-# Virtualization check to install CachyOS x86-64-v3 repository packages
+# Virtualization check to install CachyOS packages
 if ! systemd-detect-virt --quiet --vm; then
-  pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst'
+  pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
+  pacman-key --lsign-key F3B607488DB35A47
+  pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
+  'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist-27-1-any.pkg.tar.zst' \
+  'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst' \
+  'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v4-mirrorlist-27-1-any.pkg.tar.zst' \
+  'https://mirror.cachyos.org/repo/x86_64/cachyos/pacman-7.1.0.r9.g54d9411-4-x86_64.pkg.tar.zst'
 fi
 
 # Set the console keyboard layout
@@ -160,13 +158,13 @@ timedatectl set-ntp true
 pacman --sync --noconfirm --needed rate-mirrors
 country="$(curl --ipv4 ifconfig.io/country_code)"
 rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root arch
-rate-mirrors --save=/etc/pacman.d/cachyos-mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root cachyos
-export COUNTRY=$country
 
-# Virtualization check to select CachyOS x86-64-v3 mirrors
+# Virtualization check to select CachyOS mirrors
 if ! systemd-detect-virt --quiet --vm; then
-  cp /etc/pacman.d/cachyos-mirrorlist /etc/pacman.d/cachyos-v3-mirrorlist
+  rate-mirrors --save=/etc/pacman.d/cachyos-v3-mirrorlist --max-jumps=0 --entry-country="${country}" --allow-root cachyos
 fi
+
+export COUNTRY=$country
 
 #######################################
 # Prepare the disks
@@ -303,13 +301,6 @@ if ! systemd-detect-virt --quiet --vm; then
   sed --in-place '82 a [cachyos-extra-v3]' /etc/pacman.conf
   sed --in-place '83 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
   sed --in-place '84 a \\' /etc/pacman.conf
-  sed --in-place '76 a [cachyos]' /etc/pacman.conf
-  sed --in-place '77 a Include = /etc/pacman.d/cachyos-mirrorlist' /etc/pacman.conf
-  sed --in-place '78 a \\' /etc/pacman.conf
-else
-  sed --in-place '76 a [cachyos]' /etc/pacman.conf
-  sed --in-place '77 a Include = /etc/pacman.d/cachyos-mirrorlist' /etc/pacman.conf
-  sed --in-place '78 a \\' /etc/pacman.conf
 fi
 
 # Refresh repositories
@@ -321,42 +312,62 @@ sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$thread\"/g" /etc/makepkg.con
 # Multiple cores on compression
 sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=$thread -z -)/g" /etc/makepkg.conf
 
-# Install essential packages
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt \
-| sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
-pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
+# Virtualization check to install essential packages
+if ! systemd-detect-virt --quiet --vm; then
+  # Install essential packages with CachyOS kernel
+  { grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt; \
+  printf '%s\n' 'linux-cachyos' 'linux-cachyos-headers'; } \
+  | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
+  pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
+else
+  # Install essential packages
+  { grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt; \
+  printf '%s\n' 'linux-zen' 'linux-zen-headers'; } \
+  | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
+  pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txtt
+fi
 
 #######################################
 # Chroot Preparation
 #######################################
 
 # Time
-timezone="$(curl --fail --max-time 5 --silent https://ipapi.co/timezone)"
-export TIMEZONE=$timezone
+time_zone="$(curl --fail --max-time 5 --silent https://ipapi.co/timezone)"
+export TIME_ZONE=$time_zone
 
 # Configure bootloader
 root_uuid="$(blkid -s UUID -o value "$root_part")"
 
 # Prepare configuration file for bootloader
-cat << EOF > /mnt/limine.conf
+if ! systemd-detect-virt --quiet --vm; then
+  cat << EOF > /mnt/limine.conf
 timeout: 3
 default_entry: Arch Linux/linux-cachyos
 remember_last_entry: yes
 interface_resolution: 1920x1080
-
 /+Arch Linux
   //linux-cachyos
   protocol: linux
   path: boot():/vmlinuz-linux-cachyos
+  cmdline: root=UUID=${root_uuid} rw
   cmdline: root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs
   module_path: boot():/initramfs-linux-cachyos.img
-
+EOF
+else
+  cat << EOF > /mnt/limine.conf
+timeout: 3
+default_entry: Arch Linux/linux-zen
+remember_last_entry: yes
+interface_resolution: 1920x1080
+/+Arch Linux
   //linux-zen
   protocol: linux
   path: boot():/vmlinuz-linux-zen
+  cmdline: root=UUID=${root_uuid} rw
   cmdline: root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs
   module_path: boot():/initramfs-linux-zen.img
 EOF
+fi
 
 #######################################
 # Configure the system
@@ -369,7 +380,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot -S /mnt /bin/bash << EOF
 
 # Set time zone
-ln --force --symbolic /usr/share/zoneinfo/"$(TIMEZONE)" /etc/localtime
+ln --force --symbolic /usr/share/zoneinfo/"${TIME_ZONE}" /etc/localtime
 hwclock --systohc
 
 # Generate locales
@@ -427,17 +438,23 @@ pacman --sync --noconfirm archlinux-keyring
 pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
 pacman-key --lsign-key F3B607488DB35A47
 
+# Virtualization check to install CachyOS keyring
+if ! systemd-detect-virt --quiet --vm; then
+  pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
+  pacman-key --lsign-key F3B607488DB35A47
+fi
+
 # Repositories
 sed --in-place 's|#\[multilib\]|\[multilib\]|g' /etc/pacman.conf
 sed --in-place '96s|#Include = /etc/pacman.d/mirrorlist|Include = /etc/pacman.d/mirrorlist|g' /etc/pacman.conf
 
-# Install CachyOS repository packages
-pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
-'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist-27-1-any.pkg.tar.zst'
-
-# Virtualization check to install CachyOS x86-64-v3 repository packages
+# Virtualization check to install CachyOS packages
 if ! systemd-detect-virt --quiet --vm; then
-  pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst'
+  pacman --upgrade --noconfirm 'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
+  'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist-27-1-any.pkg.tar.zst' \
+  'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst' \
+  'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v4-mirrorlist-27-1-any.pkg.tar.zst' \
+  'https://mirror.cachyos.org/repo/x86_64/cachyos/pacman-7.1.0.r9.g54d9411-4-x86_64.pkg.tar.zst'
 fi
 
 # Virtualization check to append CachyOS repositories
@@ -451,23 +468,11 @@ if ! systemd-detect-virt --quiet --vm; then
   sed --in-place '82 a [cachyos-extra-v3]' /etc/pacman.conf
   sed --in-place '83 a Include = /etc/pacman.d/cachyos-v3-mirrorlist' /etc/pacman.conf
   sed --in-place '84 a \\' /etc/pacman.conf
-  sed --in-place '76 a [cachyos]' /etc/pacman.conf
-  sed --in-place '77 a Include = /etc/pacman.d/cachyos-mirrorlist' /etc/pacman.conf
-  sed --in-place '78 a \\' /etc/pacman.conf
-else
-  sed --in-place '76 a [cachyos]' /etc/pacman.conf
-  sed --in-place '77 a Include = /etc/pacman.d/cachyos-mirrorlist' /etc/pacman.conf
-  sed --in-place '78 a \\' /etc/pacman.conf
 fi
 
 # Select CachyOS mirrors
 pacman --sync --noconfirm --needed rate-mirrors
-rate-mirrors --save=/etc/pacman.d/cachyos-mirrorlist --max-jumps=0 --entry-country="${COUNTRY}" --allow-root cachyos
-
-# Virtualization check to select CachyOS x86-64-v3 mirrors
-if ! systemd-detect-virt --quiet --vm; then
-  cp /etc/pacman.d/cachyos-mirrorlist /etc/pacman.d/cachyos-v3-mirrorlist
-fi
+rate-mirrors --save=/etc/pacman.d/cachyos-v3-mirrorlist --max-jumps=0 --entry-country="${COUNTRY}" --allow-root cachyos
 
 # Refresh repositories
 pacman --sync --refresh --upgrade
@@ -478,9 +483,17 @@ sed --in-place "s/#MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j$thread\"/g" /etc/makepkg.con
 # Multiple cores on compression
 sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=$thread -z -)/g" /etc/makepkg.conf
 
-# Install essential packages
-curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
-grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacman-pkglist.txt | sort --output=install-pacman-pkglist.txt --unique
+# Virtualization check to install essential packages
+if ! systemd-detect-virt --quiet --vm; then
+  curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
+  { grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacman-pkglist.txt; \
+  printf '%s\n' 'mangowm'; } \
+  | sort --output=install-pacman-pkglist.txt --unique
+else
+  curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
+  grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacman-pkglist.txt | sort --output=install-pacman-pkglist.txt --unique
+fi
+
 pacman -S --noconfirm --needed - < install-pacman-pkglist.txt
 rm --force --recursive install-pacman-pkglist.txt
 
@@ -503,6 +516,22 @@ mv /limine.conf /boot/EFI/arch-limine/
 #######################################
 # Graphical user interface
 #######################################
+
+if systemd-detect-virt --quiet --vm; then
+  # scenefx (mangowm dependency)
+  runuser --login "${USERNAME}" --command='
+  git clone https://aur.archlinux.org/scenefx0.5.git /home/"${USERNAME}"/aur/scenefx0.5
+  cd /home/"${USERNAME}"/aur/scenefx0.5
+  makepkg --syncdeps --install --noconfirm
+'
+
+  # Window manager
+  runuser --login "${USERNAME}" --command='
+  git clone https://aur.archlinux.org/mangowm-git.git /home/"${USERNAME}"/aur/mangowm-git
+  cd /home/"${USERNAME}"/aur/mangowm-git
+  makepkg --syncdeps --install --noconfirm
+'
+fi
 
 # Configure mangowm
 runuser --user="${USERNAME}" mkdir --parents /home/"${USERNAME}"/.config/mango
@@ -532,3 +561,14 @@ EOF
 
 # Unmount all partitions
 umount -R /mnt
+
+# Restart system
+sec=15
+while [[ ${sec} -gt 1 ]]; do
+  printf "\r\e[K%s" "Restarting in $sec seconds"
+  sleep 1
+  ((sec--))
+done
+printf "\r\e[K%s\n" "Restarting in 1 second"
+sleep 1
+reboot
