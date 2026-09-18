@@ -532,14 +532,3 @@ EOF
 
 # Unmount all partitions
 umount -R /mnt
-
-# Restart system
-sec=15
-while [[ ${sec} -gt 1 ]]; do
-  printf "\r\e[K%s" "Restarting in $sec seconds"
-  sleep 1
-  ((sec--))
-done
-printf "\r\e[K%s\n" "Restarting in 1 second"
-sleep 1
-reboot
