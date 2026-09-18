@@ -528,14 +528,14 @@ if systemd-detect-virt --quiet --vm; then
   cd /home/"${USERNAME}"/aur/mangowm-git
   makepkg --syncdeps --install --noconfirm
 '
-
-  # Web browser
-  runuser --login "${USERNAME}" --command='
-  git clone https://aur.archlinux.org/zen-browser.git /home/"${USERNAME}"/aur/zen-browser
-  cd /home/"${USERNAME}"/aur/zen-browser
-  makepkg --syncdeps --install --noconfirm
-'
 fi
+
+# Web browser
+runuser --login "${USERNAME}" --command='
+git clone https://aur.archlinux.org/zen-browser-bin.git /home/"${USERNAME}"/aur/zen-browser-bin
+cd /home/"${USERNAME}"/aur/zen-browser-bin
+makepkg --syncdeps --install --noconfirm
+'
 
 # Configure mangowm
 runuser --user="${USERNAME}" mkdir --parents /home/"${USERNAME}"/.config/mango
@@ -565,14 +565,3 @@ EOF
 
 # Unmount all partitions
 umount -R /mnt
-
-# Restart system
-sec=15
-while [[ ${sec} -gt 1 ]]; do
-  printf "\r\e[K%s" "Restarting in $sec seconds"
-  sleep 1
-  ((sec--))
-done
-printf "\r\e[K%s\n" "Restarting in 1 second"
-sleep 1
-reboot
