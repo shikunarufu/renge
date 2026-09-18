@@ -3,9 +3,9 @@
 # Renge (Arch Linux Installation Script)
 
 # Log all actions
-# exec 3>&1 4>&2
-# trap 'exec 2>&4 1>&3' 0 1 2 3
-# exec 1>log.out 2>&1
+exec 3>&1 4>&2
+trap 'exec 2>&4 1>&3' 0 1 2 3
+exec 1>log.out 2>&1
 
 # Exit immediately if a command exits with a non-zero status
 # set -eEo pipefail
@@ -331,8 +331,8 @@ pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 #######################################
 
 # Time
-time_zone="$(curl --fail --max-time 5 --silent https://ipapi.co/timezone)"
-export TIME_ZONE=$time_zone
+timezone="$(curl --fail --max-time 5 --silent https://ipapi.co/timezone)"
+export TIMEZONE=$timezone
 
 # Configure bootloader
 root_uuid="$(blkid -s UUID -o value "$root_part")"
@@ -369,7 +369,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot -S /mnt /bin/bash << EOF
 
 # Set time zone
-ln --force --symbolic /usr/share/zoneinfo/"$(TIME_ZONE)" /etc/localtime
+ln --force --symbolic /usr/share/zoneinfo/"$(TIMEZONE)" /etc/localtime
 hwclock --systohc
 
 # Generate locales
@@ -532,14 +532,3 @@ EOF
 
 # Unmount all partitions
 umount -R /mnt
-
-# Restart system
-sec=15
-while [[ ${sec} -gt 1 ]]; do
-  printf "\r\e[K%s" "Restarting in $sec seconds"
-  sleep 1
-  ((sec--))
-done
-printf "\r\e[K%s\n" "Restarting in 1 second"
-sleep 1
-reboot
