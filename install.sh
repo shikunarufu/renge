@@ -324,7 +324,7 @@ else
   { grep --extended-regexp --only-matching '^[^(#|[:space:])]*' ./renge/pkgs/install-pacstrap-pkglist.txt; \
   printf '%s\n' 'linux-zen' 'linux-zen-headers'; } \
   | sort --output=./renge/pkgs/install-pacstrap-pkglist.txt --unique
-  pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txtt
+  pacstrap -K /mnt - < ./renge/pkgs/install-pacstrap-pkglist.txt
 fi
 
 #######################################
