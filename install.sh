@@ -3,9 +3,9 @@
 # Renge (Arch Linux Installation Script)
 
 # Log all actions
-# exec 3>&1 4>&2
-# trap 'exec 2>&4 1>&3' 0 1 2 3
-# exec 1>log.out 2>&1
+exec 3>&1 4>&2
+trap 'exec 2>&4 1>&3' 0 1 2 3
+exec 1>log.out 2>&1
 
 # Exit immediately if a command exits with a non-zero status
 set -eEo pipefail
@@ -366,7 +366,7 @@ EOF
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Change root into new system
-arch-chroot /mnt /bin/bash << EOF
+arch-chroot -S /mnt /bin/bash << EOF
 
 # Set time zone
 ln --force --symbolic /usr/share/zoneinfo/"$(TIME_ZONE)" /etc/localtime
