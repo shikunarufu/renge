@@ -67,7 +67,7 @@ userinfo () {
     '3. Maximum character length is 32.'
   done
   clear
-  export USERNAME=$username
+  export USERNAME=${username,,}
 
   # User Password
   while true
@@ -429,10 +429,6 @@ sed --in-place '/#DisableSandboxSyscalls/a DisableDownloadTimeout' /etc/pacman.c
 pacman --sync --refresh
 pacman --sync --noconfirm archlinux-keyring
 
-# Install CachyOS keyring
-pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
-pacman-key --lsign-key F3B607488DB35A47
-
 # Virtualization check to install CachyOS keyring
 if ! systemd-detect-virt --quiet --vm; then
   pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
@@ -466,8 +462,10 @@ if ! systemd-detect-virt --quiet --vm; then
 fi
 
 # Select CachyOS mirrors
-pacman --sync --noconfirm --needed rate-mirrors
-rate-mirrors --save=/etc/pacman.d/cachyos-v3-mirrorlist --max-jumps=0 --entry-country="${COUNTRY}" --allow-root cachyos
+if ! systemd-detect-virt --quiet --vm; then
+  pacman --sync --noconfirm --needed rate-mirrors
+  rate-mirrors --save=/etc/pacman.d/cachyos-v3-mirrorlist --max-jumps=0 --entry-country="${COUNTRY}" --allow-root cachyos
+fi
 
 # Refresh repositories
 pacman --sync --refresh --upgrade
@@ -506,7 +504,7 @@ efibootmgr \
 --unicode
 
 # Configure bootloader
-mv /mnt/limine.conf /boot/EFI/arch-limine/
+mv /limine.conf /boot/EFI/arch-limine/
 
 #######################################
 # Graphical user interface
@@ -536,7 +534,7 @@ makepkg --syncdeps --install --noconfirm
 '
 
 # Configure mangowm
-runuser --user="${USERNAME}" -- cp --recursive /mnt/renge/mango /home/"${username}"/.config
+runuser --user="${USERNAME}" -- cp --recursive /renge/mango /home/"${USERNAME}"/.config
 
 # Sound system
 amixer sset Master unmute
