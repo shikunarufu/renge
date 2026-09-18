@@ -3,9 +3,9 @@
 # Renge (Arch Linux Installation Script)
 
 # Log all command and still output to console
-exec 3>&1 4>&2
-trap 'exec 2>&4 1>&3' 0 1 2 3
-exec > >(tee -a log_renge.txt >&3) 2>&1
+# exec 3>&1 4>&2
+# trap 'exec 2>&4 1>&3' 0 1 2 3
+# exec > >(tee -a log_renge.txt >&3) 2>&1
 
 #######################################
 # Configure the installation
@@ -346,7 +346,6 @@ interface_resolution: 1920x1080
   //linux-cachyos
   protocol: linux
   path: boot():/vmlinuz-linux-cachyos
-  cmdline: root=UUID=${root_uuid} rw
   cmdline: root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs
   module_path: boot():/initramfs-linux-cachyos.img
 EOF
@@ -360,7 +359,6 @@ interface_resolution: 1920x1080
   //linux-zen
   protocol: linux
   path: boot():/vmlinuz-linux-zen
-  cmdline: root=UUID=${root_uuid} rw
   cmdline: root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs
   module_path: boot():/initramfs-linux-zen.img
 EOF
@@ -538,8 +536,8 @@ makepkg --syncdeps --install --noconfirm
 '
 
 # Configure mangowm
-runuser --user="${USERNAME}" mkdir --parents /home/"${USERNAME}"/.config/mango
-cp /home/"${USERNAME}"/renge/mango/config.conf /home/"${USERNAME}"/.config/mango/config.conf
+runuser --user="${USERNAME}" -- mkdir --parents /home/"${USERNAME}"/.config/mango
+runuser --user="${USERNAME}" -- cp /mnt/renge/mango/config.conf /home/"${USERNAME}"/.config/mango/config.conf
 
 # Sound system
 amixer sset Master unmute
@@ -565,3 +563,14 @@ EOF
 
 # Unmount all partitions
 umount -R /mnt
+
+# Restart system
+sec=15
+while [[ ${sec} -gt 1 ]]; do
+  printf "\r\e[K%s" "Restarting in $sec seconds"
+  sleep 1
+  ((sec--))
+done
+printf "\r\e[K%s\n" "Restarting in 1 second"
+sleep 1
+reboot
