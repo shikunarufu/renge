@@ -36,6 +36,15 @@ pipewire-audio
 pipewire-alsa
 pipewire-pulse
 
+# Web browser
+libnotify
+onnxruntime-opt-rocm
+speech-dispatcher
+xdg-desktop-portal
+
+# BitTorrent Client
+qbittorrent
+
 # Benchmarking
 mangohud
 lib32-mangohud
@@ -56,6 +65,11 @@ noto-fonts-extra
 ttf-jetbrains-mono-nerd
 otf-geist-mono-nerd
 ttf-liberation
+
+# Terminal emulator
+foot
+foot-terminfo
+xdg-utils
 
 # Tab-completion enhancements
 bash-completion
