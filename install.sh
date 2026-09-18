@@ -364,6 +364,9 @@ interface_resolution: 1920x1080
 EOF
 fi
 
+# Copy config files
+cp --recursive ./renge /mnt/renge
+
 #######################################
 # Configure the system
 #######################################
@@ -533,8 +536,8 @@ cd /home/"${USERNAME}"/aur/zen-browser-bin
 makepkg --syncdeps --install --noconfirm
 '
 
-# Configure mangowm
-runuser --user="${USERNAME}" -- cp --recursive /renge/mango /home/"${USERNAME}"/.config
+# Configure window manager
+cp --recursive /renge/mango /home/"${USERNAME}"/.config
 
 # Sound system
 amixer sset Master unmute
@@ -549,6 +552,7 @@ systemctl enable fstrim.timer
 
 # Cleanup
 sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+rm --recursive --force /renge
 
 # Exit chroot environment
 exit
