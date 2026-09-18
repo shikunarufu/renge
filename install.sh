@@ -531,6 +531,13 @@ if systemd-detect-virt --quiet --vm; then
   cd /home/"${USERNAME}"/aur/mangowm-git
   makepkg --syncdeps --install --noconfirm
 '
+
+  # Web browser
+  runuser --login "${USERNAME}" --command='
+  git clone https://aur.archlinux.org/zen-browser.git /home/"${USERNAME}"/aur/zen-browser
+  cd /home/"${USERNAME}"/aur/zen-browser
+  makepkg --syncdeps --install --noconfirm
+'
 fi
 
 # Configure mangowm
