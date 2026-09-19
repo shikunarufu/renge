@@ -538,6 +538,7 @@ makepkg --syncdeps --install --noconfirm
 
 # mozc-ut (fcitx5-mozc-ut dependency)
 runuser --login "${USERNAME}" --command='
+rm --recursive --force /home/"${USERNAME}"/.cache/bazel
 git clone https://aur.archlinux.org/mozc-ut.git /home/"${USERNAME}"/aur/mozc-ut
 cd /home/"${USERNAME}"/aur/mozc-ut
 makepkg --syncdeps --install --noconfirm
@@ -545,6 +546,7 @@ makepkg --syncdeps --install --noconfirm
 
 # Input method
 runuser --login "${USERNAME}" --command='
+rm --recursive --force /home/"${USERNAME}"/.cache/bazel
 git clone https://aur.archlinux.org/fcitx5-mozc-ut.git /home/"${USERNAME}"/aur/fcitx5-mozc-ut
 cd /home/"${USERNAME}"/aur/fcitx5-mozc-ut
 makepkg --syncdeps --install --noconfirm
