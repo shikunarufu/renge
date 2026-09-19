@@ -366,7 +366,6 @@ fi
 
 # Copy config files
 cp --recursive ./renge /mnt/renge
-chown --recursive "${username,,}":"${username,,}" /mnt/renge
 
 #######################################
 # Configure the system
@@ -410,6 +409,9 @@ echo "root:${ROOT_PASSWORD}" | chpasswd
 # Users and groups
 useradd --create-home --groups wheel --shell /bin/bash "${USERNAME}"
 echo "${USERNAME}:${USER_PASSWORD}" | chpasswd
+
+# Change file owner
+chown --recursive "${username,,}":"${username,,}" /renge
 
 # Security
 sed --in-place 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
