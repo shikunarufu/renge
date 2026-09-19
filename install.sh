@@ -410,9 +410,6 @@ echo "root:${ROOT_PASSWORD}" | chpasswd
 useradd --create-home --groups wheel --shell /bin/bash "${USERNAME}"
 echo "${USERNAME}:${USER_PASSWORD}" | chpasswd
 
-# Change config files owner
-chown --recursive "${username,,}":"${username,,}" /renge
-
 # Security
 sed --in-place 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
 sed --in-place 's/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
@@ -548,13 +545,14 @@ amixer sset Speaker unmute
 amixer sset Headphone unmute
 
 # User directories
-xdg-user-dirs-update
+runuser --user="${USERNAME}" -- xdg-user-dirs-update
 
 # Solid state drives
 systemctl enable fstrim.timer
 
 # Cleanup
 sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
+chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.config
 rm --recursive --force /renge
 
 # Exit chroot environment
