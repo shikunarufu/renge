@@ -410,7 +410,7 @@ echo "root:${ROOT_PASSWORD}" | chpasswd
 useradd --create-home --groups wheel --shell /bin/bash "${USERNAME}"
 echo "${USERNAME}:${USER_PASSWORD}" | chpasswd
 
-# Change file owner
+# Change config files owner
 chown --recursive "${username,,}":"${username,,}" /renge
 
 # Security
