@@ -536,8 +536,8 @@ cd /home/"${USERNAME}"/aur/zen-browser-bin
 makepkg --syncdeps --install --noconfirm
 '
 
-# Configure window manager
-cp --recursive /renge/mango /home/"${USERNAME}"/.config
+# Apply config files
+cp --recursive /renge/.config /home/"${USERNAME}"/.config
 
 # Sound system
 amixer sset Master unmute
