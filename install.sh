@@ -3,9 +3,9 @@
 # Renge (Arch Linux Installation Script)
 
 # Log all command and still output to console
-exec 3>&1 4>&2
-trap 'exec 2>&4 1>&3' 0 1 2 3
-exec > >(tee -a log_renge.txt >&3) 2>&1
+# exec 3>&1 4>&2
+# trap 'exec 2>&4 1>&3' 0 1 2 3
+# exec > >(tee -a log_renge.txt >&3) 2>&1
 
 #######################################
 # Configure the installation
@@ -171,7 +171,7 @@ export COUNTRY=$country
 pacman --sync --noconfirm gptfdisk btrfs-progs glibc
 
 # Unmount all disks
-umount --all-targets --recursive /mnt || true
+umount --all-targets --recursive /mnt
 
 # Destroy GPT and MBR data structure on all disks
 sgdisk --zap-all "$root_disk"
@@ -366,6 +366,7 @@ fi
 
 # Copy config files
 cp --recursive ./renge /mnt/renge
+chown --recursive "${username,,}":"${username,,}" /mnt/renge
 
 #######################################
 # Configure the system
@@ -564,3 +565,14 @@ EOF
 
 # Unmount all partitions
 umount -R /mnt
+
+# Restart system
+sec=15
+while [[ ${sec} -gt 1 ]]; do
+  printf "\r\e[K%s" "Restarting in $sec seconds"
+  sleep 1
+  ((sec--))
+done
+printf "\r\e[K%s\n" "Restarting in 1 second"
+sleep 1
+reboot
