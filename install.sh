@@ -365,7 +365,7 @@ EOF
 fi
 
 # Copy config files
-cp --recursive ./renge /mnt/renge
+cp --recursive ./renge /mnt
 
 #######################################
 # Configure the system
