@@ -53,6 +53,8 @@ qbittorrent
 mangohud
 lib32-mangohud
 goverlay
+btop
+rocm-smi-lib
 
 # Overclocking
 lact
