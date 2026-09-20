@@ -45,24 +45,16 @@ PanelWindow {
 
   color: bgNormal
 
-  // IPC: Periodically poll MangoWM state or fetch updates
-  // For an instant response, we trigger this loop quickly
-  Timer {
-    interval: 250
-    running: true
-    repeat: true
-    onTriggered: tagFetcher.running = true
-  }
-
-  Process {
-    id: tagFetcher
-    // Uses mmsg to retrieve current layout/tag status
-    command: ["mmsg", "get-status"] 
-    stdout: StdioCollector {
-      onStreamFinished: {
-        // Parse the response from MangoWM here to dynamically extract the active tag
-        // Example assumptions: updating the activeTag variable based on stdout data
-        // root.activeTag = parsedValue;
+  // This listens to the pipe perfectly without polling loops
+  FileReader {
+    path: "file://" + Quickshell.env("HOME") + "/.config/quickshell/mango_pipe"
+    active: true
+        
+    onReadLine: (line) => {
+      let cleanLine = line.trim();
+      if (cleanLine.startsWith("tag:")) {
+        // Expecting data format like "tag:3"
+        root.activeTag = parseInt(cleanLine.split(":")[1]);
       }
     }
   }
