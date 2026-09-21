@@ -120,7 +120,7 @@ ShellRoot {
           id: windowTitle
 
           Layout.leftMargin: config.windowTitleLeftMargin
-          Layout.leftMargin: config.windowTitleRightMargin
+          Layout.rightMargin: config.windowTitleRightMargin
 
           implicitWidth: windowTitleLabel.implicitWidth + config.windowTitlePadding
           implicitHeight: config.rectangleHeight
