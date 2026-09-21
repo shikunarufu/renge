@@ -24,7 +24,7 @@ ShellRoot {
     // Workspace
     property int workspaceWidth: 20
     property int workspaceHeight: 20
-    property int workspacePadding: 10
+    property int workspacePadding: 12
     property int workspaceRadius: 6
     property int workspaceSpacing: 6
     property color workspaceActiveColor: "#88c0d0"
@@ -37,7 +37,7 @@ ShellRoot {
     property int windowTitleHeight: 20
     property int windowTitlePadding: 12
     property int windowTitleRadius: 6
-    property int windowTitleSpacing: 10
+    property int windowTitleSpacing: 6
     property color windowTitleColor: "#d8dee9"
     property color windowTitleBackgroundColor: "#3b4252"
     property string windowTitlePlaceholder: "Desktop"
