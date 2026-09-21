@@ -136,6 +136,33 @@ ShellRoot {
             elide: Text.ElideRight
           }
         }
+        // ── Now Playing ──
+        Rectangle {
+          id: nowPlaying
+
+          Layout.leftMargin: config.nowPlayingSpacing
+
+          visible: panel.activePlayer !== null
+          implicitWidth: Math.min(nowPlayingLabel.implicitWidth + config.nowPlayingPadding, config.nowPlayingMaxWidth)
+          implicitHeight: config.nowPlayingHeight
+          radius: config.nowPlayingRadius
+          color: config.nowPlayingBackground
+
+          Text {
+            id: nowPlayingLabel
+
+            anchors.centerIn: parent
+            width: parent.width - config.nowPlayingPadding
+            text: panel.activePlayer
+            ? `${config.nowPlayingIcon} ${panel.activePlayer.trackArtist || "Unknown Artist"} – ${panel.activePlayer.trackTitle || "Unknown Track"}`
+            : ""
+            color: config.nowPlayingColor
+
+            font.family: config.fontFamily
+            font.pixelSize: config.fontSize
+            elide: Text.ElideRight
+          }
+        }
       }
     }
   }
