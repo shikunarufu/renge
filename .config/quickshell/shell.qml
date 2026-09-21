@@ -76,14 +76,15 @@ ShellRoot {
             property var ws: modelData
 
             visible: ws.shouldDisplay
-            implicitWidth: config.workspaceSize
+            implicitWidth: Math.max(config.workspaceSize, label.implicitWidth + config.workspaceSize * 0.6)
             implicitHeight: config.workspaceSize
             radius: config.workspaceRadius
             color: ws.urgent
-              ? config.workspaceUrgentColor
-              : (ws.active ? config.workspaceActiveColor : config.workspaceInactiveColor)
+            ? config.workspaceUrgentColor
+            : (ws.active ? config.workspaceActiveColor : config.workspaceInactiveColor)
 
             Text {
+              id: label
               anchors.centerIn: parent
               text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
               color: ws.active ? config.workspaceActiveTextColor : config.workspaceInactiveTextColor
@@ -112,8 +113,8 @@ ShellRoot {
           Text {
             Layout.leftMargin: config.windowTitleSpacing
             text: ToplevelManager.activeToplevel
-              ? ToplevelManager.activeToplevel.title
-              : config.windowTitlePlaceholder
+            ? ToplevelManager.activeToplevel.title
+            : config.windowTitlePlaceholder
             color: config.windowTitleColor
 
             font.family: config.fontFamily
