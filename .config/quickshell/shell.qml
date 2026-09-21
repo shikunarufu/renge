@@ -12,9 +12,9 @@ ShellRoot {
 
     // Bar
     property int barHeight: 24
-    property color barBackground: "transparent"
     property int marginTop: 6
     property int marginLeft: 8
+    property color barBackground: "transparent"
 
     // Font
     property string fontFamily: "JetBrainsMono Nerd Font"
@@ -34,12 +34,12 @@ ShellRoot {
     property color workspaceInactiveTextColor: "#d8dee9"
 
     // Window Title
-    property color windowTitleColor: "#d8dee9"
-    property color windowTitleBackground: "#3b4252"
     property int windowTitleHeight: 20
-    property int windowTitleRadius: 6
     property int windowTitlePadding: 12
+    property int windowTitleRadius: 6
     property int windowTitleSpacing: 10
+    property color windowTitleColor: "#d8dee9"
+    property color windowTitleBackgroundColor: "#3b4252"
     property string windowTitlePlaceholder: "Desktop"
   }
 
@@ -120,7 +120,7 @@ ShellRoot {
           implicitWidth: windowTitleLabel.implicitWidth + config.windowTitlePadding
           implicitHeight: config.windowTitleHeight
           radius: config.windowTitleRadius
-          color: config.windowTitleBackground
+          color: config.windowTitleBackgroundColor
 
           Text {
             id: windowTitleLabel
