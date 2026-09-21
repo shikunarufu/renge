@@ -6,7 +6,7 @@ import Quickshell.Wayland
 
 ShellRoot {
 
-  // ────────────────── Configuration ──────────────────
+  // ─────────────────── Configuration ───────────────────
   QtObject {
     id: config
 
@@ -14,6 +14,8 @@ ShellRoot {
     property int barHeight: 24
     property int marginTop: 6
     property int marginLeft: 8
+    property int rectangleHeight: 20
+    property int rectangleRadius: 2
     property color barBackground: "transparent"
 
     // Font
@@ -23,9 +25,7 @@ ShellRoot {
 
     // Workspace
     property int workspaceWidth: 20
-    property int workspaceHeight: 20
     property int workspacePadding: 12
-    property int workspaceRadius: 6
     property int workspaceSpacing: 6
     property color workspaceActiveColor: "#88c0d0"
     property color workspaceInactiveColor: "#3b4252"
@@ -34,14 +34,18 @@ ShellRoot {
     property color workspaceInactiveTextColor: "#d8dee9"
 
     // Window Title
-    property int windowTitleHeight: 20
     property int windowTitlePadding: 12
-    property int windowTitleRadius: 6
-    property int windowTitleSpacing: 6
+    property int windowTitleLeftMargin: 0
+    property int windowTitleRightMargin: 6
     property color windowTitleColor: "#d8dee9"
     property color windowTitleBackgroundColor: "#3b4252"
     property string windowTitlePlaceholder: "Desktop"
+
+    // Now Playing
+    property int nowPlayingLeftMargin: 0
+    property int nowPlayingRightMargin: 0
   }
+  // ─────────────────────────────────────────────────────
 
   // ── Bar ──
   Variants {
@@ -86,8 +90,8 @@ ShellRoot {
 
             visible: ws.shouldDisplay
             implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
-            implicitHeight: config.workspaceHeight
-            radius: config.workspaceRadius
+            implicitHeight: config.rectangleHeight
+            radius: config.rectangleRadius
             color: ws.urgent
             ? config.workspaceUrgentColor
             : (ws.active ? config.workspaceActiveColor : config.workspaceInactiveColor)
@@ -113,13 +117,14 @@ ShellRoot {
 
         // ── Window Title ──
         Rectangle {
-          id: windowTitleLabel
+          id: windowTitle
 
-          Layout.leftMargin: config.windowTitleSpacing
+          Layout.leftMargin: config.windowTitleLeftMargin
+          Layout.leftMargin: config.windowTitleRightMargin
 
           implicitWidth: windowTitleLabel.implicitWidth + config.windowTitlePadding
-          implicitHeight: config.windowTitleHeight
-          radius: config.windowTitleRadius
+          implicitHeight: config.rectangleHeight
+          radius: config.rectangleRadius
           color: config.windowTitleBackgroundColor
 
           Text {
@@ -136,16 +141,18 @@ ShellRoot {
             elide: Text.ElideRight
           }
         }
+
         // ── Now Playing ──
         Rectangle {
           id: nowPlaying
 
-          Layout.leftMargin: config.nowPlayingSpacing
+          Layout.leftMargin: config.nowPlayingLeftMargin
+          Layout.rightMargin: config.nowPlayingRightMargin
 
           visible: panel.activePlayer !== null
           implicitWidth: Math.min(nowPlayingLabel.implicitWidth + config.nowPlayingPadding, config.nowPlayingMaxWidth)
           implicitHeight: config.nowPlayingHeight
-          radius: config.nowPlayingRadius
+          radius: config.rectangleRadius
           color: config.nowPlayingBackground
 
           Text {
