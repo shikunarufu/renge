@@ -33,6 +33,10 @@ ShellRoot {
 
     // Window Title
     property color windowTitleColor: "#d8dee9"
+    property color windowTitleBackground: "#3b4252"
+    property int windowTitleRadius: 6
+    property int windowTitlePaddingH: 10
+    property int windowTitlePaddingV: 4
     property int windowTitleSpacing: 10
     property string windowTitlePlaceholder: "Desktop"
   }
@@ -97,16 +101,25 @@ ShellRoot {
         }
 
         // ── Window Title ──
-        Text {
+        Rectangle {
           Layout.leftMargin: config.windowTitleSpacing
-          text: ToplevelManager.activeToplevel
-            ? ToplevelManager.activeToplevel.title
-            : config.windowTitlePlaceholder
-          color: config.windowTitleColor
 
-          font.family: config.fontFamily
-          font.pixelSize: config.fontSize
-          elide: Text.ElideRight
+          implicitWidth: windowTitleText.implicitWidth + config.windowTitlePaddingH * 2
+          implicitHeight: windowTitleText.implicitHeight + config.windowTitlePaddingV * 2
+          radius: config.windowTitleRadius
+          color: config.windowTitleBackground
+
+          Text {
+            Layout.leftMargin: config.windowTitleSpacing
+            text: ToplevelManager.activeToplevel
+              ? ToplevelManager.activeToplevel.title
+              : config.windowTitlePlaceholder
+            color: config.windowTitleColor
+
+            font.family: config.fontFamily
+            font.pixelSize: config.fontSize
+            elide: Text.ElideRight
+          }
         }
       }
     }
