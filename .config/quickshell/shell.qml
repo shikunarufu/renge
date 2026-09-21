@@ -22,7 +22,9 @@ ShellRoot {
     property bool fontBold: true
 
     // Workspace
-    property int workspaceSize: 20
+    property int workspaceWidth: 20
+    property int workspaceHeight: 20
+    property int workspacePadding: 10
     property int workspaceRadius: 6
     property int workspaceSpacing: 6
     property color workspaceActiveColor: "#88c0d0"
@@ -34,9 +36,9 @@ ShellRoot {
     // Window Title
     property color windowTitleColor: "#d8dee9"
     property color windowTitleBackground: "#3b4252"
+    property int windowTitleHeight: 20
     property int windowTitleRadius: 6
-    property int windowTitlePaddingH: 10
-    property int windowTitlePaddingV: 4
+    property int windowTitlePadding: 12
     property int windowTitleSpacing: 10
     property string windowTitlePlaceholder: "Desktop"
   }
@@ -46,45 +48,53 @@ ShellRoot {
     model: Quickshell.screens
 
     PanelWindow {
-      required property ShellScreen modelData
-      screen: modelData
+      id: panel
 
+      required property ShellScreen modelData
+      property var projection: WindowManager.screenProjection(modelData)
+
+      screen: modelData
       implicitHeight: config.barHeight
       color: config.barBackground
+
       margins {
         top: config.marginTop
         left: config.marginLeft
       }
+
       anchors {
         top: true
         left: true
         right: true
       }
 
-      property var projection: WindowManager.screenProjection(modelData)
-
       // ── Workspace ──
       RowLayout {
+        id: barRow
+
         anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         spacing: config.workspaceSpacing
 
         Repeater {
-          model: projection ? projection.windowsets : []
+          model: panel.projection ? panel.projection.windowsets : []
 
           delegate: Rectangle {
+            id: workspaceDelegate
+
             property var ws: modelData
 
             visible: ws.shouldDisplay
-            implicitWidth: Math.max(config.workspaceSize, label.implicitWidth + config.workspaceSize * 0.6)
-            implicitHeight: config.workspaceSize
+            implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
+            implicitHeight: config.workspaceHeight
             radius: config.workspaceRadius
             color: ws.urgent
             ? config.workspaceUrgentColor
             : (ws.active ? config.workspaceActiveColor : config.workspaceInactiveColor)
 
             Text {
-              id: label
+              id: workspaceLabel
+
               anchors.centerIn: parent
               text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
               color: ws.active ? config.workspaceActiveTextColor : config.workspaceInactiveTextColor
@@ -96,22 +106,26 @@ ShellRoot {
 
             MouseArea {
               anchors.fill: parent
-              onClicked: if (ws.canActivate) ws.activate()
+              onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
             }
           }
         }
 
         // ── Window Title ──
         Rectangle {
+          id: windowTitleLabel
+
           Layout.leftMargin: config.windowTitleSpacing
 
-          implicitWidth: windowTitleText.implicitWidth + config.windowTitlePaddingH * 2
-          implicitHeight: windowTitleText.implicitHeight + config.windowTitlePaddingV * 2
+          implicitWidth: windowTitleLabel.implicitWidth + config.windowTitlePadding
+          implicitHeight: config.windowTitleHeight
           radius: config.windowTitleRadius
           color: config.windowTitleBackground
 
           Text {
-            Layout.leftMargin: config.windowTitleSpacing
+            id: windowTitleLabel
+
+            anchors.centerIn: parent
             text: ToplevelManager.activeToplevel
             ? ToplevelManager.activeToplevel.title
             : config.windowTitlePlaceholder
