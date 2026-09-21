@@ -555,6 +555,10 @@ makepkg --syncdeps --install --noconfirm
 # Apply config files
 cp --recursive /renge/.config /home/"${USERNAME}"/.config
 
+# Audio players
+runuser --user="${USERNAME}" -- mkdir /home/"${USERNAME}"/.config/mpd/playlists
+runuser --user="${USERNAME}" -- mkdir --parents /home/"${USERNAME}"/.local/state/mpd
+
 # Sound system
 amixer sset Master unmute
 amixer sset Speaker unmute
