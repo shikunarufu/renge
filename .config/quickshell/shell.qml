@@ -7,69 +7,56 @@ import Quickshell.Services.Mpris
 
 ShellRoot {
 
-  // ─────────────────── Configuration (Okinami — MonochromeAccentDark) ───────────────────
+  // ─────────── Configuration (Okinami island bar, measured from screenshot) ───────────
+  // Shape: a thin full-width "rail" sits flush at the very top of the screen, and each
+  // widget group hangs from it as its own pill with square top corners (fused into the
+  // rail) and rounded bottom corners — not one continuous floating bar.
   QtObject {
     id: config
 
-    // Bar — floating "island" shell, matches yasb-bar.adaptive edgeradius/border
-    property int barHeight: 35
-    property int marginTop: 6
-    property int marginLeft: 8
-    property int marginRight: 8
-    property int barPaddingH: 14
-    property int edgeRadius: 22       // outer bar corner radius (-qproperty-edgeradius)
-    property int islandRadius: 14     // per-group pill radius  (--border-radius)
-    property int smallRadius: 4       // workspace pill radius  (--border-radius2)
-    property int borderWidth: 1
-    property color barBackground: "#18181b"   // --background
-    property color barBorderColor: "#3f3f42"  // --border
+    // Bar
+    property int barHeight: 40        // total height incl. rail
+    property int railHeight: 6        // thin connecting strip across the full width
+    property int islandRadius: 16     // bottom-corner radius of each hanging group
+    property int groupPaddingH: 14    // horizontal padding inside each island
+    property color barBackground: "#18181b"
 
-    // Font — Okinami uses Segoe UI Variable, semi-bold, 12px
+    // Font
     property string fontFamily: "Segoe UI Variable"
-    property int fontSize: 12
+    property int fontSize: 13
     property int fontWeight: Font.DemiBold
-    property bool fontBold: false
+    property string iconFontFamily: "JetBrainsMono Nerd Font"
+    property int iconSize: 15
 
     // Palette
-    property color colorText: "#e5e7eb"        // --text
-    property color colorBackground2: "#3f3f42" // --background2 / --mutedBG
-    property color colorAccent: "#9599b2"      // --accent (normally system accent color; tune to taste)
-    property color colorAccentText: "#18181b"  // --accentText
+    property color colorText: "#e5e7eb"
+    property color colorAccent: "#e2a97b"      // sampled from the active workspace pill
+    property color colorAccentText: "#18181b"
+    property color separatorColor: "#5a5a5e"
 
-    // Workspace (komorebi-workspaces .ws-btn)
-    property int workspaceWidth: 20
-    property int rectangleHeight: 20
-    property int workspacePadding: 12
-    property int workspaceSpacing: 6
-    property int workspaceRadius: smallRadius
+    // Workspace pill
+    property int workspaceWidth: 22
+    property int workspaceHeight: 22
+    property int workspacePadding: 14
+    property int workspaceSpacing: 8
+    property int workspaceRadius: 5
     property color workspaceActiveColor: colorAccent
-    property color workspaceInactiveColor: colorBackground2
-    property color workspaceUrgentColor: "#e5e7eb"   // --redFlash in this variant is monochrome
+    property color workspaceInactiveColor: "transparent"
+    property color workspaceUrgentColor: colorAccent
     property color workspaceActiveTextColor: colorAccentText
     property color workspaceInactiveTextColor: colorText
 
-    // Window Title (.widget pill)
-    property int windowTitlePadding: 16
-    property int windowTitleLeftMargin: 8
-    property int windowTitleRightMargin: 6
-    property int windowTitleRadius: islandRadius
+    // Window title (icon + text, no pill behind it)
     property color windowTitleColor: colorText
-    property color windowTitleBackgroundColor: colorBackground2
+    property string windowTitleIcon: "\uebc4" // nf-cod-terminal
     property string windowTitlePlaceholder: "Desktop"
 
-    // Now Playing (.widget pill)
-    property int nowPlayingLeftMargin: 6
-    property int nowPlayingRightMargin: 0
-    property int nowPlayingPadding: 16
-    property int nowPlayingHeight: rectangleHeight
-    property int nowPlayingMaxWidth: 280
-    property int nowPlayingRadius: islandRadius
-    property color nowPlayingBackground: colorBackground2
+    // Now playing (its own island, center of bar)
     property color nowPlayingColor: colorText
-    property string nowPlayingIcon: "\uf001" // nf-fa-music
-    property string iconFontFamily: "JetBrainsMono Nerd Font"
+    property int nowPlayingMaxWidth: 420
+    property string nowPlayingSeparator: " • "
   }
-  // ─────────────────────────────────────────────────────
+  // ───────────────────────────────────────────────────────────────────────────────────
 
   // ── Bar ──
   Variants {
@@ -81,7 +68,7 @@ ShellRoot {
       required property ShellScreen modelData
       property var projection: WindowManager.screenProjection(modelData)
 
-      // MPRIS: pick the first active/playing player, mirroring panel.activePlayer
+      // MPRIS: pick the first active/playing player
       property var activePlayer: {
         for (const p of Mpris.players.values) {
           if (p.playbackState === MprisPlaybackState.Playing) return p;
@@ -91,134 +78,101 @@ ShellRoot {
 
       screen: modelData
       implicitHeight: config.barHeight
-      color: "transparent" // window surface stays transparent; the pill below draws the bar
+      color: "transparent"
 
-      margins {
-        top: config.marginTop
-        left: config.marginLeft
-        right: config.marginRight
-      }
+      margins { top: 0; left: 0; right: 0 }
+      anchors { top: true; left: true; right: true }
 
-      anchors {
-        top: true
-        left: true
-        right: true
-      }
-
-      // ── Floating island bar background ──
+      // ── Connecting rail: fills the gaps between islands so the top edge reads as
+      //    one continuous line, exactly like the reference screenshot. ──
       Rectangle {
-        anchors.fill: parent
-        radius: config.edgeRadius
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: config.railHeight
         color: config.barBackground
-        border.width: config.borderWidth
-        border.color: config.barBorderColor
       }
 
-      // ── Workspace ──
-      RowLayout {
-        id: barRow
+      // ── Left island: workspaces + active window ──
+      Rectangle {
+        id: leftIsland
 
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.left: parent.left
-        anchors.leftMargin: config.barPaddingH
-        anchors.rightMargin: config.barPaddingH
-        spacing: config.workspaceSpacing
+        x: 0
+        y: 0
+        height: config.barHeight
+        width: leftRow.implicitWidth + config.groupPaddingH * 2
+        color: config.barBackground
 
-        Repeater {
-          model: panel.projection ? panel.projection.windowsets : []
+        topLeftRadius: 0
+        topRightRadius: 0
+        bottomLeftRadius: config.islandRadius
+        bottomRightRadius: config.islandRadius
 
-          delegate: Rectangle {
-            id: workspaceDelegate
+        RowLayout {
+          id: leftRow
+          anchors.centerIn: parent
+          spacing: config.workspaceSpacing
 
-            property var ws: modelData
+          Repeater {
+            model: panel.projection ? panel.projection.windowsets : []
 
-            visible: ws.shouldDisplay
-            implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
-            implicitHeight: config.rectangleHeight
-            radius: config.workspaceRadius
-            color: ws.urgent
-            ? config.workspaceUrgentColor
-            : (ws.active ? config.workspaceActiveColor : config.workspaceInactiveColor)
+            delegate: Rectangle {
+              id: workspaceDelegate
 
-            Text {
-              id: workspaceLabel
+              property var ws: modelData
 
-              anchors.centerIn: parent
-              text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
-              color: ws.active ? config.workspaceActiveTextColor : config.workspaceInactiveTextColor
+              visible: ws.shouldDisplay
+              implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
+              implicitHeight: config.workspaceHeight
+              radius: config.workspaceRadius
+              color: ws.urgent
+              ? config.workspaceUrgentColor
+              : (ws.active ? config.workspaceActiveColor : config.workspaceInactiveColor)
 
-              font.family: config.fontFamily
-              font.pixelSize: config.fontSize
-              font.weight: config.fontWeight
-            }
+              Text {
+                id: workspaceLabel
 
-            MouseArea {
-              anchors.fill: parent
-              onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
+                anchors.centerIn: parent
+                text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
+                color: ws.active ? config.workspaceActiveTextColor : config.workspaceInactiveTextColor
+
+                font.family: config.fontFamily
+                font.pixelSize: config.fontSize
+                font.weight: config.fontWeight
+              }
+
+              MouseArea {
+                anchors.fill: parent
+                onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
+              }
             }
           }
-        }
 
-        // ── Window Title ──
-        Rectangle {
-          id: windowTitle
-
-          Layout.leftMargin: config.windowTitleLeftMargin
-          Layout.rightMargin: config.windowTitleRightMargin
-
-          implicitWidth: windowTitleLabel.implicitWidth + config.windowTitlePadding
-          implicitHeight: config.rectangleHeight
-          radius: config.windowTitleRadius
-          color: config.windowTitleBackgroundColor
-
+          // divider between workspaces and the active window title
           Text {
-            id: windowTitleLabel
-
-            anchors.centerIn: parent
-            text: ToplevelManager.activeToplevel
-            ? ToplevelManager.activeToplevel.appId
-            : config.windowTitlePlaceholder
-            color: config.windowTitleColor
-
+            text: "|"
+            color: config.separatorColor
             font.family: config.fontFamily
             font.pixelSize: config.fontSize
-            font.weight: config.fontWeight
-            elide: Text.ElideRight
           }
-        }
 
-        // ── Now Playing ──
-        Rectangle {
-          id: nowPlaying
-
-          Layout.leftMargin: config.nowPlayingLeftMargin
-          Layout.rightMargin: config.nowPlayingRightMargin
-
-          visible: panel.activePlayer !== null
-          implicitWidth: Math.min(nowPlayingRow.implicitWidth + config.nowPlayingPadding, config.nowPlayingMaxWidth)
-          implicitHeight: config.nowPlayingHeight
-          radius: config.nowPlayingRadius
-          color: config.nowPlayingBackground
-
-          Row {
-            id: nowPlayingRow
-            anchors.centerIn: parent
-            spacing: 4
+          // ── Active window (icon + text, plain, no pill background) ──
+          RowLayout {
+            spacing: 6
 
             Text {
-              text: config.nowPlayingIcon
-              color: config.nowPlayingColor
+              text: config.windowTitleIcon
+              color: config.windowTitleColor
               font.family: config.iconFontFamily
-              font.pixelSize: config.fontSize
+              font.pixelSize: config.iconSize
             }
 
             Text {
-              id: nowPlayingLabel
-              width: Math.min(implicitWidth, config.nowPlayingMaxWidth - config.nowPlayingPadding - 20)
-              text: panel.activePlayer
-              ? `${panel.activePlayer.trackArtist || "Unknown Artist"} – ${panel.activePlayer.trackTitle || "Unknown Track"}`
-              : ""
-              color: config.nowPlayingColor
+              id: windowTitleLabel
+              text: ToplevelManager.activeToplevel
+              ? ToplevelManager.activeToplevel.appId
+              : config.windowTitlePlaceholder
+              color: config.windowTitleColor
 
               font.family: config.fontFamily
               font.pixelSize: config.fontSize
@@ -226,6 +180,39 @@ ShellRoot {
               elide: Text.ElideRight
             }
           }
+        }
+      }
+
+      // ── Center island: now playing ──
+      Rectangle {
+        id: nowPlayingIsland
+
+        anchors.horizontalCenter: parent.horizontalCenter
+        y: 0
+        height: config.barHeight
+        width: nowPlayingLabel.implicitWidth + config.groupPaddingH * 2
+        visible: panel.activePlayer !== null
+        color: config.barBackground
+
+        topLeftRadius: 0
+        topRightRadius: 0
+        bottomLeftRadius: config.islandRadius
+        bottomRightRadius: config.islandRadius
+
+        Text {
+          id: nowPlayingLabel
+
+          anchors.centerIn: parent
+          width: Math.min(implicitWidth, config.nowPlayingMaxWidth)
+          text: panel.activePlayer
+          ? `${panel.activePlayer.trackArtist || "Unknown Artist"}${config.nowPlayingSeparator}${panel.activePlayer.trackTitle || "Unknown Track"}`
+          : ""
+          color: config.nowPlayingColor
+
+          font.family: config.fontFamily
+          font.pixelSize: config.fontSize
+          font.weight: config.fontWeight
+          elide: Text.ElideRight
         }
       }
     }
