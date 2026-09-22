@@ -48,25 +48,6 @@ ShellRoot {
     // Now Playing
     property int nowPlayingLeftMargin: 0
     property int nowPlayingRightMargin: 0
-    property int nowPlayingMaxWidth: 260
-    property color nowPlayingColor: "#d8dee9"
-    property string nowPlayingPlaceholder: "Nothing playing"
-
-    // Left cluster (workspace group / layout mode / launcher)
-    property string homeLabel: "家"
-    property string layoutModeLabel: "BSP"
-    property color leftLabelColor: "#d8dee9"
-
-    // Shared
-    property color separatorColor: "#4c566a"
-    property color iconColor: "#d8dee9"
-    property string iconFontFamily: "JetBrainsMono Nerd Font"
-
-    // Right cluster (clock / status icons)
-    property color clockColor: "#d8dee9"
-    property string clockFormat: "ddd, d MMM HH:mm"
-    property int volumePercent: 50   // TODO: wire to a real audio service (e.g. Pipewire)
-    property string currentLang: "en" // TODO: wire to a real keyboard-layout service
   }
   // ─────────────────────────────────────────────────────
 
@@ -79,8 +60,6 @@ ShellRoot {
 
       required property ShellScreen modelData
       property var projection: WindowManager.screenProjection(modelData)
-      // TODO: wire this to a real MPRIS source, e.g. Quickshell.Services.Mpris
-      property var activePlayer: null
       screen: modelData
 
       implicitHeight: config.barHeight + config.barRadius
@@ -99,9 +78,9 @@ ShellRoot {
         Rectangle {
           id: leftBar
           color: config.barColor
-          implicitWidth: barRow.implicitWidth + config.marginLeft * 2
+          Layout.preferredWidth: 100
           Layout.preferredHeight: config.barHeight
-          bottomRightRadius: config.barRadius
+          bottomRightRadius: 6
 
           // ── Workspace ──
           RowLayout {
@@ -109,26 +88,7 @@ ShellRoot {
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-            anchors.leftMargin: config.marginLeft
             spacing: config.workspaceSpacing
-
-            // ── Home / launcher label ──
-            Text {
-              text: config.homeLabel
-              color: config.leftLabelColor
-              font.family: config.fontFamily
-              font.pixelSize: config.fontSize
-              font.bold: config.fontBold
-            }
-
-            // ── Layout mode (e.g. BSP, tiling, floating) ──
-            Text {
-              text: config.layoutModeLabel
-              color: config.leftLabelColor
-              font.family: config.fontFamily
-              font.pixelSize: config.fontSize
-              font.bold: config.fontBold
-            }
 
             Repeater {
               model: panel.projection ? panel.projection.windowsets : []
@@ -165,156 +125,79 @@ ShellRoot {
               }
             }
 
-              // ── Separator ──
+              // ── Window Title ──
+              Rectangle {
+                  id: windowTitle
+
+                  Layout.leftMargin: config.windowTitleLeftMargin
+                  Layout.rightMargin: config.windowTitleRightMargin
+
+                  implicitWidth: windowTitleLabel.implicitWidth + config.windowTitlePadding
+                  implicitHeight: config.rectangleHeight
+                  radius: config.rectangleRadius
+                  color: config.windowTitleBackgroundColor
+
+                  Text {
+                      id: windowTitleLabel
+
+                      anchors.centerIn: parent
+                      text: ToplevelManager.activeToplevel
+                      ? ToplevelManager.activeToplevel.appId
+                      : config.windowTitlePlaceholder
+                      color: config.windowTitleColor
+
+                      font.family: config.fontFamily
+                      font.pixelSize: config.fontSize
+                      elide: Text.ElideRight
+                  }
+              }
+
+              // ── Now Playing ──
+            Rectangle {
+              id: nowPlaying
+
+              Layout.leftMargin: config.nowPlayingLeftMargin
+              Layout.rightMargin: config.nowPlayingRightMargin
+
+              visible: panel.activePlayer !== null
+              implicitWidth: Math.min(nowPlayingLabel.implicitWidth + config.nowPlayingPadding, config.nowPlayingMaxWidth)
+              implicitHeight: config.nowPlayingHeight
+              radius: config.rectangleRadius
+              color: config.nowPlayingBackground
+
               Text {
-                text: "|"
-                color: config.separatorColor
+                id: nowPlayingLabel
+
+                anchors.centerIn: parent
+                width: parent.width - config.nowPlayingPadding
+                text: panel.activePlayer
+                ? `${config.nowPlayingIcon} ${panel.activePlayer.trackArtist || "Unknown Artist"} – ${panel.activePlayer.trackTitle || "Unknown Track"}`
+                : ""
+                color: config.nowPlayingColor
+
                 font.family: config.fontFamily
                 font.pixelSize: config.fontSize
+                elide: Text.ElideRight
               }
-
-              // ── Search ──
-              Text {
-                text: "\uf002" // nf-fa-search
-                color: config.iconColor
-                font.family: config.iconFontFamily
-                font.pixelSize: config.fontSize
-              }
-
-              // ── Active window / terminal ──
-              RowLayout {
-                spacing: 6
-
-                Text {
-                  text: "\uf120" // nf-fa-terminal
-                  color: config.iconColor
-                  font.family: config.iconFontFamily
-                  font.pixelSize: config.fontSize
-                }
-
-                Text {
-                  text: ToplevelManager.activeToplevel
-                  ? ToplevelManager.activeToplevel.appId
-                  : config.windowTitlePlaceholder
-                  color: config.windowTitleColor
-                  font.family: config.fontFamily
-                  font.pixelSize: config.fontSize
-                  elide: Text.ElideRight
-                }
-              }
+            }
           }
         }
 
         Rectangle {
           id: centerBar
-          color: "transparent"
+          color: transparent
           Layout.fillWidth: true
           Layout.preferredHeight: config.barHeight
           Layout.alignment: Qt.VCenter
+          bottomRadius: 6
         }
 
         Rectangle {
           id: rightBar
           color: config.barColor
-          implicitWidth: rightRow.implicitWidth + config.marginLeft * 2
+          Layout.preferredWidth: 100
           Layout.preferredHeight: config.barHeight
-          bottomLeftRadius: config.barRadius
-
-          // live clock, ticks once a second
-          property date currentTime: new Date()
-          Timer {
-            interval: 1000
-            running: true
-            repeat: true
-            onTriggered: rightBar.currentTime = new Date()
-          }
-
-          RowLayout {
-            id: rightRow
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-            anchors.rightMargin: config.marginLeft
-            spacing: config.workspaceSpacing
-
-            // ── Clock ──
-            Text {
-              text: Qt.formatDateTime(rightBar.currentTime, config.clockFormat)
-              color: config.clockColor
-              font.family: config.fontFamily
-              font.pixelSize: config.fontSize
-              font.bold: config.fontBold
-            }
-
-            // ── Now Playing ──
-            Text {
-              text: panel.activePlayer
-              ? `${panel.activePlayer.trackArtist || "Unknown Artist"} • ${panel.activePlayer.trackTitle || "Unknown Track"}`
-              : config.nowPlayingPlaceholder
-              color: config.nowPlayingColor
-              font.family: config.fontFamily
-              font.pixelSize: config.fontSize
-              elide: Text.ElideRight
-              Layout.maximumWidth: config.nowPlayingMaxWidth
-            }
-
-            // ── Dropdown (e.g. quick settings) ──
-            Text {
-              text: "\uf078" // nf-fa-chevron_down
-              color: config.iconColor
-              font.family: config.iconFontFamily
-              font.pixelSize: config.fontSize
-            }
-
-            // ── Screenshot / gallery ──
-            Text {
-              text: "\uf03e" // nf-fa-picture_o
-              color: config.iconColor
-              font.family: config.iconFontFamily
-              font.pixelSize: config.fontSize
-            }
-
-            // ── Volume ──
-            RowLayout {
-              spacing: 4
-              Text {
-                text: "\uf028" // nf-fa-volume_up
-                color: config.iconColor
-                font.family: config.iconFontFamily
-                font.pixelSize: config.fontSize
-              }
-              Text {
-                text: config.volumePercent + "%"
-                color: config.iconColor
-                font.family: config.fontFamily
-                font.pixelSize: config.fontSize
-              }
-            }
-
-            // ── Notifications ──
-            Text {
-              text: "\uf0f3" // nf-fa-bell
-              color: config.iconColor
-              font.family: config.iconFontFamily
-              font.pixelSize: config.fontSize
-            }
-
-            // ── Keyboard layout / language ──
-            Text {
-              text: config.currentLang
-              color: config.iconColor
-              font.family: config.fontFamily
-              font.pixelSize: config.fontSize
-            }
-
-            // ── Settings ──
-            Text {
-              text: "\uf013" // nf-fa-cog
-              color: config.iconColor
-              font.family: config.iconFontFamily
-              font.pixelSize: config.fontSize
-            }
-          }
+          bottomLeftRadius: 6
         }
       }
     }
