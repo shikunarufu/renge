@@ -1,188 +1,233 @@
 import QtQuick
 import QtQuick.Layouts
-import QtQuick.Shapes
 import Quickshell
-import Quickshell.Widgets
+import Quickshell.WindowManager
+import Quickshell.Wayland
+import Quickshell.Services.Mpris
 
 ShellRoot {
-    // ==========================================
-    // THEME PALETTE: Okinami (Catppuccin Mocha Style)
-    // ==========================================
-    readonly property var colors: {
-        "bg": "#1e1e2e",       // Base background
-        "crust": "#11111b",    // Darker contrast sections
-        "wave1": "#89b4fa",    // Soft Blue Wave
-        "wave2": "#f5c2e7",    // Mauve/Pink Wave
-        "text": "#cdd6f4",     // Main text color
-        "subtext": "#a6adc8"   // Dimmed text color
-    }
 
-    // ==========================================
-    // DATA TIMERS (For dynamic updates)
-    // ==========================================
-    property string currentTime: "00:00 AM"
+  // ─────────────────── Configuration (Okinami — MonochromeAccentDark) ───────────────────
+  QtObject {
+    id: config
 
-    Timer {
-        id: clockTimer
-        interval: 1000
-        running: true
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: {
-            currentTime = new Date().toLocaleTimeString(Qt.locale(), "hh:mm A")
-        }
-    }
+    // Bar — floating "island" shell, matches yasb-bar.adaptive edgeradius/border
+    property int barHeight: 35
+    property int marginTop: 6
+    property int marginLeft: 8
+    property int marginRight: 8
+    property int barPaddingH: 14
+    property int edgeRadius: 22       // outer bar corner radius (-qproperty-edgeradius)
+    property int islandRadius: 14     // per-group pill radius  (--border-radius)
+    property int smallRadius: 4       // workspace pill radius  (--border-radius2)
+    property int borderWidth: 1
+    property color barBackground: "#18181b"   // --background
+    property color barBorderColor: "#3f3f42"  // --border
 
-    // ==========================================
-    // BAR WINDOW CONFIGURATION
-    // ==========================================
+    // Font — Okinami uses Segoe UI Variable, semi-bold, 12px
+    property string fontFamily: "Segoe UI Variable"
+    property int fontSize: 12
+    property int fontWeight: Font.DemiBold
+    property bool fontBold: false
+
+    // Palette
+    property color colorText: "#e5e7eb"        // --text
+    property color colorBackground2: "#3f3f42" // --background2 / --mutedBG
+    property color colorAccent: "#9599b2"      // --accent (normally system accent color; tune to taste)
+    property color colorAccentText: "#18181b"  // --accentText
+
+    // Workspace (komorebi-workspaces .ws-btn)
+    property int workspaceWidth: 20
+    property int rectangleHeight: 20
+    property int workspacePadding: 12
+    property int workspaceSpacing: 6
+    property int workspaceRadius: smallRadius
+    property color workspaceActiveColor: colorAccent
+    property color workspaceInactiveColor: colorBackground2
+    property color workspaceUrgentColor: "#e5e7eb"   // --redFlash in this variant is monochrome
+    property color workspaceActiveTextColor: colorAccentText
+    property color workspaceInactiveTextColor: colorText
+
+    // Window Title (.widget pill)
+    property int windowTitlePadding: 16
+    property int windowTitleLeftMargin: 8
+    property int windowTitleRightMargin: 6
+    property int windowTitleRadius: islandRadius
+    property color windowTitleColor: colorText
+    property color windowTitleBackgroundColor: colorBackground2
+    property string windowTitlePlaceholder: "Desktop"
+
+    // Now Playing (.widget pill)
+    property int nowPlayingLeftMargin: 6
+    property int nowPlayingRightMargin: 0
+    property int nowPlayingPadding: 16
+    property int nowPlayingHeight: rectangleHeight
+    property int nowPlayingMaxWidth: 280
+    property int nowPlayingRadius: islandRadius
+    property color nowPlayingBackground: colorBackground2
+    property color nowPlayingColor: colorText
+    property string nowPlayingIcon: "\uf001" // nf-fa-music
+    property string iconFontFamily: "JetBrainsMono Nerd Font"
+  }
+  // ─────────────────────────────────────────────────────
+
+  // ── Bar ──
+  Variants {
+    model: Quickshell.screens
+
     PanelWindow {
-        id: topBar
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        height: 32
-        
-        // Transparent base allows our custom inner borders/shapes to look flawless
-        color: "transparent"
+      id: panel
 
-        Rectangle {
-            anchors.fill: parent
-            color: colors.bg
+      required property ShellScreen modelData
+      property var projection: WindowManager.screenProjection(modelData)
 
-            RowLayout {
-                anchors.fill: parent
-                spacing: 0
-
-                // ==========================================
-                // LEFT SECTION: Workspaces / Tags
-                // ==========================================
-                Row {
-                    Layout.fillHeight: true
-                    spacing: 12
-                    leftPadding: 15
-                    rightPadding: 15
-
-                    Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: "              " 
-                        font.family: "JetBrainsMono Nerd Font Propo"
-                        font.pointSize: 11
-                        color: colors.text
-                    }
-                }
-
-                // Flexible Spacer
-                Item { Layout.fillWidth: true }
-
-                // ==========================================
-                // CENTER SECTION: Clock & Date with Okinami Curve
-                // ==========================================
-                Rectangle {
-                    Layout.fillHeight: true
-                    width: 140
-                    color: colors.crust
-                    clip: false // Allows the wave accent to bleed outward naturally
-
-                    // Left Transition: Smooth Bezier Wave 
-                    Shape {
-                        width: 16
-                        height: parent.height
-                        anchors.right: parent.left
-                        
-                        ShapePath {
-                            fillColor: colors.crust
-                            strokeColor: "transparent"
-                            startX: 16; startY: 0
-                            PathCubic {
-                                x: 0; y: parent.height
-                                control1X: 8; control1Y: 0
-                                control2X: 8; control2Y: parent.height
-                            }
-                            PathLine { x: 16; y: parent.height }
-                            PathLine { x: 16; y: 0 }
-                        }
-                    }
-
-                    // Right Transition: Symmetrical Wave Cap
-                    Shape {
-                        width: 16
-                        height: parent.height
-                        anchors.left: parent.right
-                        
-                        ShapePath {
-                            fillColor: colors.crust
-                            strokeColor: "transparent"
-                            startX: 0; startY: 0
-                            PathCubic {
-                                x: 16; y: parent.height
-                                control1X: 8; control1Y: 0
-                                control2X: 8; control2Y: parent.height
-                            }
-                            PathLine { x: 0; y: parent.height }
-                            PathLine { x: 0; y: 0 }
-                        }
-                    }
-
-                    // Displaying Live Time String
-                    Text {
-                        anchors.centerIn: parent
-                        text: currentTime
-                        font.family: "JetBrainsMono Nerd Font Propo"
-                        font.bold: true
-                        font.pointSize: 10
-                        color: colors.wave1
-                    }
-                }
-
-                // Flexible Spacer
-                Item { Layout.fillWidth: true }
-
-                // ==========================================
-                // RIGHT SECTION: Hard-coded System Status Capsule
-                // ==========================================
-                Row {
-                    Layout.fillHeight: true
-                    rightPadding: 0 
-                    
-                    // Container for system stats
-                    Rectangle {
-                        height: parent.height
-                        width: 180
-                        color: colors.wave2
-
-                        // Left entry wave logic for the capsule edge
-                        Shape {
-                            width: 16
-                            height: parent.height
-                            anchors.right: parent.left
-                            
-                            ShapePath {
-                                fillColor: colors.wave2
-                                strokeColor: "transparent"
-                                startX: 16; startY: 0
-                                PathCubic {
-                                    x: 0; y: parent.height
-                                    control1X: 8; control1Y: 0
-                                    control2X: 8; control2Y: parent.height
-                                }
-                                PathLine { x: 16; y: parent.height }
-                                PathLine { x: 16; y: 0 }
-                            }
-                        }
-
-                        Text {
-                            anchors.centerIn: parent
-                            text: "   42%     80%     100%"
-                            font.family: "JetBrainsMono Nerd Font Propo"
-                            font.bold: true
-                            font.pointSize: 9
-                            color: colors.bg // High contrast dark text on bright accent base
-                        }
-                    }
-                }
-
-            }
+      // MPRIS: pick the first active/playing player, mirroring panel.activePlayer
+      property var activePlayer: {
+        for (const p of Mpris.players.values) {
+          if (p.playbackState === MprisPlaybackState.Playing) return p;
         }
+        return Mpris.players.values.length > 0 ? Mpris.players.values[0] : null;
+      }
+
+      screen: modelData
+      implicitHeight: config.barHeight
+      color: "transparent" // window surface stays transparent; the pill below draws the bar
+
+      margins {
+        top: config.marginTop
+        left: config.marginLeft
+        right: config.marginRight
+      }
+
+      anchors {
+        top: true
+        left: true
+        right: true
+      }
+
+      // ── Floating island bar background ──
+      Rectangle {
+        anchors.fill: parent
+        radius: config.edgeRadius
+        color: config.barBackground
+        border.width: config.borderWidth
+        border.color: config.barBorderColor
+      }
+
+      // ── Workspace ──
+      RowLayout {
+        id: barRow
+
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.left: parent.left
+        anchors.leftMargin: config.barPaddingH
+        anchors.rightMargin: config.barPaddingH
+        spacing: config.workspaceSpacing
+
+        Repeater {
+          model: panel.projection ? panel.projection.windowsets : []
+
+          delegate: Rectangle {
+            id: workspaceDelegate
+
+            property var ws: modelData
+
+            visible: ws.shouldDisplay
+            implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
+            implicitHeight: config.rectangleHeight
+            radius: config.workspaceRadius
+            color: ws.urgent
+            ? config.workspaceUrgentColor
+            : (ws.active ? config.workspaceActiveColor : config.workspaceInactiveColor)
+
+            Text {
+              id: workspaceLabel
+
+              anchors.centerIn: parent
+              text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
+              color: ws.active ? config.workspaceActiveTextColor : config.workspaceInactiveTextColor
+
+              font.family: config.fontFamily
+              font.pixelSize: config.fontSize
+              font.weight: config.fontWeight
+            }
+
+            MouseArea {
+              anchors.fill: parent
+              onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
+            }
+          }
+        }
+
+        // ── Window Title ──
+        Rectangle {
+          id: windowTitle
+
+          Layout.leftMargin: config.windowTitleLeftMargin
+          Layout.rightMargin: config.windowTitleRightMargin
+
+          implicitWidth: windowTitleLabel.implicitWidth + config.windowTitlePadding
+          implicitHeight: config.rectangleHeight
+          radius: config.windowTitleRadius
+          color: config.windowTitleBackgroundColor
+
+          Text {
+            id: windowTitleLabel
+
+            anchors.centerIn: parent
+            text: ToplevelManager.activeToplevel
+            ? ToplevelManager.activeToplevel.appId
+            : config.windowTitlePlaceholder
+            color: config.windowTitleColor
+
+            font.family: config.fontFamily
+            font.pixelSize: config.fontSize
+            font.weight: config.fontWeight
+            elide: Text.ElideRight
+          }
+        }
+
+        // ── Now Playing ──
+        Rectangle {
+          id: nowPlaying
+
+          Layout.leftMargin: config.nowPlayingLeftMargin
+          Layout.rightMargin: config.nowPlayingRightMargin
+
+          visible: panel.activePlayer !== null
+          implicitWidth: Math.min(nowPlayingRow.implicitWidth + config.nowPlayingPadding, config.nowPlayingMaxWidth)
+          implicitHeight: config.nowPlayingHeight
+          radius: config.nowPlayingRadius
+          color: config.nowPlayingBackground
+
+          Row {
+            id: nowPlayingRow
+            anchors.centerIn: parent
+            spacing: 4
+
+            Text {
+              text: config.nowPlayingIcon
+              color: config.nowPlayingColor
+              font.family: config.iconFontFamily
+              font.pixelSize: config.fontSize
+            }
+
+            Text {
+              id: nowPlayingLabel
+              width: Math.min(implicitWidth, config.nowPlayingMaxWidth - config.nowPlayingPadding - 20)
+              text: panel.activePlayer
+              ? `${panel.activePlayer.trackArtist || "Unknown Artist"} – ${panel.activePlayer.trackTitle || "Unknown Track"}`
+              : ""
+              color: config.nowPlayingColor
+
+              font.family: config.fontFamily
+              font.pixelSize: config.fontSize
+              font.weight: config.fontWeight
+              elide: Text.ElideRight
+            }
+          }
+        }
+      }
     }
+  }
 }
