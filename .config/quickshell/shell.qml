@@ -19,104 +19,162 @@ ShellRoot {
   // ─────────────────────────────────────────────────────
 
   // ── Bar ──
-  Variants {
-    model: Quickshell.screens
+  Scope {
+    id: root
+
+    Variants {
+      model: Quickshell.screens
+
+      Item {
+        id: screenRoot
+
+        required property var modelData
+
+        PanelWindow {
+          exclusiveZone: config.barHeight
+          WlrLayershell.layer: WlrLayer.Bottom
+          anchors { left: true; right: true; top: true }
+          color: "transparent"
+          screen: screenRoot.modelData
+          implicitHeight: config.barHeight
+        }
+      }
+    }
+  }
+
+  // ── Left Bar ──
+  PanelWindow {
+    exclusiveZone: config.barHeight
+    anchors { left: true; right: true; top: true }
+    color: "transparent"
+    implicitHeight: config.barHeight
 
     Item {
-      id: screenRoot
+      anchors.fill: parent
 
-      required property var modelData
+      Rectangle {
+        id: leftBar
 
-      PanelWindow {
-        exclusiveZone: config.barHeight
-        WlrLayershell.layer: WlrLayer.Bottom
-        anchors { left: true; right: true; top: true }
-        color: "transparent"
-        screen: screenRoot.modelData
-        implicitHeight: config.barHeight
+        bottomRightRadius: config.barRadius
+        color: config.barColor
+        anchors { left: parent.left; top: parent.top }
+        height: config.barHeight
+        width: 100
+      }
 
-        Item {
-          anchors.fill: parent
+      // ── Left Concave ──
+      Item {
+        anchors { left: parent.left; top: parent.top }
 
-          // ── Left Bar ──
-          Rectangle {
-            id: leftBar
+        Shape {
+          id: leftConcave1
 
-            bottomRightRadius: config.barRadius
-            color: config.barColor
-            anchors { left: parent.left; top: parent.top }
-            height: config.barHeight
-            width: 100
+          preferredRendererType: Shape.CurveRenderer
+          implicitHeight: config.barRadius
+          implicitWidth: config.barRadius
+          transform: Scale {
+            xScale: 1
+            origin { x: config.barRadius / 2; y: 0 }
           }
 
-          // ── Center Bar ──
-          Rectangle {
-            id: centerBar
+          ShapePath {
+            fillColor: config.barColor
+            strokeColor: "transparent"
+            startX: config.barRadius
+            startY: 0
 
-            bottomLeftRadius: config.barRadius
-            bottomRightRadius: config.barRadius
-            color: config.barColor
-            anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
-            height: config.barHeight
-            width: 100
-          }
+            PathLine {
+              x: 0
+              y: 0
+            }
 
-          // ── Right Bar ──
-          Rectangle {
-            id: leftBar
+            PathLine {
+              x: 0
+              y: config.barRadius
+            }
 
-            bottomLeftRadius: config.barRadius
-            color: config.barColor
-            anchors { right: parent.right; top: parent.top }
-            height: config.barHeight
-            width: 100
+            PathArc {
+              direction: PathArc.Clockwise
+              radiusX: config.barRadius
+              radiusY: config.barRadius
+              x: config.barRadius
+              y: 0
+            }
           }
         }
+      }
+    }
+  }
 
-        // ── Concave ──
-        PanelWindow {
-          anchors { top: true; left: true }
-          color: "transparent"
+  // ── Center Bar ──
+  Rectangle {
+    id: centerBar
+
+    bottomLeftRadius: config.barRadius
+    bottomRightRadius: config.barRadius
+    color: config.barColor
+    anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
+    height: config.barHeight
+    width: 100
+  }
+
+  // ── Right Bar ──
+  PanelWindow {
+    exclusiveZone: config.barHeight
+    anchors { left: true; right: true; top: true }
+    color: "transparent"
+    implicitHeight: config.barHeight
+
+    Item {
+      anchors.fill: parent
+
+      Rectangle {
+        id: rightBar
+
+        bottomLeftRadius: config.barRadius
+        color: config.barColor
+        anchors { right: parent.right; top: parent.top }
+        height: config.barHeight
+        width: 100
+      }
+
+      // ── Right Concave ──
+      Item {
+        anchors { right: parent.right; top: parent.top }
+
+        Shape {
+          id: rightConcave1
+
+          preferredRendererType: Shape.CurveRenderer
+          implicitHeight: config.barRadius
+          implicitWidth: config.barRadius
+          transform: Scale {
+            xScale: -1
+            origin { x: config.barRadius / 2; y: 0 }
           }
 
-          Item {
-            anchors { top: parent.top; left: parent.left }
+          ShapePath {
+            fillColor: config.barColor
+            strokeColor: "transparent"
+            startX: config.barRadius
+            startY: 0
 
-            Shape {
-              id: concave1
+            PathLine {
+              x: 0
+              y: 0
+            }
 
-              preferredRendererType: Shape.CurveRenderer
-              implicitHeight: config.barRadius
-              implicitWidth: config.barRadius
-              transform: Scale {
-                xScale: 1
-                origin { x: config.barRadius; y: 0 }
-              }
+            PathLine {
+              x: 0
+              y: config.barRadius
+            }
 
-              ShapePath {
-                fillColor: config.barColor
-                strokeColor: "transparent"
-                startX: config.barRadius
-                startY: 0
-
-                PathLine {
-                  x: 0
-                  y: 0
-                }
-
-                PathLine {
-                  x: 0
-                  y: config.barRadius
-                }
-
-                PathArc {
-                  direction: PathArc.Clockwise
-                  radiusX: config.barRadius
-                  radiusY: config.barRadius
-                  x: config.barRadius
-                  y: 0
-                }
-              }
+            PathArc {
+              direction: PathArc.Clockwise
+              radiusX: config.barRadius
+              radiusY: config.barRadius
+              x: config.barRadius
+              y: 0
             }
           }
         }
