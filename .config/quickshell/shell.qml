@@ -52,6 +52,84 @@ ShellRoot {
               width: 100
             }
 
+            // ── Left Concave 2 ──
+            Shape {
+              id: leftConcave2
+
+              preferredRendererType: Shape.CurveRenderer
+              anchors { left: leftBar.right; top: parent.top }
+              implicitHeight: config.barRadius
+              implicitWidth: config.barRadius
+              transform: Scale {
+                xScale: 1
+                origin { x: config.barRadius / 2; y: 0 }
+              }
+
+              ShapePath {
+                fillColor: config.barColor
+                strokeColor: "transparent"
+                startX: config.barRadius
+                startY: 0
+
+                PathLine {
+                  x: 0
+                  y: 0
+                }
+
+                PathLine {
+                  x: 0
+                  y: config.barRadius
+                }
+
+                PathArc {
+                  direction: PathArc.Clockwise
+                  radiusX: config.barRadius
+                  radiusY: config.barRadius
+                  x: config.barRadius
+                  y: 0
+                }
+              }
+            }
+
+            // ── Center Concave 1 ──
+            Shape {
+              id: centerConcave1
+
+              preferredRendererType: Shape.CurveRenderer
+              anchors { right: centerBar.left; top: parent.top }
+              implicitHeight: config.barRadius
+              implicitWidth: config.barRadius
+              transform: Scale {
+                xScale: -1
+                origin { x: config.barRadius / 2; y: 0 }
+              }
+
+              ShapePath {
+                fillColor: config.barColor
+                strokeColor: "transparent"
+                startX: config.barRadius
+                startY: 0
+
+                PathLine {
+                  x: 0
+                  y: 0
+                }
+
+                PathLine {
+                  x: 0
+                  y: config.barRadius
+                }
+
+                PathArc {
+                  direction: PathArc.Clockwise
+                  radiusX: config.barRadius
+                  radiusY: config.barRadius
+                  x: config.barRadius
+                  y: 0
+                }
+              }
+            }
+
             // ── Center Bar ──
             Rectangle {
               id: centerBar
@@ -62,6 +140,84 @@ ShellRoot {
               anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
               height: config.barHeight
               width: 100
+            }
+
+            // ── Center Concave 2 ──
+            Shape {
+              id: centerConcave2
+
+              preferredRendererType: Shape.CurveRenderer
+              anchors { left: centerBar.right; top: parent.top }
+              implicitHeight: config.barRadius
+              implicitWidth: config.barRadius
+              transform: Scale {
+                xScale: 1
+                origin { x: config.barRadius / 2; y: 0 }
+              }
+
+              ShapePath {
+                fillColor: config.barColor
+                strokeColor: "transparent"
+                startX: config.barRadius
+                startY: 0
+
+                PathLine {
+                  x: 0
+                  y: 0
+                }
+
+                PathLine {
+                  x: 0
+                  y: config.barRadius
+                }
+
+                PathArc {
+                  direction: PathArc.Clockwise
+                  radiusX: config.barRadius
+                  radiusY: config.barRadius
+                  x: config.barRadius
+                  y: 0
+                }
+              }
+            }
+
+            // ── Right Concave 1 ──
+            Shape {
+              id: rightConcave1
+
+              preferredRendererType: Shape.CurveRenderer
+              anchors { right: rightBar.left; top: parent.top }
+              implicitHeight: config.barRadius
+              implicitWidth: config.barRadius
+              transform: Scale {
+                xScale: -1
+                origin { x: config.barRadius / 2; y: 0 }
+              }
+
+              ShapePath {
+                fillColor: config.barColor
+                strokeColor: "transparent"
+                startX: config.barRadius
+                startY: 0
+
+                PathLine {
+                  x: 0
+                  y: 0
+                }
+
+                PathLine {
+                  x: 0
+                  y: config.barRadius
+                }
+
+                PathArc {
+                  direction: PathArc.Clockwise
+                  radiusX: config.barRadius
+                  radiusY: config.barRadius
+                  x: config.barRadius
+                  y: 0
+                }
+              }
             }
 
             // ── Right Bar ──
@@ -75,7 +231,7 @@ ShellRoot {
               width: 100
             }
 
-            // ── Left Concave ──
+            // ── Left Concave 1 ──
             PanelWindow {
               anchors { left: true; top: true }
               color: "transparent"
@@ -83,7 +239,7 @@ ShellRoot {
               implicitWidth: config.barRadius
 
               Shape {
-                id: leftConcave
+                id: leftConcave1
 
                 preferredRendererType: Shape.CurveRenderer
                 implicitHeight: config.barRadius
@@ -120,7 +276,7 @@ ShellRoot {
               }
             }
 
-            // ── Right Concave ──
+            // ── Right Concave 2 ──
             PanelWindow {
               anchors { right: true; top: true }
               color: "transparent"
@@ -128,13 +284,13 @@ ShellRoot {
               implicitWidth: config.barRadius
 
               Shape {
-                id: rightConcave
+                id: rightConcave2
 
                 preferredRendererType: Shape.CurveRenderer
                 implicitHeight: config.barRadius
                 implicitWidth: config.barRadius
                 transform: Scale {
-                  xScale: 1
+                  xScale: -1
                   origin { x: config.barRadius / 2; y: 0 }
                 }
 
