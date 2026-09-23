@@ -37,144 +37,135 @@ ShellRoot {
           color: "transparent"
           screen: screenRoot.modelData
           implicitHeight: config.barHeight
-        }
-      }
-    }
-  }
 
-  // ── Left Bar ──
-  PanelWindow {
-    exclusiveZone: config.barHeight
-    anchors { left: true; right: true; top: true }
-    color: "transparent"
-    implicitHeight: config.barHeight
+          Item {
+            anchors.fill: parent
 
-    Item {
-      anchors.fill: parent
+            Rectangle {
+              id: leftBar
 
-      Rectangle {
-        id: leftBar
-
-        bottomRightRadius: config.barRadius
-        color: config.barColor
-        anchors { left: parent.left; top: parent.top }
-        height: config.barHeight
-        width: 100
-      }
-
-      // ── Left Concave ──
-      Item {
-        anchors { left: parent.left; top: parent.top }
-
-        Shape {
-          id: leftConcave1
-
-          preferredRendererType: Shape.CurveRenderer
-          implicitHeight: config.barRadius
-          implicitWidth: config.barRadius
-          transform: Scale {
-            xScale: 1
-            origin { x: config.barRadius / 2; y: 0 }
-          }
-
-          ShapePath {
-            fillColor: config.barColor
-            strokeColor: "transparent"
-            startX: config.barRadius
-            startY: 0
-
-            PathLine {
-              x: 0
-              y: 0
+              bottomRightRadius: config.barRadius
+              color: config.barColor
+              anchors { left: parent.left; top: parent.top }
+              height: config.barHeight
+              width: 100
             }
 
-            PathLine {
-              x: 0
-              y: config.barRadius
+            Rectangle {
+              id: centerBar
+
+              bottomLeftRadius: config.barRadius
+              bottomRightRadius: config.barRadius
+              color: config.barColor
+              anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
+              height: config.barHeight
+              width: 100
             }
 
-            PathArc {
-              direction: PathArc.Clockwise
-              radiusX: config.barRadius
-              radiusY: config.barRadius
-              x: config.barRadius
-              y: 0
-            }
-          }
-        }
-      }
-    }
-  }
+            Rectangle {
+              id: rightBar
 
-  // ── Center Bar ──
-  Rectangle {
-    id: centerBar
-
-    bottomLeftRadius: config.barRadius
-    bottomRightRadius: config.barRadius
-    color: config.barColor
-    anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
-    height: config.barHeight
-    width: 100
-  }
-
-  // ── Right Bar ──
-  PanelWindow {
-    exclusiveZone: config.barHeight
-    anchors { left: true; right: true; top: true }
-    color: "transparent"
-    implicitHeight: config.barHeight
-
-    Item {
-      anchors.fill: parent
-
-      Rectangle {
-        id: rightBar
-
-        bottomLeftRadius: config.barRadius
-        color: config.barColor
-        anchors { right: parent.right; top: parent.top }
-        height: config.barHeight
-        width: 100
-      }
-
-      // ── Right Concave ──
-      Item {
-        anchors { right: parent.right; top: parent.top }
-
-        Shape {
-          id: rightConcave1
-
-          preferredRendererType: Shape.CurveRenderer
-          implicitHeight: config.barRadius
-          implicitWidth: config.barRadius
-          transform: Scale {
-            xScale: -1
-            origin { x: config.barRadius / 2; y: 0 }
-          }
-
-          ShapePath {
-            fillColor: config.barColor
-            strokeColor: "transparent"
-            startX: config.barRadius
-            startY: 0
-
-            PathLine {
-              x: 0
-              y: 0
+              bottomLeftRadius: config.barRadius
+              color: config.barColor
+              anchors { right: parent.right; top: parent.top }
+              height: config.barHeight
+              width: 100
             }
 
-            PathLine {
-              x: 0
-              y: config.barRadius
+            PanelWindow {
+              exclusiveZone: config.barHeight
+              anchors { left: true; top: true }
+              color: "transparent"
+              implicitHeight: config.barHeight
+
+              Item {
+                anchors { left: parent.left; top: parent.top }
+
+                Shape {
+                  id: leftConcave1
+
+                  preferredRendererType: Shape.CurveRenderer
+                  implicitHeight: config.barRadius
+                  implicitWidth: config.barRadius
+                  transform: Scale {
+                    xScale: 1
+                    origin { x: config.barRadius / 2; y: 0 }
+                  }
+
+                  ShapePath {
+                    fillColor: config.barColor
+                    strokeColor: "transparent"
+                    startX: config.barRadius
+                    startY: 0
+
+                    PathLine {
+                      x: 0
+                      y: 0
+                    }
+
+                    PathLine {
+                      x: 0
+                      y: config.barRadius
+                    }
+
+                    PathArc {
+                      direction: PathArc.Clockwise
+                      radiusX: config.barRadius
+                      radiusY: config.barRadius
+                      x: config.barRadius
+                      y: 0
+                    }
+                  }
+                }
+              }
             }
 
-            PathArc {
-              direction: PathArc.Clockwise
-              radiusX: config.barRadius
-              radiusY: config.barRadius
-              x: config.barRadius
-              y: 0
+            PanelWindow {
+              exclusiveZone: config.barHeight
+              anchors { right: true; top: true }
+              color: "transparent"
+              implicitHeight: config.barHeight
+
+              Item {
+                anchors { right: parent.right; top: parent.top }
+
+                Shape {
+                  id: rightConcave1
+
+                  preferredRendererType: Shape.CurveRenderer
+                  implicitHeight: config.barRadius
+                  implicitWidth: config.barRadius
+                  transform: Scale {
+                    xScale: 1
+                    origin { x: config.barRadius / 2; y: 0 }
+                  }
+
+                  ShapePath {
+                    fillColor: config.barColor
+                    strokeColor: "transparent"
+                    startX: config.barRadius
+                    startY: 0
+
+                    PathLine {
+                      x: 0
+                      y: 0
+                    }
+
+                    PathLine {
+                      x: 0
+                      y: config.barRadius
+                    }
+
+                    PathArc {
+                      direction: PathArc.Clockwise
+                      radiusX: config.barRadius
+                      radiusY: config.barRadius
+                      x: config.barRadius
+                      y: 0
+                    }
+                  }
+                }
+              }
             }
           }
         }
