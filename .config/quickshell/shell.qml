@@ -36,7 +36,7 @@ ShellRoot {
     property int workspaceSpacing: 8
 
     // Focus Window
-    property string focusWindowIcon: "\uebc4" // nf-cod-terminal
+    property string focusWindowIconPlaceholder: "\uebc4" // nf-cod-terminal
     property string focusWindowPlaceholder: "Desktop"
   }
   // ─────────────────────────────────────────────────────
@@ -56,7 +56,7 @@ ShellRoot {
         PanelWindow {
           id: bar
 
-          property var projection: WindowManager.screenProjection(modelData)
+          property var projection: WindowManager.screenProjection(screenRoot.modelData)
 
           exclusiveZone: config.barHeight
           WlrLayershell.layer: WlrLayer.Bottom
@@ -91,14 +91,14 @@ ShellRoot {
                   delegate: Rectangle {
                     id: workspaceDelegate
 
-                    property color workspaceActiveColor: colorAccent
-                    property color workspaceActiveTextColor: colorAccentText
+                    property color workspaceActiveColor: config.colorAccent
+                    property color workspaceActiveTextColor: config.colorAccentText
                     property color workspaceInactiveColor: "transparent"
-                    property color workspaceInactiveTextColor: colorText
-                    property color workspaceUrgentColor: colorAccent
+                    property color workspaceInactiveTextColor: config.colorText
+                    property color workspaceUrgentColor: config.colorAccent
                     property var ws: modelData
 
-                    color: ws.urgent ? config.workspaceUrgentColor : (ws.active ? config.workspaceActiveColor : config.workspaceInactiveColor)
+                    color: ws.urgent ? workspaceUrgentColor : (ws.active ? workspaceActiveColor : workspaceInactiveColor)
                     radius: config.workspaceRadius
                     implicitHeight: config.workspaceHeight
                     implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
@@ -107,7 +107,7 @@ ShellRoot {
                     Text {
                       id: workspaceLabel
 
-                      color: ws.active ? config.workspaceActiveTextColor : config.workspaceInactiveTextColor
+                      color: ws.active ? workspaceActiveTextColor : workspaceInactiveTextColor
                       font.family: config.fontFamily
                       font.pixelSize: config.fontSize
                       font.weight: config.fontWeight
@@ -143,7 +143,7 @@ ShellRoot {
                     color: config.colorText
                     font.family: config.iconFontFamily
                     font.pixelSize: config.iconSize
-                    text: config.focusWindowIcon
+                    text: config.focusWindowIconPlaceholder
                   }
 
                   Text {
