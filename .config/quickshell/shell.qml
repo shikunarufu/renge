@@ -38,6 +38,15 @@ ShellRoot {
     // Focus Window
     property string focusWindowIconPlaceholder: "\uebc4" // nf-cod-terminal
     property string focusWindowPlaceholder: "Desktop"
+
+    // Power Menu
+    property string powerMenuIconGlyph: "\uf303" // nf-linux-archlinux — verify against your installed Nerd Font version
+    property int powerMenuWidth: 160
+    property string cmdShutdown: "systemctl poweroff"
+    property string cmdRestart: "systemctl reboot"
+    property string cmdSleep: "systemctl suspend"
+    property string cmdLock: "loginctl lock-session"
+    property string cmdLogout: "loginctl terminate-session self" // adjust for your compositor, e.g. "hyprctl dispatch exit" or "swaymsg exit"
   }
   // ─────────────────────────────────────────────────────
 
@@ -84,6 +93,32 @@ ShellRoot {
                 anchors.centerIn: parent
                 spacing: config.workspaceSpacing
 
+                // ── Power Menu ──
+                Text {
+                  id: powerMenuIcon
+
+                  color: config.colorText
+                  font.family: config.iconFontFamily
+                  font.pixelSize: config.iconSize
+                  text: config.powerMenuIconGlyph
+
+                  MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: powerMenuPopup.visible = !powerMenuPopup.visible
+                  }
+                }
+
+                // Separator 1
+                Text {
+                  bottomPadding: 3
+                  color: config.colorText
+                  font.family: config.fontFamily
+                  font.pixelSize: config.fontSize
+                  font.weight: config.fontWeight
+                  text: "|"
+                }
+
                 // ── Workspace ──
                 Repeater {
                   model: bar.projection ? bar.projection.windowsets : []
@@ -111,6 +146,7 @@ ShellRoot {
                       font.family: config.fontFamily
                       font.pixelSize: config.fontSize
                       font.weight: config.fontWeight
+                      rightPadding: 1
                       text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
                       anchors.centerIn: parent
                     }
@@ -123,7 +159,7 @@ ShellRoot {
                   }
                 }
 
-                // Separator
+                // Separator 2
                 Text {
                   bottomPadding: 3
                   color: config.colorText
@@ -155,6 +191,76 @@ ShellRoot {
                     font.pixelSize: config.fontSize
                     font.weight: config.fontWeight
                     text: ToplevelManager.activeToplevel ? ToplevelManager.activeToplevel.appId : config.focusWindowPlaceholder
+                  }
+                }
+              }
+            }
+
+            // ── Power Menu Popup ──
+            PopupWindow {
+              id: powerMenuPopup
+
+              anchor.item: powerMenuIcon
+              anchor.edges: Edges.Bottom | Edges.Left
+              anchor.gravity: Edges.Bottom | Edges.Right
+              implicitWidth: config.powerMenuWidth
+              implicitHeight: powerMenuColumn.implicitHeight + 16
+              color: "transparent"
+              visible: false
+
+              Rectangle {
+                anchors.fill: parent
+                color: config.barColor
+                radius: config.workspaceRadius
+
+                ColumnLayout {
+                  id: powerMenuColumn
+
+                  anchors.fill: parent
+                  anchors.margins: 8
+                  spacing: 2
+
+                  Repeater {
+                    model: [
+                      { label: "Shut Down", command: config.cmdShutdown },
+                      { label: "Restart", command: config.cmdRestart },
+                      { label: "Sleep", command: config.cmdSleep },
+                      { label: "Lock", command: config.cmdLock },
+                      { label: "Log Out", command: config.cmdLogout }
+                    ]
+
+                    delegate: Rectangle {
+                      id: powerMenuOption
+
+                      property var entry: modelData
+
+                      Layout.fillWidth: true
+                      color: powerMenuOptionArea.containsMouse ? config.colorAccent : "transparent"
+                      radius: config.workspaceRadius
+                      implicitHeight: 28
+
+                      Text {
+                        color: powerMenuOptionArea.containsMouse ? config.colorAccentText : config.colorText
+                        font.family: config.fontFamily
+                        font.pixelSize: config.fontSize
+                        font.weight: config.fontWeight
+                        leftPadding: 8
+                        text: powerMenuOption.entry.label
+                        anchors.verticalCenter: parent.verticalCenter
+                      }
+
+                      MouseArea {
+                        id: powerMenuOptionArea
+
+                        anchors.fill: parent
+                        hoverEnabled: true
+
+                        onClicked: {
+                          Quickshell.execDetached(["sh", "-c", powerMenuOption.entry.command])
+                          powerMenuPopup.visible = false
+                        }
+                      }
+                    }
                   }
                 }
               }
