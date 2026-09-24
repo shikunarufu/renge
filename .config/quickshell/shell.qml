@@ -15,6 +15,37 @@ ShellRoot {
     property int barHeight: 24
     property color barColor: "#18181b"
     property int barRadius: 12
+
+    // Workspace
+    property int workspaceSpacing: 8
+    property int workspaceWidth: 22
+    property int workspaceHeight: 22
+    property int workspaceRadius: 5
+    property int workspacePadding: 14
+    property color workspaceActiveColor: colorAccent
+    property color workspaceInactiveColor: "transparent"
+    property color workspaceUrgentColor: colorAccent
+    property color workspaceActiveTextColor: colorAccentText
+    property color workspaceInactiveTextColor: colorText
+    property color separatorColor: "#5a5a5e"
+
+    // Font
+    property string fontFamily: "Segoe UI Variable"
+    property int fontSize: 13
+    property int fontWeight: Font.DemiBold
+    property string iconFontFamily: "JetBrainsMono Nerd Font"
+    property int iconSize: 15
+
+    // Palette
+    property color colorText: "#e5e7eb"
+    property color colorAccent: "#e2a97b"      // sampled from the active workspace pill
+    property color colorAccentText: "#18181b"
+    property color separatorColor: "#5a5a5e"
+
+    // Window title (icon + text, no pill behind it)
+    property color windowTitleColor: colorText
+    property string windowTitleIcon: "\uebc4" // nf-cod-terminal
+    property string windowTitlePlaceholder: "Desktop"
   }
   // ─────────────────────────────────────────────────────
 
@@ -28,7 +59,8 @@ ShellRoot {
       Item {
         id: screenRoot
 
-        required property var modelData
+        required property ShellScreen modelData
+        property var projection: WindowManager.screenProjection(modelData)
 
         PanelWindow {
           exclusiveZone: config.barHeight
@@ -49,7 +81,81 @@ ShellRoot {
               color: config.barColor
               anchors { left: parent.left; top: parent.top }
               height: config.barHeight
-              width: 100
+              width: leftRow.implicitWidth
+
+              RowLayout {
+                id: leftRow
+                anchors.centerIn: parent
+                spacing: config.workspaceSpacing
+
+                Repeater {
+                  model: panel.projection ? panel.projection.windowsets : []
+
+                  delegate: Rectangle {
+                    id: workspaceDelegate
+
+                    property var ws: modelData
+
+                    visible: ws.shouldDisplay
+                    implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
+                    implicitHeight: config.workspaceHeight
+                    radius: config.workspaceRadius
+                    color: ws.urgent
+                    ? config.workspaceUrgentColor
+                    : (ws.active ? config.workspaceActiveColor : config.workspaceInactiveColor)
+
+                    Text {
+                      id: workspaceLabel
+
+                      anchors.centerIn: parent
+                      text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
+                      color: ws.active ? config.workspaceActiveTextColor : config.workspaceInactiveTextColor
+
+                      font.family: config.fontFamily
+                      font.pixelSize: config.fontSize
+                      font.weight: config.fontWeight
+                    }
+
+                    MouseArea {
+                      anchors.fill: parent
+                      onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
+                    }
+                  }
+                }
+
+                // divider between workspaces and the active window title
+                Text {
+                  text: "|"
+                  color: config.separatorColor
+                  font.family: config.fontFamily
+                  font.pixelSize: config.fontSize
+                }
+
+                // ── Active window (icon + text, plain, no pill background) ──
+                RowLayout {
+                  spacing: 6
+
+                  Text {
+                    text: config.windowTitleIcon
+                    color: config.windowTitleColor
+                    font.family: config.iconFontFamily
+                    font.pixelSize: config.iconSize
+                  }
+
+                  Text {
+                    id: windowTitleLabel
+                    text: ToplevelManager.activeToplevel
+                    ? ToplevelManager.activeToplevel.appId
+                    : config.windowTitlePlaceholder
+                    color: config.windowTitleColor
+
+                    font.family: config.fontFamily
+                    font.pixelSize: config.fontSize
+                    font.weight: config.fontWeight
+                    elide: Text.ElideRight
+                  }
+                }
+              }
             }
 
             // ── Left Concave 2 ──
