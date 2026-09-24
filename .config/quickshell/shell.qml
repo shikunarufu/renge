@@ -11,41 +11,33 @@ ShellRoot {
   QtObject {
     id: config
 
-    // Bar
-    property int barHeight: 24
-    property color barColor: "#18181b"
-    property int barRadius: 12
-
-    // Workspace
-    property int workspaceSpacing: 8
-    property int workspaceWidth: 22
-    property int workspaceHeight: 22
-    property int workspaceRadius: 5
-    property int workspacePadding: 14
-    property color workspaceActiveColor: colorAccent
-    property color workspaceInactiveColor: "transparent"
-    property color workspaceUrgentColor: colorAccent
-    property color workspaceActiveTextColor: colorAccentText
-    property color workspaceInactiveTextColor: colorText
-    property color separatorColor: "#5a5a5e"
+    // Color
+    property color colorText: "#e5e7eb"
+    property color colorAccent: "#e2a97b"
+    property color colorAccentText: "#18181b"
 
     // Font
     property string fontFamily: "Segoe UI Variable"
-    property int fontSize: 13
+    property int fontSize: 12
     property int fontWeight: Font.DemiBold
     property string iconFontFamily: "JetBrainsMono Nerd Font"
-    property int iconSize: 15
+    property int iconSize: 16
 
-    // Palette
-    property color colorText: "#e5e7eb"
-    property color colorAccent: "#e2a97b"      // sampled from the active workspace pill
-    property color colorAccentText: "#18181b"
-    property color separatorColor: "#5a5a5e"
+    // Bar
+    property color barColor: "#18181b"
+    property int barHeight: 35
+    property int barRadius: 16
 
-    // Window title (icon + text, no pill behind it)
-    property color windowTitleColor: colorText
-    property string windowTitleIcon: "\uebc4" // nf-cod-terminal
-    property string windowTitlePlaceholder: "Desktop"
+    // Workspace
+    property int workspaceHeight: 16
+    property int workspaceWidth: 16
+    property int workspacePadding: 4
+    property int workspaceRadius: 4
+    property int workspaceSpacing: 8
+
+    // Focus Window
+    property string focusWindowIcon: "\uebc4" // nf-cod-terminal
+    property string focusWindowPlaceholder: "Desktop"
   }
   // ─────────────────────────────────────────────────────
 
@@ -60,9 +52,12 @@ ShellRoot {
         id: screenRoot
 
         required property ShellScreen modelData
-        property var projection: WindowManager.screenProjection(modelData)
 
         PanelWindow {
+          id: bar
+
+          property var projection: WindowManager.screenProjection(modelData)
+
           exclusiveZone: config.barHeight
           WlrLayershell.layer: WlrLayer.Bottom
           anchors { left: true; right: true; top: true }
@@ -85,74 +80,81 @@ ShellRoot {
 
               RowLayout {
                 id: leftRow
+
                 anchors.centerIn: parent
                 spacing: config.workspaceSpacing
 
+                // ── Workspace ──
                 Repeater {
-                  model: panel.projection ? panel.projection.windowsets : []
+                  model: bar.projection ? bar.projection.windowsets : []
 
                   delegate: Rectangle {
                     id: workspaceDelegate
 
+                    property color workspaceActiveColor: colorAccent
+                    property color workspaceActiveTextColor: colorAccentText
+                    property color workspaceInactiveColor: "transparent"
+                    property color workspaceInactiveTextColor: colorText
+                    property color workspaceUrgentColor: colorAccent
                     property var ws: modelData
 
-                    visible: ws.shouldDisplay
-                    implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
-                    implicitHeight: config.workspaceHeight
+                    color: ws.urgent ? config.workspaceUrgentColor : (ws.active ? config.workspaceActiveColor : config.workspaceInactiveColor)
                     radius: config.workspaceRadius
-                    color: ws.urgent
-                    ? config.workspaceUrgentColor
-                    : (ws.active ? config.workspaceActiveColor : config.workspaceInactiveColor)
+                    implicitHeight: config.workspaceHeight
+                    implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
+                    visible: ws.shouldDisplay
 
                     Text {
                       id: workspaceLabel
 
-                      anchors.centerIn: parent
-                      text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
                       color: ws.active ? config.workspaceActiveTextColor : config.workspaceInactiveTextColor
-
                       font.family: config.fontFamily
                       font.pixelSize: config.fontSize
                       font.weight: config.fontWeight
+                      text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
+                      anchors.centerIn: parent
                     }
 
                     MouseArea {
-                      anchors.fill: parent
                       onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
+
+                      anchors.fill: parent
                     }
                   }
                 }
 
-                // divider between workspaces and the active window title
+                // Separator
                 Text {
-                  text: "|"
-                  color: config.separatorColor
+                  bottomPadding: 3
+                  color: config.colorText
                   font.family: config.fontFamily
                   font.pixelSize: config.fontSize
+                  font.weight: config.fontWeight
+                  text: "|"
                 }
 
-                // ── Active window (icon + text, plain, no pill background) ──
+                // ── Focus Window ──
                 RowLayout {
                   spacing: 6
 
                   Text {
-                    text: config.windowTitleIcon
-                    color: config.windowTitleColor
+                    id: focusWindowIcon
+
+                    color: config.colorText
                     font.family: config.iconFontFamily
                     font.pixelSize: config.iconSize
+                    text: config.focusWindowIcon
                   }
 
                   Text {
-                    id: windowTitleLabel
-                    text: ToplevelManager.activeToplevel
-                    ? ToplevelManager.activeToplevel.appId
-                    : config.windowTitlePlaceholder
-                    color: config.windowTitleColor
+                    id: focusWindowLabel
 
+                    elide: Text.ElideRight
+                    color: config.colorText
                     font.family: config.fontFamily
                     font.pixelSize: config.fontSize
                     font.weight: config.fontWeight
-                    elide: Text.ElideRight
+                    text: ToplevelManager.activeToplevel ? ToplevelManager.activeToplevel.appId : config.focusWindowPlaceholder
                   }
                 }
               }
