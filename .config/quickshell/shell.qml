@@ -26,6 +26,7 @@ ShellRoot {
     // Bar
     property color barColor: "#18181b"
     property int barHeight: 35
+    property int barPadding: 28
     property int barRadius: 16
 
     // Workspace
@@ -36,17 +37,12 @@ ShellRoot {
     property int workspaceSpacing: 8
 
     // Focus Window
-    property string focusWindowIconPlaceholder: "\uebc4" // nf-cod-terminal
+    property string focusWindowGlyph: "\uebc4" // nf-cod-terminal
     property string focusWindowPlaceholder: "Desktop"
 
     // Power Menu
-    property string powerMenuIconGlyph: "\uf303" // nf-linux-archlinux — verify against your installed Nerd Font version
     property int powerMenuWidth: 160
-    property string cmdShutdown: "systemctl poweroff"
-    property string cmdRestart: "systemctl reboot"
-    property string cmdSleep: "systemctl suspend"
-    property string cmdLock: "loginctl lock-session"
-    property string cmdLogout: "loginctl terminate-session self" // adjust for your compositor, e.g. "hyprctl dispatch exit" or "swaymsg exit"
+    property string powerMenuIcon: "\uf303" // nf-linux-archlinux — verify against your installed Nerd Font version
   }
   // ─────────────────────────────────────────────────────
 
@@ -85,7 +81,7 @@ ShellRoot {
               color: config.barColor
               anchors { left: parent.left; top: parent.top }
               height: config.barHeight
-              width: leftRow.implicitWidth
+              width: leftRow.implicitWidth + config.barPadding
 
               RowLayout {
                 id: leftRow
@@ -95,17 +91,17 @@ ShellRoot {
 
                 // ── Power Menu ──
                 Text {
-                  id: powerMenuIcon
+                  id: powerMenuGlyph
 
-                  color: config.colorText
+                  color: config.colorAccent
                   font.family: config.iconFontFamily
                   font.pixelSize: config.iconSize
-                  text: config.powerMenuIconGlyph
+                  text: config.powerMenuIcon
 
                   MouseArea {
                     anchors.fill: parent
 
-                    onClicked: powerMenuPopup.visible = !powerMenuPopup.visible
+                    onClicked: powerContextMenu.visible = !powerContextMenu.visible
                   }
                 }
 
@@ -179,7 +175,7 @@ ShellRoot {
                     color: config.colorText
                     font.family: config.iconFontFamily
                     font.pixelSize: config.iconSize
-                    text: config.focusWindowIconPlaceholder
+                    text: config.focusWindowGlyph
                   }
 
                   Text {
@@ -196,17 +192,18 @@ ShellRoot {
               }
             }
 
-            // ── Power Menu Popup ──
+            // ── Power Context Menu ──
             PopupWindow {
-              id: powerMenuPopup
+              id: powerContextMenu
 
-              anchor.item: powerMenuIcon
+              anchor.item: powerMenuGlyph
               anchor.edges: Edges.Bottom | Edges.Left
               anchor.gravity: Edges.Bottom | Edges.Right
               implicitWidth: config.powerMenuWidth
-              implicitHeight: powerMenuColumn.implicitHeight + 16
+              implicitHeight: powerMenuColumn.implicitHeight + (powerMenuColumn.anchors.margins * 2)
               color: "transparent"
               visible: false
+              grabFocus: true
 
               Rectangle {
                 anchors.fill: parent
@@ -222,12 +219,18 @@ ShellRoot {
 
                   Repeater {
                     model: [
-                      { label: "Shut Down", command: config.cmdShutdown },
-                      { label: "Restart", command: config.cmdRestart },
-                      { label: "Sleep", command: config.cmdSleep },
-                      { label: "Lock", command: config.cmdLock },
-                      { label: "Log Out", command: config.cmdLogout }
+                      { label: "Shut Down", command: cmdShutdown },
+                      { label: "Restart", command: cmdRestart },
+                      { label: "Sleep", command: cmdSleep },
+                      { label: "Lock", command: cmdLock },
+                      { label: "Log Out", command: cmdLogout }
                     ]
+
+                    property string cmdShutdown: "systemctl poweroff"
+                    property string cmdRestart: "systemctl reboot"
+                    property string cmdSleep: "systemctl suspend"
+                    property string cmdLock: "loginctl lock-session"
+                    property string cmdLogout: "loginctl terminate-session self" // adjust for your compositor, e.g. "hyprctl dispatch exit" or "swaymsg exit"
 
                     delegate: Rectangle {
                       id: powerMenuOption
@@ -236,7 +239,7 @@ ShellRoot {
 
                       Layout.fillWidth: true
                       color: powerMenuOptionArea.containsMouse ? config.colorAccent : "transparent"
-                      radius: config.workspaceRadius
+                      radius: config.barRadius
                       implicitHeight: 28
 
                       Text {
