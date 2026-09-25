@@ -1,3 +1,4 @@
+import QtCore
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Shapes
@@ -43,6 +44,12 @@ ShellRoot {
     // Power Menu
     property int powerMenuWidth: 160
     property string powerMenuIcon: "\uf303" // nf-linux-archlinux — verify against your installed Nerd Font version
+
+    // App Launcher
+    property int appLauncherWidth: 360
+    property int appLauncherMaxVisible: 7
+    property int appLauncherItemHeight: 42
+    property string appLauncherIcon: "\uea6d" // nf-cod-search
   }
   // ─────────────────────────────────────────────────────
 
@@ -165,6 +172,22 @@ ShellRoot {
                   text: "|"
                 }
 
+                // ── App Launcher ──
+                Text {
+                  id: appLauncherGlyph
+
+                  color: config.colorText
+                  font.family: config.iconFontFamily
+                  font.pixelSize: config.iconSize
+                  text: config.appLauncherIcon
+
+                  MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: appLauncherPopup.visible = !appLauncherPopup.visible
+                  }
+                }
+
                 // ── Focus Window ──
                 RowLayout {
                   spacing: 6
@@ -262,6 +285,215 @@ ShellRoot {
                           Quickshell.execDetached(["sh", "-c", powerMenuOption.entry.command])
                           powerMenuPopup.visible = false
                         }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            // ── App Launcher Popup ──
+            PopupWindow {
+              id: appLauncherPopup
+
+              property string searchQuery: ""
+              property int selectedIndex: 0
+              property var recentIds: JSON.parse(recentAppsSettings.recentIdsSerialized)
+
+              property var filteredApps: {
+                var q = searchQuery.trim().toLowerCase()
+                var vals = DesktopEntries.applications.values
+
+                if (q !== "") {
+                  return vals.filter(function (e) {
+                    if (e.name.toLowerCase().indexOf(q) !== -1) return true
+                    if (e.genericName && e.genericName.toLowerCase().indexOf(q) !== -1) return true
+                    for (var i = 0; i < e.keywords.length; i++)
+                      if (e.keywords[i].toLowerCase().indexOf(q) !== -1) return true
+                    return false
+                  }).sort(function (a, b) { return a.name.localeCompare(b.name) })
+                }
+
+                var recent = appLauncherPopup.recentIds
+                return vals.slice().sort(function (a, b) {
+                  var ai = recent.indexOf(a.id)
+                  var bi = recent.indexOf(b.id)
+                  if (ai !== -1 && bi !== -1) return ai - bi
+                  if (ai !== -1) return -1
+                  if (bi !== -1) return 1
+                  return a.name.localeCompare(b.name)
+                })
+              }
+
+              anchor.item: appLauncherGlyph
+              anchor.edges: Edges.Bottom | Edges.Left
+              anchor.gravity: Edges.Bottom | Edges.Right
+              implicitWidth: config.appLauncherWidth
+              implicitHeight: 56 + Math.min(filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
+              color: "transparent"
+              visible: false
+              grabFocus: true
+
+              onFilteredAppsChanged: selectedIndex = 0
+
+              onVisibleChanged: {
+                if (visible) {
+                  searchField.text = ""
+                  searchQuery = ""
+                  selectedIndex = 0
+                  searchField.forceActiveFocus()
+                }
+              }
+
+              function recordLaunch(id) {
+                var list = appLauncherPopup.recentIds.slice()
+                var idx = list.indexOf(id)
+                if (idx !== -1) list.splice(idx, 1)
+                list.unshift(id)
+                if (list.length > 12) list = list.slice(0, 12)
+                appLauncherPopup.recentIds = list
+                recentAppsSettings.recentIdsSerialized = JSON.stringify(list)
+              }
+
+              function navigate(delta) {
+                if (filteredApps.length === 0) return
+                selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
+                appList.positionViewAtIndex(selectedIndex, ListView.Contain)
+              }
+
+              function launchEntry(entry) {
+                recordLaunch(entry.id)
+                entry.execute()
+                appLauncherPopup.visible = false
+              }
+
+              Settings {
+                id: recentAppsSettings
+
+                category: "AppLauncher"
+                property string recentIdsSerialized: "[]"
+              }
+
+              Rectangle {
+                anchors.fill: parent
+                color: config.barColor
+                radius: config.workspaceRadius
+
+                ColumnLayout {
+                  anchors.fill: parent
+                  anchors.margins: 8
+                  spacing: 8
+
+                  Rectangle {
+                    Layout.fillWidth: true
+                    implicitHeight: 32
+                    radius: config.workspaceRadius
+                    color: Qt.rgba(1, 1, 1, 0.07)
+
+                    TextInput {
+                      id: searchField
+
+                      anchors.fill: parent
+                      anchors.leftMargin: 8
+                      anchors.rightMargin: 8
+                      color: config.colorText
+                      font.family: config.iconFontFamily
+                      font.pixelSize: config.fontSize
+                      verticalAlignment: TextInput.AlignVCenter
+                      clip: true
+
+                      onTextChanged: appLauncherPopup.searchQuery = text
+
+                      Keys.onPressed: function (event) {
+                        if (event.key === Qt.Key_Up) {
+                          appLauncherPopup.navigate(-1)
+                          event.accepted = true
+                        } else if (event.key === Qt.Key_Down) {
+                          appLauncherPopup.navigate(1)
+                          event.accepted = true
+                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                          if (appLauncherPopup.filteredApps.length > 0)
+                            appLauncherPopup.launchEntry(appLauncherPopup.filteredApps[appLauncherPopup.selectedIndex])
+                          event.accepted = true
+                        } else if (event.key === Qt.Key_Escape) {
+                          appLauncherPopup.visible = false
+                          event.accepted = true
+                        }
+                      }
+
+                      Text {
+                        anchors.fill: parent
+                        color: config.colorText
+                        font.family: config.iconFontFamily
+                        font.pixelSize: config.fontSize
+                        opacity: 0.35
+                        text: "Search apps…"
+                        verticalAlignment: Text.AlignVCenter
+                        visible: searchField.text === ""
+                      }
+                    }
+                  }
+
+                  ListView {
+                    id: appList
+
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
+                    model: appLauncherPopup.filteredApps
+                    clip: true
+                    interactive: false
+
+                    Text {
+                      anchors.centerIn: parent
+                      color: config.colorText
+                      font.family: config.iconFontFamily
+                      font.pixelSize: config.fontSize
+                      opacity: 0.35
+                      text: "No apps found"
+                      visible: appLauncherPopup.filteredApps.length === 0
+                    }
+
+                    delegate: Rectangle {
+                      id: appRow
+
+                      width: appList.width
+                      height: config.appLauncherItemHeight
+                      color: appLauncherPopup.selectedIndex === index ? config.colorAccent : "transparent"
+                      radius: config.workspaceRadius
+
+                      Row {
+                        anchors.fill: parent
+                        anchors.leftMargin: 8
+                        anchors.rightMargin: 8
+                        spacing: 10
+
+                        Image {
+                          width: 24
+                          height: 24
+                          anchors.verticalCenter: parent.verticalCenter
+                          mipmap: true
+                          smooth: true
+                          source: modelData.icon !== "" ? "image://icon/" + modelData.icon : ""
+                        }
+
+                        Text {
+                          anchors.verticalCenter: parent.verticalCenter
+                          width: parent.width - 34
+                          color: appLauncherPopup.selectedIndex === index ? config.colorAccentText : config.colorText
+                          elide: Text.ElideRight
+                          font.family: config.fontFamily
+                          font.pixelSize: config.fontSize
+                          font.weight: config.fontWeight
+                          text: modelData.name
+                        }
+                      }
+
+                      MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+
+                        onEntered: appLauncherPopup.selectedIndex = index
+                        onClicked: appLauncherPopup.launchEntry(modelData)
                       }
                     }
                   }
