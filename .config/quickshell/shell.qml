@@ -27,6 +27,7 @@ ShellRoot {
     // Bar
     property color barColor: "#18181b"
     property int barHeight: 35
+    property int barItemSpacing: 8
     property int barPadding: 28
     property int barRadius: 16
 
@@ -94,7 +95,7 @@ ShellRoot {
                 id: leftRow
 
                 anchors.centerIn: parent
-                spacing: config.workspaceSpacing
+                spacing: config.barItemSpacing
 
                 // ── Power Menu ──
                 Text {
@@ -123,41 +124,47 @@ ShellRoot {
                 }
 
                 // ── Workspace ──
-                Repeater {
-                  model: bar.projection ? bar.projection.windowsets : []
+                RowLayout {
+                  id: workspaceRow
 
-                  delegate: Rectangle {
-                    id: workspaceDelegate
+                  spacing: config.workspaceSpacing
 
-                    property color workspaceActiveColor: config.colorAccent
-                    property color workspaceActiveTextColor: config.colorAccentText
-                    property color workspaceInactiveColor: "transparent"
-                    property color workspaceInactiveTextColor: config.colorText
-                    property color workspaceUrgentColor: config.colorAccent
-                    property var ws: modelData
+                  Repeater {
+                    model: bar.projection ? bar.projection.windowsets : []
 
-                    color: ws.urgent ? workspaceUrgentColor : (ws.active ? workspaceActiveColor : workspaceInactiveColor)
-                    radius: config.workspaceRadius
-                    implicitHeight: config.workspaceHeight
-                    implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
-                    visible: ws.shouldDisplay
+                    delegate: Rectangle {
+                      id: workspaceDelegate
 
-                    Text {
-                      id: workspaceLabel
+                      property color workspaceActiveColor: config.colorAccent
+                      property color workspaceActiveTextColor: config.colorAccentText
+                      property color workspaceInactiveColor: "transparent"
+                      property color workspaceInactiveTextColor: config.colorText
+                      property color workspaceUrgentColor: config.colorAccent
+                      property var ws: modelData
 
-                      color: ws.active ? workspaceActiveTextColor : workspaceInactiveTextColor
-                      font.family: config.fontFamily
-                      font.pixelSize: config.fontSize
-                      font.weight: config.fontWeight
-                      rightPadding: 1
-                      text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
-                      anchors.centerIn: parent
-                    }
+                      color: ws.urgent ? workspaceUrgentColor : (ws.active ? workspaceActiveColor : workspaceInactiveColor)
+                      radius: config.workspaceRadius
+                      implicitHeight: config.workspaceHeight
+                      implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
+                      visible: ws.shouldDisplay
 
-                    MouseArea {
-                      onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
+                      Text {
+                        id: workspaceLabel
 
-                      anchors.fill: parent
+                        color: ws.active ? workspaceActiveTextColor : workspaceInactiveTextColor
+                        font.family: config.fontFamily
+                        font.pixelSize: config.fontSize
+                        font.weight: config.fontWeight
+                        rightPadding: 1
+                        text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
+                        anchors.centerIn: parent
+                      }
+
+                      MouseArea {
+                        onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
+
+                        anchors.fill: parent
+                      }
                     }
                   }
                 }
