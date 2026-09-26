@@ -27,9 +27,9 @@ ShellRoot {
     // Bar
     property color barColor: "#18181b"
     property int barHeight: 35
-    property int barItemSpacing: 8
-    property int barPadding: 28
-    property int barRadius: 16
+    property int barItemSpacing: 16
+    property int barPadding: 44
+    property int barRadius: 22
 
     // Workspace
     property int workspaceHeight: 16
@@ -197,7 +197,7 @@ ShellRoot {
 
                 // ── Focus Window ──
                 RowLayout {
-                  spacing: 6
+                  spacing: 8
 
                   Text {
                     id: focusWindowIcon
