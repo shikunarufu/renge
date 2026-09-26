@@ -34,7 +34,7 @@ ShellRoot {
     // Workspace
     property int workspaceHeight: 16
     property int workspaceWidth: 16
-    property int workspacePadding: 4
+    property int workspacePadding: 8
     property int workspaceRadius: 4
     property int workspaceSpacing: 8
 
@@ -123,6 +123,16 @@ ShellRoot {
                   text: "|"
                 }
 
+                // Separator 2
+                Text {
+                  bottomPadding: 3
+                  color: config.colorText
+                  font.family: config.fontFamily
+                  font.pixelSize: config.fontSize
+                  font.weight: config.fontWeight
+                  text: "|"
+                }
+
                 // ── Workspace ──
                 RowLayout {
                   id: workspaceRow
@@ -169,7 +179,7 @@ ShellRoot {
                   }
                 }
 
-                // Separator 2
+                // Separator 3
                 Text {
                   bottomPadding: 3
                   color: config.colorText
@@ -314,10 +324,10 @@ ShellRoot {
                 if (q !== "") {
                   return vals.filter(function (e) {
                     if (e.name.toLowerCase().indexOf(q) !== -1) return true
-                    if (e.genericName && e.genericName.toLowerCase().indexOf(q) !== -1) return true
-                    for (var i = 0; i < e.keywords.length; i++)
-                      if (e.keywords[i].toLowerCase().indexOf(q) !== -1) return true
-                    return false
+                      if (e.genericName && e.genericName.toLowerCase().indexOf(q) !== -1) return true
+                        for (var i = 0; i < e.keywords.length; i++)
+                          if (e.keywords[i].toLowerCase().indexOf(q) !== -1) return true
+                            return false
                   }).sort(function (a, b) { return a.name.localeCompare(b.name) })
                 }
 
@@ -326,9 +336,9 @@ ShellRoot {
                   var ai = recent.indexOf(a.id)
                   var bi = recent.indexOf(b.id)
                   if (ai !== -1 && bi !== -1) return ai - bi
-                  if (ai !== -1) return -1
-                  if (bi !== -1) return 1
-                  return a.name.localeCompare(b.name)
+                    if (ai !== -1) return -1
+                      if (bi !== -1) return 1
+                        return a.name.localeCompare(b.name)
                 })
               }
 
@@ -356,16 +366,16 @@ ShellRoot {
                 var list = appLauncherPopup.recentIds.slice()
                 var idx = list.indexOf(id)
                 if (idx !== -1) list.splice(idx, 1)
-                list.unshift(id)
-                if (list.length > 12) list = list.slice(0, 12)
-                appLauncherPopup.recentIds = list
-                recentAppsSettings.recentIdsSerialized = JSON.stringify(list)
+                  list.unshift(id)
+                  if (list.length > 12) list = list.slice(0, 12)
+                    appLauncherPopup.recentIds = list
+                    recentAppsSettings.recentIdsSerialized = JSON.stringify(list)
               }
 
               function navigate(delta) {
                 if (filteredApps.length === 0) return
-                selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
-                appList.positionViewAtIndex(selectedIndex, ListView.Contain)
+                  selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
+                  appList.positionViewAtIndex(selectedIndex, ListView.Contain)
               }
 
               function launchEntry(entry) {
@@ -421,7 +431,7 @@ ShellRoot {
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                           if (appLauncherPopup.filteredApps.length > 0)
                             appLauncherPopup.launchEntry(appLauncherPopup.filteredApps[appLauncherPopup.selectedIndex])
-                          event.accepted = true
+                            event.accepted = true
                         } else if (event.key === Qt.Key_Escape) {
                           appLauncherPopup.visible = false
                           event.accepted = true
