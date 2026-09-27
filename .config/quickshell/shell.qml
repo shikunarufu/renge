@@ -3,6 +3,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Shapes
 import Quickshell
+import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.WindowManager
 
@@ -51,6 +52,9 @@ ShellRoot {
     property int appLauncherMaxVisible: 7
     property int appLauncherItemHeight: 42
     property string appLauncherIcon: "\uea6d" // nf-cod-search
+
+    // Layout Changer
+    property var layoutList: ["tile", "monocle", "grid", "scroller"] // mangowm setlayout names — see mango's layout-commands docs for the full list
   }
   // ─────────────────────────────────────────────────────
 
@@ -121,6 +125,55 @@ ShellRoot {
                   font.pixelSize: config.fontSize
                   font.weight: config.fontWeight
                   text: "|"
+                }
+
+                // ── Layout Changer ──
+                Text {
+                  id: layoutChangerGlyph
+
+                  property string currentLayout: config.layoutList[0]
+                  property int nextIndex: 0
+
+                  color: config.colorAccent
+                  font.family: config.fontFamily
+                  font.pixelSize: config.fontSize
+                  font.weight: config.fontWeight
+                  text: currentLayout
+
+                  Process {
+                    id: layoutWatcher
+
+                    command: ["mmsg", "watch", "all-monitors"]
+                    running: true
+
+                    stdout: SplitParser {
+                      onRead: data => {
+                        try {
+                          var payload = JSON.parse(data)
+                          var monitors = payload.monitors || []
+                          for (var i = 0; i < monitors.length; i++) {
+                            if (monitors[i].name === screenRoot.modelData.name) {
+                              layoutChangerGlyph.currentLayout = monitors[i].layout_symbol
+                              break
+                            }
+                          }
+                        } catch (e) {
+                          // ignore partial/malformed JSON chunks
+                        }
+                      }
+                    }
+
+                    onRunningChanged: if (!running) running = true
+                  }
+
+                  MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: {
+                      layoutChangerGlyph.nextIndex = (layoutChangerGlyph.nextIndex + 1) % config.layoutList.length
+                      Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + config.layoutList[layoutChangerGlyph.nextIndex]])
+                    }
+                  }
                 }
 
                 // Separator 2
