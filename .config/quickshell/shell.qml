@@ -658,7 +658,25 @@ ShellRoot {
               color: config.barColor
               anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
               height: config.barHeight
-              width: 100
+              width: clockLabel.implicitWidth + config.barPadding
+
+              SystemClock {
+                id: clock
+
+                precision: SystemClock.Minutes
+              }
+
+              // ── Clock ──
+              Text {
+                id: clockLabel
+
+                color: config.colorText
+                font.family: config.fontFamily
+                font.pixelSize: config.fontSize
+                font.weight: config.fontWeight
+                text: Qt.formatDateTime(clock.date, "ddd, d MMM   HH:mm")
+                anchors.centerIn: parent
+              }
             }
 
             // ── Center Concave 2 ──
