@@ -381,10 +381,9 @@ genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot -S /mnt /bin/bash << EOF
 
 # Set time zone
-timedatectl --no-ask-password set-timezone ${TIME_ZONE}
 ln --force --symbolic /usr/share/zoneinfo/"${TIME_ZONE}" /etc/localtime
 hwclock --systohc
-timedatectl --no-ask-password set-ntp true
+systemctl enable systemd-timesyncd
 
 # Generate locales
 locale="en_GB.UTF-8 UTF-8"
