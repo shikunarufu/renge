@@ -557,11 +557,14 @@ makepkg --syncdeps --install --noconfirm
 '
 
 # Apply config files
-cp --recursive /renge/.config /home/"${USERNAME}"/.config
+mkdir --parents /home/"${USERNAME}"/.config
+cp --recursive /renge/.config/. /home/"${USERNAME}"/.config/
+chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.config
 
 # Audio players
-runuser --user="${USERNAME}" -- mkdir /home/"${USERNAME}"/.config/mpd/playlists
-runuser --user="${USERNAME}" -- mkdir --parents /home/"${USERNAME}"/.local/state/mpd
+runuser --user="${USERNAME}" -- mkdir --parents \
+/home/"${USERNAME}"/.config/mpd/playlists \
+/home/"${USERNAME}"/.local/state/mpd
 
 # Sound system
 amixer sset Master unmute
@@ -576,7 +579,6 @@ systemctl enable fstrim.timer
 
 # Cleanup
 sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
-chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.config
 rm --recursive --force /renge
 
 # Exit chroot environment
