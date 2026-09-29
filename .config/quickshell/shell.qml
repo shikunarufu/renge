@@ -105,7 +105,7 @@ ShellRoot {
                 Text {
                   id: powerMenuGlyph
 
-                  color: config.colorAccent
+                  color: config.colorText
                   font.family: config.iconFontFamily
                   font.pixelSize: config.iconSize
                   text: config.powerMenuIcon
@@ -134,7 +134,7 @@ ShellRoot {
                   property string currentLayout: config.layoutList[0]
                   property int nextIndex: 0
 
-                  color: config.colorAccent
+                  color: config.colorText
                   font.family: config.fontFamily
                   font.pixelSize: config.fontSize
                   font.weight: config.fontWeight
