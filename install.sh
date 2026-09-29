@@ -330,6 +330,9 @@ fi
 
 # Time
 time_zone="$(curl --fail --max-time 5 --silent https://ipapi.co/timezone)"
+if [[ ! -f "/usr/share/zoneinfo/${time_zone}" || -z "${time_zone}" ]]; then
+  time_zone="Asia/Manila"
+fi
 export TIME_ZONE=$time_zone
 
 # Configure bootloader
@@ -378,8 +381,10 @@ genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot -S /mnt /bin/bash << EOF
 
 # Set time zone
+timedatectl --no-ask-password set-timezone ${TIME_ZONE}
 ln --force --symbolic /usr/share/zoneinfo/"${TIME_ZONE}" /etc/localtime
 hwclock --systohc
+timedatectl --no-ask-password set-ntp true
 
 # Generate locales
 locale="en_GB.UTF-8 UTF-8"
