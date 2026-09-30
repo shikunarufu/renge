@@ -2,6 +2,7 @@ import QtCore
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Shapes
+import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
@@ -55,8 +56,78 @@ ShellRoot {
 
     // Layout Changer
     property var layoutList: ["tile", "monocle", "grid", "scroller"] // mangowm setlayout names — see mango's layout-commands docs for the full list
+
+    // Wallpaper Changer
+    property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
+    property string wallpaperIcon: "\uf03e" // nf-fa-image — verify against your installed Nerd Font version
   }
   // ─────────────────────────────────────────────────────
+
+  // ── Wallpaper Controller (shared by all screens) ──
+  Scope {
+    id: wallpaper
+
+    property string current: wallpaperSettings.current
+
+    function step(delta) {
+      var n = wallpaperFolder.count
+      if (n === 0) return
+
+      var i = -1
+      for (var k = 0; k < n; k++) {
+        if (wallpaperFolder.get(k, "filePath") === current) { i = k; break }
+      }
+
+      var next = i === -1 ? 0 : (i + delta + n) % n
+      wallpaperSettings.current = wallpaperFolder.get(next, "filePath")
+    }
+
+    Settings {
+      id: wallpaperSettings
+
+      category: "Wallpaper"
+      property string current: ""
+    }
+
+    FolderListModel {
+      id: wallpaperFolder
+
+      folder: "file://" + config.wallpaperDir
+      nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
+      showDirs: false
+      sortField: FolderListModel.Name
+
+      // First run: no saved wallpaper, use the first file
+      onStatusChanged: {
+        if (status === FolderListModel.Ready && wallpaper.current === "" && count > 0)
+          wallpaperSettings.current = get(0, "filePath")
+      }
+    }
+  }
+
+  // ── Wallpaper Windows (one per screen, background layer) ──
+  Variants {
+    model: Quickshell.screens
+
+    PanelWindow {
+      required property ShellScreen modelData
+
+      WlrLayershell.layer: WlrLayer.Background
+      WlrLayershell.namespace: "wallpaper"
+      exclusionMode: ExclusionMode.Ignore
+      anchors { left: true; right: true; top: true; bottom: true }
+      color: config.barColor
+      screen: modelData
+
+      Image {
+        anchors.fill: parent
+        asynchronous: true
+        fillMode: Image.PreserveAspectCrop
+        source: wallpaper.current !== "" ? "file://" + wallpaper.current : ""
+        sourceSize: Qt.size(modelData.width, modelData.height)
+      }
+    }
+  }
 
   // ── Bar ──
   Scope {
@@ -312,18 +383,12 @@ ShellRoot {
 
                   Repeater {
                     model: [
-                      { label: "Shut Down", command: cmdShutdown },
-                      { label: "Restart", command: cmdRestart },
-                      { label: "Sleep", command: cmdSleep },
-                      { label: "Lock", command: cmdLock },
-                      { label: "Log Out", command: cmdLogout }
+                      { label: "Shut Down", command: "systemctl poweroff" },
+                      { label: "Restart", command: "systemctl reboot" },
+                      { label: "Sleep", command: "systemctl suspend" },
+                      { label: "Lock", command: "loginctl lock-session" },
+                      { label: "Log Out", command: "loginctl terminate-session self" } // adjust for your compositor, e.g. "hyprctl dispatch exit" or "swaymsg exit"
                     ]
-
-                    property string cmdShutdown: "systemctl poweroff"
-                    property string cmdRestart: "systemctl reboot"
-                    property string cmdSleep: "systemctl suspend"
-                    property string cmdLock: "loginctl lock-session"
-                    property string cmdLogout: "loginctl terminate-session self" // adjust for your compositor, e.g. "hyprctl dispatch exit" or "swaymsg exit"
 
                     delegate: Rectangle {
                       id: powerMenuOption
@@ -353,7 +418,7 @@ ShellRoot {
 
                         onClicked: {
                           Quickshell.execDetached(["sh", "-c", powerMenuOption.entry.command])
-                          powerMenuPopup.visible = false
+                          powerContextMenu.visible = false
                         }
                       }
                     }
@@ -765,7 +830,32 @@ ShellRoot {
               color: config.barColor
               anchors { right: parent.right; top: parent.top }
               height: config.barHeight
-              width: 100
+              width: rightRow.implicitWidth + config.barPadding
+
+              RowLayout {
+                id: rightRow
+
+                anchors.centerIn: parent
+                spacing: config.barItemSpacing
+
+                // ── Wallpaper Changer ──
+                // Left click: next. Right click: previous.
+                Text {
+                  id: wallpaperGlyph
+
+                  color: config.colorText
+                  font.family: config.iconFontFamily
+                  font.pixelSize: config.iconSize
+                  text: config.wallpaperIcon
+
+                  MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                    onClicked: mouse => wallpaper.step(mouse.button === Qt.RightButton ? -1 : 1)
+                  }
+                }
+              }
             }
 
             // ── Left Concave 1 ──
