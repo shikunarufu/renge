@@ -5,6 +5,7 @@ import QtQuick.Shapes
 import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import Quickshell.WindowManager
 
@@ -60,6 +61,12 @@ ShellRoot {
     // Wallpaper Changer
     property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
     property string wallpaperIcon: "\uf03e" // nf-fa-image — verify against your installed Nerd Font version
+
+    // Volume
+    property real volumeStep: 0.05 // per scroll notch (5%)
+    property string volumeIconHigh: "\uf028" // nf-fa-volume_up
+    property string volumeIconLow: "\uf027" // nf-fa-volume_down
+    property string volumeIconMuted: "\uf026" // nf-fa-volume_off
   }
   // ─────────────────────────────────────────────────────
 
@@ -582,8 +589,9 @@ ShellRoot {
                     Layout.fillWidth: true
                     Layout.preferredHeight: Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
                     model: appLauncherPopup.filteredApps
+                    boundsBehavior: Flickable.StopAtBounds
                     clip: true
-                    interactive: false
+                    interactive: true
 
                     Text {
                       anchors.centerIn: parent
@@ -871,6 +879,63 @@ ShellRoot {
                   font.pixelSize: config.fontSize
                   font.weight: config.fontWeight
                   text: "|"
+                }
+
+                // ── Volume ──
+                // Scroll: adjust volume. Left click: mute/unmute.
+                Item {
+                  id: volumeItem
+
+                  property var sink: Pipewire.defaultAudioSink
+                  property real volume: sink && sink.audio ? sink.audio.volume : 0
+                  property bool muted: sink && sink.audio ? sink.audio.muted : false
+
+                  implicitHeight: volumeRow.implicitHeight
+                  implicitWidth: volumeRow.implicitWidth
+
+                  PwObjectTracker { objects: [volumeItem.sink] }
+
+                  RowLayout {
+                    id: volumeRow
+
+                    spacing: 6
+
+                    Text {
+                      Layout.alignment: Qt.AlignVCenter
+                      color: config.colorText
+                      font.family: config.iconFontFamily
+                      font.pixelSize: config.iconSize
+                      text: volumeItem.muted ? config.volumeIconMuted
+                          : volumeItem.volume < 0.5 ? config.volumeIconLow
+                          : config.volumeIconHigh
+                    }
+
+                    Text {
+                      Layout.alignment: Qt.AlignVCenter
+                      color: config.colorText
+                      font.family: config.fontFamily
+                      font.pixelSize: config.fontSize
+                      font.weight: config.fontWeight
+                      text: Math.round(volumeItem.volume * 100) + "%"
+                    }
+                  }
+
+                  MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton
+
+                    onClicked: {
+                      if (volumeItem.sink && volumeItem.sink.audio)
+                        volumeItem.sink.audio.muted = !volumeItem.sink.audio.muted
+                    }
+
+                    onWheel: wheel => {
+                      if (!volumeItem.sink || !volumeItem.sink.audio) return
+                      var delta = wheel.angleDelta.y > 0 ? config.volumeStep : -config.volumeStep
+                      volumeItem.sink.audio.muted = false
+                      volumeItem.sink.audio.volume = Math.max(0, Math.min(1, volumeItem.volume + delta))
+                    }
+                  }
                 }
               }
             }
