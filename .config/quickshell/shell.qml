@@ -5,6 +5,7 @@ import QtQuick.Shapes
 import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import Quickshell.WindowManager
@@ -67,6 +68,19 @@ ShellRoot {
     property string volumeIconHigh: "\uf028" // nf-fa-volume_up
     property string volumeIconLow: "\uf027" // nf-fa-volume_down
     property string volumeIconMuted: "\uf026" // nf-fa-volume_off
+
+    // Now Playing
+    property string nowPlayingSeparator: " - "
+    property int nowPlayingMaxLength: 45
+
+    // Visualizer (requires cava)
+    property int visualizerBars: 10
+    property int visualizerBarWidth: 2
+    property int visualizerBarGap: 4
+    property int visualizerHeight: 12
+    property int visualizerFramerate: 60
+    property int visualizerMinFreq: 500
+    property int visualizerMaxFreq: 12000
   }
   // ─────────────────────────────────────────────────────
 
@@ -132,6 +146,67 @@ ShellRoot {
         fillMode: Image.PreserveAspectCrop
         source: wallpaper.current !== "" ? "file://" + wallpaper.current : ""
         sourceSize: Qt.size(modelData.width, modelData.height)
+      }
+    }
+  }
+
+  // ── Media Controller (shared by all screens) ──
+  Scope {
+    id: media
+
+    // First player that is currently playing; null when nothing plays
+    property var player: {
+      var list = Mpris.players.values
+      for (var i = 0; i < list.length; i++) {
+        if (list[i].isPlaying) return list[i]
+      }
+      return null
+    }
+    property bool active: player !== null
+    property var levels: []
+
+    property string label: {
+      if (!player) return ""
+      var parts = []
+      if (player.trackTitle) parts.push(player.trackTitle)
+      if (player.trackArtist) parts.push(player.trackArtist)
+      var text = parts.join(config.nowPlayingSeparator)
+      return text.length > config.nowPlayingMaxLength
+        ? text.substring(0, config.nowPlayingMaxLength - 1) + "…"
+        : text
+    }
+
+    onActiveChanged: if (!active) levels = []
+
+    // cava runs only while something plays
+    Process {
+      id: cava
+
+      running: media.active
+      command: [
+        "sh", "-c",
+        'f="${XDG_RUNTIME_DIR:-/tmp}/quickshell-cava.conf"; printf "%s\\n" "$0" > "$f"; exec cava -p "$f"',
+        "[general]\n"
+        + "bars = " + config.visualizerBars + "\n"
+        + "framerate = " + config.visualizerFramerate + "\n"
+        + "lower_cutoff_freq = " + config.visualizerMinFreq + "\n"
+        + "higher_cutoff_freq = " + config.visualizerMaxFreq + "\n"
+        + "[input]\nmethod = pipewire\nsource = auto\n"
+        + "[output]\nmethod = raw\nraw_target = /dev/stdout\n"
+        + "data_format = ascii\nascii_max_range = 100\n"
+        + "bar_delimiter = 59\nframe_delimiter = 10\n"
+        + "[smoothing]\nnoise_reduction = 77\n"
+      ]
+
+      stdout: SplitParser {
+        onRead: data => {
+          var out = []
+          var parts = data.split(";")
+          for (var i = 0; i < parts.length; i++) {
+            if (parts[i] !== "") out.push(Number(parts[i]))
+          }
+          media.levels = out
+        }
       }
     }
   }
@@ -738,7 +813,7 @@ ShellRoot {
               color: config.barColor
               anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
               height: config.barHeight
-              width: clockLabel.implicitWidth + config.barPadding
+              width: centerRow.implicitWidth + config.barPadding
 
               SystemClock {
                 id: clock
@@ -746,16 +821,74 @@ ShellRoot {
                 precision: SystemClock.Minutes
               }
 
-              // ── Clock ──
-              Text {
-                id: clockLabel
+              RowLayout {
+                id: centerRow
 
-                color: config.colorText
-                font.family: config.fontFamily
-                font.pixelSize: config.fontSize
-                font.weight: config.fontWeight
-                text: Qt.formatDateTime(clock.date, "ddd, d MMM   HH:mm")
                 anchors.centerIn: parent
+                spacing: config.barItemSpacing
+
+                // ── Clock ──
+                Text {
+                  id: clockLabel
+
+                  color: config.colorText
+                  font.family: config.fontFamily
+                  font.pixelSize: config.fontSize
+                  font.weight: config.fontWeight
+                  text: Qt.formatDateTime(clock.date, "ddd, d MMM   HH:mm")
+                }
+
+                // ── Visualizer ── (hidden when nothing plays)
+                Row {
+                  id: visualizer
+
+                  Layout.alignment: Qt.AlignVCenter
+                  Layout.preferredHeight: config.visualizerHeight
+                  spacing: config.visualizerBarGap
+                  visible: media.active
+
+                  Repeater {
+                    model: config.visualizerBars
+
+                    delegate: Rectangle {
+                      required property int index
+
+                      anchors.verticalCenter: parent.verticalCenter
+                      color: config.colorText
+                      height: Math.max(config.visualizerBarWidth, ((media.levels[index] || 0) / 100) * config.visualizerHeight)
+                      width: config.visualizerBarWidth
+
+                      Behavior on height { NumberAnimation { duration: 60 } }
+                    }
+                  }
+                }
+
+                // ── Now Playing ── (hidden when nothing plays)
+                // Left click: pause. Right click: next track.
+                Text {
+                  id: nowPlayingLabel
+
+                  color: config.colorText
+                  font.family: config.fontFamily
+                  font.pixelSize: config.fontSize
+                  font.weight: config.fontWeight
+                  text: media.label
+                  visible: media.active
+
+                  MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                    onClicked: mouse => {
+                      if (!media.player) return
+                      if (mouse.button === Qt.RightButton) {
+                        if (media.player.canGoNext) media.player.next()
+                      } else if (media.player.canTogglePlaying) {
+                        media.player.togglePlaying()
+                      }
+                    }
+                  }
+                }
               }
             }
 
