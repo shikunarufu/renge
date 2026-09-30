@@ -559,8 +559,9 @@ makepkg --syncdeps --install --noconfirm
 # Apply config files
 mkdir --parents /home/"${USERNAME}"/.config
 cp --recursive /renge/.config/. /home/"${USERNAME}"/.config/
-cp --recursive /renge/pictures/wallpapers/. /home/"${USERNAME}"/Pictures/Wallpapers
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.config
+mkdir --parents /home/"${USERNAME}"/Pictures/Wallpapers
+cp --recursive /renge/pictures/wallpapers/. /home/"${USERNAME}"/Pictures/Wallpapers
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures/Wallpapers
 
 # Audio players
