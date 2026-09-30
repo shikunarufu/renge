@@ -68,6 +68,15 @@ rocm-smi-lib
 # File index and search
 plocate
 
+# File managers
+thunar
+catfish
+gvfs
+thunar-archive-plugin
+thunar-media-tags-plugin
+thunar-volman
+tumbler
+
 # Fonts
 terminus-font
 noto-fonts
