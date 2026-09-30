@@ -568,6 +568,7 @@ chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures/Wallp
 runuser --user="${USERNAME}" -- mkdir --parents \
 /home/"${USERNAME}"/.config/mpd/playlists \
 /home/"${USERNAME}"/.local/state/mpd
+systemctl --global enable mpd
 
 # Sound system
 amixer sset Master unmute
