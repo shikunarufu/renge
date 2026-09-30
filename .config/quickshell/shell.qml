@@ -73,13 +73,13 @@ ShellRoot {
       var n = wallpaperFolder.count
       if (n === 0) return
 
-      var i = -1
-      for (var k = 0; k < n; k++) {
-        if (wallpaperFolder.get(k, "filePath") === current) { i = k; break }
-      }
+        var i = -1
+        for (var k = 0; k < n; k++) {
+          if (wallpaperFolder.get(k, "filePath") === current) { i = k; break }
+        }
 
-      var next = i === -1 ? 0 : (i + delta + n) % n
-      wallpaperSettings.current = wallpaperFolder.get(next, "filePath")
+        var next = i === -1 ? 0 : (i + delta + n) % n
+        wallpaperSettings.current = wallpaperFolder.get(next, "filePath")
     }
 
     Settings {
@@ -428,7 +428,7 @@ ShellRoot {
             }
 
             // ── App Launcher Popup ──
-            PopupWindow {
+            PanelWindow {
               id: appLauncherPopup
 
               property string searchQuery: ""
@@ -460,19 +460,26 @@ ShellRoot {
                 })
               }
 
-              anchor.item: appLauncherGlyph
-              anchor.edges: Edges.Bottom | Edges.Left
-              anchor.gravity: Edges.Bottom | Edges.Right
+              // Own layer-shell window instead of a popup: xdg_popup grabs give no
+              // keyboard or pointer input from a Bottom-layer parent on wlroots.
+              screen: screenRoot.modelData
+              WlrLayershell.layer: WlrLayer.Overlay
+              WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+              WlrLayershell.namespace: "app-launcher"
+              exclusionMode: ExclusionMode.Ignore
+              anchors { left: true; top: true }
+              margins.left: 0
+              margins.top: config.barHeight
               implicitWidth: config.appLauncherWidth
               implicitHeight: 56 + Math.min(filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
               color: "transparent"
               visible: false
-              grabFocus: true
 
               onFilteredAppsChanged: selectedIndex = 0
 
               onVisibleChanged: {
                 if (visible) {
+                  margins.left = Math.max(0, appLauncherGlyph.mapToItem(null, 0, 0).x)
                   searchField.text = ""
                   searchQuery = ""
                   selectedIndex = 0
@@ -854,6 +861,16 @@ ShellRoot {
 
                     onClicked: mouse => wallpaper.step(mouse.button === Qt.RightButton ? -1 : 1)
                   }
+                }
+
+                // Separator 4
+                Text {
+                  bottomPadding: 3
+                  color: config.colorText
+                  font.family: config.fontFamily
+                  font.pixelSize: config.fontSize
+                  font.weight: config.fontWeight
+                  text: "|"
                 }
               }
             }
