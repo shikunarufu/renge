@@ -44,6 +44,7 @@ cava
 
 # Video players
 mpv
+mpv-mpris
 yt-dlp
 
 # Sound system
