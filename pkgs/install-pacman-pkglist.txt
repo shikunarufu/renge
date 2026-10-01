@@ -37,6 +37,7 @@ xdg-user-dirs
 
 # Audio players
 mpd
+mpd-mpris
 rmpc
 
 # Audio visualizers
