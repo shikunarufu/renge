@@ -80,6 +80,13 @@ ShellRoot {
     property string trayIconExpand: "\uf0d7" // nf-fa-caret_down
     property string trayIconCollapse: "\uf0d8" // nf-fa-caret_up
 
+    // Networks (requires NetworkManager)
+    property var networkCommand: ["nm-connection-editor"] // e.g. ["kitty", "-e", "nmtui"]
+    property int networkPollInterval: 3000
+    property string networkIconWifi: "\uf1eb" // nf-fa-wifi
+    property string networkIconEthernet: "\uf0e8" // nf-fa-sitemap
+    property real networkDisconnectedOpacity: 0.4
+
     // Input Method (requires fcitx5)
     property string imLatin: "keyboard-us" // run `fcitx5-remote -n` while typing English to confirm
     property string imJapanese: "mozc"
@@ -1191,6 +1198,48 @@ ShellRoot {
                   font.pixelSize: config.fontSize
                   font.weight: config.fontWeight
                   text: "|"
+                }
+
+                // ── Networks ──
+                // Left click: open network settings. Icon is dimmed when disconnected.
+                Text {
+                  id: networkGlyph
+
+                  property string kind: "none" // wifi | ethernet | none
+
+                  color: config.colorText
+                  font.family: config.iconFontFamily
+                  font.pixelSize: config.iconSize
+                  opacity: kind === "none" ? config.networkDisconnectedOpacity : 1
+                  text: kind === "ethernet" ? config.networkIconEthernet : config.networkIconWifi
+
+                  Process {
+                    id: networkQuery
+
+                    command: [
+                      "sh", "-c",
+                      "nmcli -t -f TYPE,STATE device | awk -F: '($1==\"wifi\"||$1==\"ethernet\")&&$2==\"connected\"{print $1; f=1; exit} END{if(!f)print \"none\"}'"
+                    ]
+
+                    stdout: SplitParser {
+                      onRead: data => { if (data !== "") networkGlyph.kind = data.trim() }
+                    }
+                  }
+
+                  Timer {
+                    interval: config.networkPollInterval
+                    repeat: true
+                    running: true
+                    triggeredOnStart: true
+
+                    onTriggered: if (!networkQuery.running) networkQuery.running = true
+                  }
+
+                  MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: Quickshell.execDetached(config.networkCommand)
+                  }
                 }
 
                 // ── Input Method ──
