@@ -36,8 +36,8 @@ ShellRoot {
     property int barItemSpacing: 16
     property int barPadding: 44
     property int barRadius: 22
-    property int barSlideDuration: 450
-    property int barSlideEasing: Easing.OutCubic
+    property int barAnimationDuration: 250
+    property int barAnimationEasing: Easing.OutCubic
 
     // Power Menu
     property int powerMenuWidth: 160
@@ -244,16 +244,6 @@ ShellRoot {
 
         required property ShellScreen modelData
 
-        // Bars slide in once this turns true; set it to false to slide them out
-        property bool shown: false
-
-        Timer {
-          interval: 50
-          running: true
-
-          onTriggered: screenRoot.shown = true
-        }
-
         PanelWindow {
           id: bar
 
@@ -276,18 +266,21 @@ ShellRoot {
               bottomRightRadius: config.barRadius
               color: config.barColor
               anchors { left: parent.left; top: parent.top }
-              anchors.leftMargin: screenRoot.shown ? 0 : -(width + config.barRadius)
+              clip: true
               height: config.barHeight
               width: leftRow.implicitWidth + config.barPadding
 
-              Behavior on anchors.leftMargin {
-                NumberAnimation { duration: config.barSlideDuration; easing.type: config.barSlideEasing }
+              Behavior on width {
+                NumberAnimation {
+                  duration: config.barAnimationDuration
+                  easing.type: config.barAnimationEasing
+                }
               }
 
               RowLayout {
                 id: leftRow
 
-                anchors.centerIn: parent
+                anchors { left: parent.left; leftMargin: config.barPadding / 2; verticalCenter: parent.verticalCenter }
                 spacing: config.barItemSpacing
 
                 // ── Power Menu ──
@@ -805,7 +798,7 @@ ShellRoot {
               id: centerConcave1
 
               preferredRendererType: Shape.CurveRenderer
-              anchors { right: centerBar.left; top: centerBar.top }
+              anchors { right: centerBar.left; top: parent.top }
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
               transform: Scale {
@@ -847,12 +840,15 @@ ShellRoot {
               bottomRightRadius: config.barRadius
               color: config.barColor
               anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
-              anchors.topMargin: screenRoot.shown ? 0 : -height
+              clip: true
               height: config.barHeight
               width: centerRow.implicitWidth + config.barPadding
 
-              Behavior on anchors.topMargin {
-                NumberAnimation { duration: config.barSlideDuration; easing.type: config.barSlideEasing }
+              Behavior on width {
+                NumberAnimation {
+                  duration: config.barAnimationDuration
+                  easing.type: config.barAnimationEasing
+                }
               }
 
               SystemClock {
@@ -936,7 +932,7 @@ ShellRoot {
               id: centerConcave2
 
               preferredRendererType: Shape.CurveRenderer
-              anchors { left: centerBar.right; top: centerBar.top }
+              anchors { left: centerBar.right; top: parent.top }
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
               transform: Scale {
@@ -1016,18 +1012,21 @@ ShellRoot {
               bottomLeftRadius: config.barRadius
               color: config.barColor
               anchors { right: parent.right; top: parent.top }
-              anchors.rightMargin: screenRoot.shown ? 0 : -(width + config.barRadius)
+              clip: true
               height: config.barHeight
               width: rightRow.implicitWidth + config.barPadding
 
-              Behavior on anchors.rightMargin {
-                NumberAnimation { duration: config.barSlideDuration; easing.type: config.barSlideEasing }
+              Behavior on width {
+                NumberAnimation {
+                  duration: config.barAnimationDuration
+                  easing.type: config.barAnimationEasing
+                }
               }
 
               RowLayout {
                 id: rightRow
 
-                anchors.centerIn: parent
+                anchors { right: parent.right; rightMargin: config.barPadding / 2; verticalCenter: parent.verticalCenter }
                 spacing: config.barItemSpacing
 
                 // ── System Tray ──
