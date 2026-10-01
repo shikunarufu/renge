@@ -36,6 +36,12 @@ ShellRoot {
     property int barItemSpacing: 16
     property int barPadding: 44
     property int barRadius: 22
+    property int barSlideDuration: 450
+    property int barSlideEasing: Easing.OutCubic
+
+    // Power Menu
+    property int powerMenuWidth: 160
+    property string powerMenuIcon: "\uf303" // nf-linux-archlinux
 
     // Workspace
     property int workspaceHeight: 16
@@ -44,29 +50,21 @@ ShellRoot {
     property int workspaceRadius: 4
     property int workspaceSpacing: 8
 
-    // Focus Window
-    property string focusWindowGlyph: "\uebc4" // nf-cod-terminal
-    property string focusWindowPlaceholder: "Desktop"
-
-    // Power Menu
-    property int powerMenuWidth: 160
-    property string powerMenuIcon: "\uf303" // nf-linux-archlinux — verify against your installed Nerd Font version
-
     // App Launcher
     property int appLauncherWidth: 360
     property int appLauncherMaxVisible: 7
     property int appLauncherItemHeight: 42
     property string appLauncherIcon: "\uea6d" // nf-cod-search
 
-    // Layout Changer
-    property var layoutList: ["tile", "monocle", "grid", "scroller"] // mangowm setlayout names — see mango's layout-commands docs for the full list
+    // Focus Window
+    property string focusWindowGlyph: "\uebc4" // nf-cod-terminal
+    property string focusWindowPlaceholder: "Desktop"
 
-    // Wallpaper Changer
-    property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
-    property string wallpaperIcon: "\uf03e" // nf-fa-image — verify against your installed Nerd Font version
+    // Wallpaper
+    property string wallpaperIcon: "\uf03e" // nf-fa-image
 
     // Volume
-    property real volumeStep: 0.05 // per scroll notch (5%)
+    property real volumeStep: 0.05
     property string volumeIconHigh: "\uf028" // nf-fa-volume_up
     property string volumeIconLow: "\uf027" // nf-fa-volume_down
     property string volumeIconMuted: "\uf026" // nf-fa-volume_off
@@ -80,15 +78,14 @@ ShellRoot {
     property string trayIconExpand: "\uf0d7" // nf-fa-caret_down
     property string trayIconCollapse: "\uf0d8" // nf-fa-caret_up
 
-    // Networks (requires NetworkManager)
-    property var networkCommand: ["nm-connection-editor"] // e.g. ["kitty", "-e", "nmtui"]
+    // Networks
     property int networkPollInterval: 3000
     property string networkIconWifi: "\uf1eb" // nf-fa-wifi
     property string networkIconEthernet: "\uf0e8" // nf-fa-sitemap
     property real networkDisconnectedOpacity: 0.4
 
-    // Input Method (requires fcitx5)
-    property string imLatin: "keyboard-us" // run `fcitx5-remote -n` while typing English to confirm
+    // Input Method
+    property string imLatin: "keyboard-us"
     property string imJapanese: "mozc"
     property string imLabelLatin: "en"
     property string imLabelJapanese: "jp"
@@ -98,18 +95,18 @@ ShellRoot {
     property string nowPlayingSeparator: " - "
     property int nowPlayingMaxLength: 45
 
-    // Visualizer (requires cava)
+    // Visualizer
     property int visualizerBars: 10
     property int visualizerBarWidth: 2
     property int visualizerBarGap: 4
     property int visualizerHeight: 12
-    property int visualizerFramerate: 60
-    property int visualizerMinFreq: 500
-    property int visualizerMaxFreq: 12000
+    property int visualizerFramerate: 180
+    property int visualizerMinFreq: 20
+    property int visualizerMaxFreq: 10000
   }
   // ─────────────────────────────────────────────────────
 
-  // ── Wallpaper Controller (shared by all screens) ──
+  // ── Wallpaper ──
   Scope {
     id: wallpaper
 
@@ -138,12 +135,13 @@ ShellRoot {
     FolderListModel {
       id: wallpaperFolder
 
+      property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
+
       folder: "file://" + config.wallpaperDir
       nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
       showDirs: false
       sortField: FolderListModel.Name
 
-      // First run: no saved wallpaper, use the first file
       onStatusChanged: {
         if (status === FolderListModel.Ready && wallpaper.current === "" && count > 0)
           wallpaperSettings.current = get(0, "filePath")
@@ -151,7 +149,6 @@ ShellRoot {
     }
   }
 
-  // ── Wallpaper Windows (one per screen, background layer) ──
   Variants {
     model: Quickshell.screens
 
@@ -175,11 +172,10 @@ ShellRoot {
     }
   }
 
-  // ── Media Controller (shared by all screens) ──
+  // ── Now Playing Function ──
   Scope {
     id: media
 
-    // First player that is currently playing; null when nothing plays
     property var player: {
       var list = Mpris.players.values
       for (var i = 0; i < list.length; i++) {
@@ -192,18 +188,18 @@ ShellRoot {
 
     property string label: {
       if (!player) return ""
-      var parts = []
-      if (player.trackTitle) parts.push(player.trackTitle)
-      if (player.trackArtist) parts.push(player.trackArtist)
-      var text = parts.join(config.nowPlayingSeparator)
-      return text.length > config.nowPlayingMaxLength
-        ? text.substring(0, config.nowPlayingMaxLength - 1) + "…"
-        : text
+        var parts = []
+        if (player.trackTitle) parts.push(player.trackTitle)
+          if (player.trackArtist) parts.push(player.trackArtist)
+            var text = parts.join(config.nowPlayingSeparator)
+            return text.length > config.nowPlayingMaxLength
+            ? text.substring(0, config.nowPlayingMaxLength - 1) + "…"
+            : text
     }
 
     onActiveChanged: if (!active) levels = []
 
-    // cava runs only while something plays
+    // ── Visualizer Function ──
     Process {
       id: cava
 
@@ -248,6 +244,16 @@ ShellRoot {
 
         required property ShellScreen modelData
 
+        // Bars slide in once this turns true; set it to false to slide them out
+        property bool shown: false
+
+        Timer {
+          interval: 50
+          running: true
+
+          onTriggered: screenRoot.shown = true
+        }
+
         PanelWindow {
           id: bar
 
@@ -270,8 +276,13 @@ ShellRoot {
               bottomRightRadius: config.barRadius
               color: config.barColor
               anchors { left: parent.left; top: parent.top }
+              anchors.leftMargin: screenRoot.shown ? 0 : -(width + config.barRadius)
               height: config.barHeight
               width: leftRow.implicitWidth + config.barPadding
+
+              Behavior on anchors.leftMargin {
+                NumberAnimation { duration: config.barSlideDuration; easing.type: config.barSlideEasing }
+              }
 
               RowLayout {
                 id: leftRow
@@ -291,7 +302,7 @@ ShellRoot {
                   MouseArea {
                     anchors.fill: parent
 
-                    onClicked: powerContextMenu.visible = !powerContextMenu.visible
+                    onClicked: powerMenuPopup.visible = !powerMenuPopup.visible
                   }
                 }
 
@@ -305,10 +316,11 @@ ShellRoot {
                   text: "|"
                 }
 
-                // ── Layout Changer ──
+                // ── Layout ──
                 Text {
-                  id: layoutChangerGlyph
+                  id: layoutGlyph
 
+                  property var layoutList: ["tile", "monocle", "grid", "scroller"]
                   property string currentLayout: config.layoutList[0]
                   property int nextIndex: 0
 
@@ -331,7 +343,7 @@ ShellRoot {
                           var monitors = payload.monitors || []
                           for (var i = 0; i < monitors.length; i++) {
                             if (monitors[i].name === screenRoot.modelData.name) {
-                              layoutChangerGlyph.currentLayout = monitors[i].layout_symbol
+                              layoutGlyph.currentLayout = monitors[i].layout_symbol
                               break
                             }
                           }
@@ -348,8 +360,8 @@ ShellRoot {
                     anchors.fill: parent
 
                     onClicked: {
-                      layoutChangerGlyph.nextIndex = (layoutChangerGlyph.nextIndex + 1) % config.layoutList.length
-                      Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + config.layoutList[layoutChangerGlyph.nextIndex]])
+                      layoutGlyph.nextIndex = (layoutGlyph.nextIndex + 1) % config.layoutList.length
+                      Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + config.layoutList[layoutGlyph.nextIndex]])
                     }
                   }
                 }
@@ -463,9 +475,9 @@ ShellRoot {
               }
             }
 
-            // ── Power Context Menu ──
+            // ── Power Menu Popup ──
             PopupWindow {
-              id: powerContextMenu
+              id: powerMenuPopup
 
               anchor.item: powerMenuGlyph
               anchor.edges: Edges.Bottom | Edges.Left
@@ -525,7 +537,7 @@ ShellRoot {
 
                         onClicked: {
                           Quickshell.execDetached(["sh", "-c", powerMenuOption.entry.command])
-                          powerContextMenu.visible = false
+                          powerMenuPopup.visible = false
                         }
                       }
                     }
@@ -567,8 +579,6 @@ ShellRoot {
                 })
               }
 
-              // Own layer-shell window instead of a popup: xdg_popup grabs give no
-              // keyboard or pointer input from a Bottom-layer parent on wlroots.
               screen: screenRoot.modelData
               WlrLayershell.layer: WlrLayer.Overlay
               WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
@@ -795,7 +805,7 @@ ShellRoot {
               id: centerConcave1
 
               preferredRendererType: Shape.CurveRenderer
-              anchors { right: centerBar.left; top: parent.top }
+              anchors { right: centerBar.left; top: centerBar.top }
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
               transform: Scale {
@@ -837,8 +847,13 @@ ShellRoot {
               bottomRightRadius: config.barRadius
               color: config.barColor
               anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
+              anchors.topMargin: screenRoot.shown ? 0 : -height
               height: config.barHeight
               width: centerRow.implicitWidth + config.barPadding
+
+              Behavior on anchors.topMargin {
+                NumberAnimation { duration: config.barSlideDuration; easing.type: config.barSlideEasing }
+              }
 
               SystemClock {
                 id: clock
@@ -863,7 +878,7 @@ ShellRoot {
                   text: Qt.formatDateTime(clock.date, "ddd, d MMM   HH:mm")
                 }
 
-                // ── Visualizer ── (hidden when nothing plays)
+                // ── Visualizer ──
                 Row {
                   id: visualizer
 
@@ -888,8 +903,7 @@ ShellRoot {
                   }
                 }
 
-                // ── Now Playing ── (hidden when nothing plays)
-                // Left click: pause. Right click: next track.
+                // ── Now Playing ──
                 Text {
                   id: nowPlayingLabel
 
@@ -906,11 +920,11 @@ ShellRoot {
 
                     onClicked: mouse => {
                       if (!media.player) return
-                      if (mouse.button === Qt.RightButton) {
-                        if (media.player.canGoNext) media.player.next()
-                      } else if (media.player.canTogglePlaying) {
-                        media.player.togglePlaying()
-                      }
+                        if (mouse.button === Qt.RightButton) {
+                          if (media.player.canGoNext) media.player.next()
+                        } else if (media.player.canTogglePlaying) {
+                          media.player.togglePlaying()
+                        }
                     }
                   }
                 }
@@ -922,7 +936,7 @@ ShellRoot {
               id: centerConcave2
 
               preferredRendererType: Shape.CurveRenderer
-              anchors { left: centerBar.right; top: parent.top }
+              anchors { left: centerBar.right; top: centerBar.top }
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
               transform: Scale {
@@ -1002,8 +1016,13 @@ ShellRoot {
               bottomLeftRadius: config.barRadius
               color: config.barColor
               anchors { right: parent.right; top: parent.top }
+              anchors.rightMargin: screenRoot.shown ? 0 : -(width + config.barRadius)
               height: config.barHeight
               width: rightRow.implicitWidth + config.barPadding
+
+              Behavior on anchors.rightMargin {
+                NumberAnimation { duration: config.barSlideDuration; easing.type: config.barSlideEasing }
+              }
 
               RowLayout {
                 id: rightRow
@@ -1012,8 +1031,6 @@ ShellRoot {
                 spacing: config.barItemSpacing
 
                 // ── System Tray ──
-                // Arrow click: open/close the popup.
-                // Icons: left click activate, middle click secondary, right click menu.
                 Text {
                   id: trayArrow
 
@@ -1105,8 +1122,7 @@ ShellRoot {
                   visible: trayArrow.visible
                 }
 
-                // ── Wallpaper Changer ──
-                // Left click: next. Right click: previous.
+                // ── Wallpaper ──
                 Text {
                   id: wallpaperGlyph
 
@@ -1134,7 +1150,6 @@ ShellRoot {
                 }
 
                 // ── Volume ──
-                // Scroll: adjust volume. Left click: mute/unmute.
                 Item {
                   id: volumeItem
 
@@ -1158,8 +1173,8 @@ ShellRoot {
                       font.family: config.iconFontFamily
                       font.pixelSize: config.iconSize
                       text: volumeItem.muted ? config.volumeIconMuted
-                          : volumeItem.volume < 0.5 ? config.volumeIconLow
-                          : config.volumeIconHigh
+                      : volumeItem.volume < 0.5 ? config.volumeIconLow
+                      : config.volumeIconHigh
                     }
 
                     Text {
@@ -1183,9 +1198,9 @@ ShellRoot {
 
                     onWheel: wheel => {
                       if (!volumeItem.sink || !volumeItem.sink.audio) return
-                      var delta = wheel.angleDelta.y > 0 ? config.volumeStep : -config.volumeStep
-                      volumeItem.sink.audio.muted = false
-                      volumeItem.sink.audio.volume = Math.max(0, Math.min(1, volumeItem.volume + delta))
+                        var delta = wheel.angleDelta.y > 0 ? config.volumeStep : -config.volumeStep
+                        volumeItem.sink.audio.muted = false
+                        volumeItem.sink.audio.volume = Math.max(0, Math.min(1, volumeItem.volume + delta))
                     }
                   }
                 }
@@ -1201,7 +1216,6 @@ ShellRoot {
                 }
 
                 // ── Networks ──
-                // Left click: open network settings. Icon is dimmed when disconnected.
                 Text {
                   id: networkGlyph
 
@@ -1238,12 +1252,13 @@ ShellRoot {
                   MouseArea {
                     anchors.fill: parent
 
+                    property var networkCommand: ["foot", "-e", "nmtui"]
+
                     onClicked: Quickshell.execDetached(config.networkCommand)
                   }
                 }
 
                 // ── Input Method ──
-                // Click: switch between English and Japanese (fcitx5).
                 Text {
                   id: imText
 
