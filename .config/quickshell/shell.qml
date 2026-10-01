@@ -986,6 +986,16 @@ ShellRoot {
                 anchors.centerIn: parent
                 spacing: config.barItemSpacing
 
+                // Separator 4
+                Text {
+                  bottomPadding: 3
+                  color: config.colorText
+                  font.family: config.fontFamily
+                  font.pixelSize: config.fontSize
+                  font.weight: config.fontWeight
+                  text: "|"
+                }
+
                 // ── Wallpaper Changer ──
                 // Left click: next. Right click: previous.
                 Text {
@@ -1004,7 +1014,7 @@ ShellRoot {
                   }
                 }
 
-                // Separator 4
+                // Separator 5
                 Text {
                   bottomPadding: 3
                   color: config.colorText
