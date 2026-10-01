@@ -854,7 +854,7 @@ ShellRoot {
                       required property int index
 
                       anchors.verticalCenter: parent.verticalCenter
-                      color: config.colorText
+                      color: config.colorAccent
                       height: Math.max(config.visualizerBarWidth, ((media.levels[index] || 0) / 100) * config.visualizerHeight)
                       width: config.visualizerBarWidth
 
