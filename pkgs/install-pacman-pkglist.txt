@@ -42,6 +42,8 @@ rmpc
 
 # Music streaming clients
 spotifyd
+spotify-player
+fzf
 
 # Audio visualizers
 cava
