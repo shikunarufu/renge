@@ -517,6 +517,9 @@ mv /limine.conf /boot/EFI/arch-limine/
 # Graphical user interface
 #######################################
 
+# Uncomment if mangowm is NOT in AUR
+pacman -S --noconfirm --needed mangowm
+
 # Uncomment if mangowm is in AUR
 # if systemd-detect-virt --quiet --vm; then
 #   # scenefx (mangowm dependency)
