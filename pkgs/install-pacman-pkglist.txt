@@ -40,6 +40,9 @@ mpd
 mpd-mpris
 rmpc
 
+# Music streaming clients
+spotifyd
+
 # Audio visualizers
 cava
 
