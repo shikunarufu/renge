@@ -7,6 +7,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
+import Quickshell.Services.SystemTray
+import Quickshell.Widgets
 import Quickshell.Wayland
 import Quickshell.WindowManager
 
@@ -68,6 +70,12 @@ ShellRoot {
     property string volumeIconHigh: "\uf028" // nf-fa-volume_up
     property string volumeIconLow: "\uf027" // nf-fa-volume_down
     property string volumeIconMuted: "\uf026" // nf-fa-volume_off
+
+    // System Tray
+    property int trayIconSize: 16
+    property int trayIconSpacing: 8
+    property string trayIconExpand: "\uf0d7" // nf-fa-caret_down
+    property string trayIconCollapse: "\uf0d8" // nf-fa-caret_up
 
     // Input Method (requires fcitx5)
     property string imLatin: "keyboard-us" // run `fcitx5-remote -n` while typing English to confirm
@@ -993,6 +1001,67 @@ ShellRoot {
                 anchors.centerIn: parent
                 spacing: config.barItemSpacing
 
+                // ── System Tray ──
+                // Arrow click: show/hide icons.
+                // Icons: left click activate, middle click secondary, right click menu.
+                RowLayout {
+                  id: trayRow
+
+                  property bool expanded: false
+
+                  spacing: config.trayIconSpacing
+                  visible: SystemTray.items.values.length > 0
+
+                  Text {
+                    color: config.colorText
+                    font.family: config.iconFontFamily
+                    font.pixelSize: config.iconSize
+                    text: trayRow.expanded ? config.trayIconCollapse : config.trayIconExpand
+
+                    MouseArea {
+                      anchors.fill: parent
+
+                      onClicked: trayRow.expanded = !trayRow.expanded
+                    }
+                  }
+
+                  Repeater {
+                    model: SystemTray.items
+
+                    delegate: Item {
+                      id: trayDelegate
+
+                      required property SystemTrayItem modelData
+
+                      implicitHeight: config.trayIconSize
+                      implicitWidth: config.trayIconSize
+                      visible: trayRow.expanded
+
+                      IconImage {
+                        anchors.fill: parent
+                        source: trayDelegate.modelData.icon
+                      }
+
+                      MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
+
+                        onClicked: mouse => {
+                          var item = trayDelegate.modelData
+                          if (mouse.button === Qt.LeftButton && !item.onlyMenu) {
+                            item.activate()
+                          } else if (mouse.button === Qt.MiddleButton) {
+                            item.secondaryActivate()
+                          } else if (item.hasMenu) {
+                            var pos = trayDelegate.mapToItem(null, 0, config.barHeight)
+                            item.display(trayDelegate.QsWindow.window, pos.x, pos.y)
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+
                 // Separator 4
                 Text {
                   bottomPadding: 3
@@ -1117,8 +1186,15 @@ ShellRoot {
                     command: ["fcitx5-remote", "-n"]
 
                     stdout: SplitParser {
-                      onRead: data => { if (data !== "") imText.current = data.trim() }
+                      onRead: data => { if (data !== "" && !imHold.running) imText.current = data.trim() }
                     }
+                  }
+
+                  // Pause polling after a click so a stale reply can't overwrite the new value
+                  Timer {
+                    id: imHold
+
+                    interval: 800
                   }
 
                   Timer {
@@ -1136,7 +1212,8 @@ ShellRoot {
                     onClicked: {
                       var target = imText.current === config.imJapanese ? config.imLatin : config.imJapanese
                       imText.current = target
-                      Quickshell.execDetached(["fcitx5-remote", "-s", target])
+                      imHold.restart()
+                      Quickshell.execDetached(["fcitx5-remote", "-t"])
                     }
                   }
                 }
