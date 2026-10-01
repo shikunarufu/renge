@@ -69,6 +69,13 @@ ShellRoot {
     property string volumeIconLow: "\uf027" // nf-fa-volume_down
     property string volumeIconMuted: "\uf026" // nf-fa-volume_off
 
+    // Input Method (requires fcitx5)
+    property string imLatin: "keyboard-us" // run `fcitx5-remote -n` while typing English to confirm
+    property string imJapanese: "mozc"
+    property string imLabelLatin: "en"
+    property string imLabelJapanese: "jp"
+    property int imPollInterval: 500
+
     // Now Playing
     property string nowPlayingSeparator: " - "
     property int nowPlayingMaxLength: 45
@@ -1089,6 +1096,49 @@ ShellRoot {
                   font.pixelSize: config.fontSize
                   font.weight: config.fontWeight
                   text: "|"
+                }
+
+                // ── Input Method ──
+                // Click: switch between English and Japanese (fcitx5).
+                Text {
+                  id: imText
+
+                  property string current: config.imLatin
+
+                  color: config.colorText
+                  font.family: config.fontFamily
+                  font.pixelSize: config.fontSize
+                  font.weight: config.fontWeight
+                  text: current === config.imJapanese ? config.imLabelJapanese : config.imLabelLatin
+
+                  Process {
+                    id: imQuery
+
+                    command: ["fcitx5-remote", "-n"]
+
+                    stdout: SplitParser {
+                      onRead: data => { if (data !== "") imText.current = data.trim() }
+                    }
+                  }
+
+                  Timer {
+                    interval: config.imPollInterval
+                    repeat: true
+                    running: true
+                    triggeredOnStart: true
+
+                    onTriggered: if (!imQuery.running) imQuery.running = true
+                  }
+
+                  MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: {
+                      var target = imText.current === config.imJapanese ? config.imLatin : config.imJapanese
+                      imText.current = target
+                      Quickshell.execDetached(["fcitx5-remote", "-s", target])
+                    }
+                  }
                 }
               }
             }
