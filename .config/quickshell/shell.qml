@@ -74,6 +74,9 @@ ShellRoot {
     // System Tray
     property int trayIconSize: 16
     property int trayIconSpacing: 8
+    property int trayPopupPadding: 10
+    property int trayPopupMargin: 6
+    property int trayPopupRadius: 12
     property string trayIconExpand: "\uf0d7" // nf-fa-caret_down
     property string trayIconCollapse: "\uf0d8" // nf-fa-caret_up
 
@@ -1002,59 +1005,81 @@ ShellRoot {
                 spacing: config.barItemSpacing
 
                 // ── System Tray ──
-                // Arrow click: show/hide icons.
+                // Arrow click: open/close the popup.
                 // Icons: left click activate, middle click secondary, right click menu.
-                RowLayout {
-                  id: trayRow
+                Text {
+                  id: trayArrow
 
-                  property bool expanded: false
-
-                  spacing: config.trayIconSpacing
+                  color: config.colorText
+                  font.family: config.iconFontFamily
+                  font.pixelSize: config.iconSize
+                  text: trayPopup.visible ? config.trayIconCollapse : config.trayIconExpand
                   visible: SystemTray.items.values.length > 0
 
-                  Text {
-                    color: config.colorText
-                    font.family: config.iconFontFamily
-                    font.pixelSize: config.iconSize
-                    text: trayRow.expanded ? config.trayIconCollapse : config.trayIconExpand
+                  MouseArea {
+                    anchors.fill: parent
 
-                    MouseArea {
-                      anchors.fill: parent
-
-                      onClicked: trayRow.expanded = !trayRow.expanded
-                    }
+                    onClicked: trayPopup.visible = !trayPopup.visible
                   }
 
-                  Repeater {
-                    model: SystemTray.items
+                  PopupWindow {
+                    id: trayPopup
 
-                    delegate: Item {
-                      id: trayDelegate
+                    anchor.item: trayArrow
+                    anchor.edges: Edges.Bottom | Edges.Right
+                    anchor.gravity: Edges.Bottom | Edges.Left
+                    anchor.margins.top: config.trayPopupMargin
+                    color: "transparent"
+                    implicitHeight: config.trayIconSize + config.trayPopupPadding * 2
+                    implicitWidth: trayIcons.implicitWidth + config.trayPopupPadding * 2
+                    visible: false
+                    grabFocus: true
 
-                      required property SystemTrayItem modelData
+                    Rectangle {
+                      anchors.fill: parent
+                      color: config.barColor
+                      radius: config.trayPopupRadius
 
-                      implicitHeight: config.trayIconSize
-                      implicitWidth: config.trayIconSize
-                      visible: trayRow.expanded
+                      RowLayout {
+                        id: trayIcons
 
-                      IconImage {
-                        anchors.fill: parent
-                        source: trayDelegate.modelData.icon
-                      }
+                        anchors.centerIn: parent
+                        spacing: config.trayIconSpacing
 
-                      MouseArea {
-                        anchors.fill: parent
-                        acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
+                        Repeater {
+                          model: SystemTray.items
 
-                        onClicked: mouse => {
-                          var item = trayDelegate.modelData
-                          if (mouse.button === Qt.LeftButton && !item.onlyMenu) {
-                            item.activate()
-                          } else if (mouse.button === Qt.MiddleButton) {
-                            item.secondaryActivate()
-                          } else if (item.hasMenu) {
-                            var pos = trayDelegate.mapToItem(null, 0, config.barHeight)
-                            item.display(trayDelegate.QsWindow.window, pos.x, pos.y)
+                          delegate: Item {
+                            id: trayDelegate
+
+                            required property SystemTrayItem modelData
+
+                            implicitHeight: config.trayIconSize
+                            implicitWidth: config.trayIconSize
+
+                            IconImage {
+                              anchors.fill: parent
+                              source: trayDelegate.modelData.icon
+                            }
+
+                            MouseArea {
+                              anchors.fill: parent
+                              acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
+
+                              onClicked: mouse => {
+                                var item = trayDelegate.modelData
+                                if (mouse.button === Qt.LeftButton && !item.onlyMenu) {
+                                  item.activate()
+                                  trayPopup.visible = false
+                                } else if (mouse.button === Qt.MiddleButton) {
+                                  item.secondaryActivate()
+                                  trayPopup.visible = false
+                                } else if (item.hasMenu) {
+                                  var pos = trayDelegate.mapToItem(null, 0, trayDelegate.height)
+                                  item.display(trayDelegate.QsWindow.window, pos.x, pos.y)
+                                }
+                              }
+                            }
                           }
                         }
                       }
@@ -1070,6 +1095,7 @@ ShellRoot {
                   font.pixelSize: config.fontSize
                   font.weight: config.fontWeight
                   text: "|"
+                  visible: trayArrow.visible
                 }
 
                 // ── Wallpaper Changer ──
