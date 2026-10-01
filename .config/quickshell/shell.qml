@@ -1080,6 +1080,16 @@ ShellRoot {
                     }
                   }
                 }
+
+                // Separator 6
+                Text {
+                  bottomPadding: 3
+                  color: config.colorText
+                  font.family: config.fontFamily
+                  font.pixelSize: config.fontSize
+                  font.weight: config.fontWeight
+                  text: "|"
+                }
               }
             }
 
