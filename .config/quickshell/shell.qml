@@ -378,20 +378,40 @@ ShellRoot {
             Rectangle {
               id: leftBar
 
+              property int slideDuration: 300
+              clip: true
               bottomRightRadius: config.barRadius
               color: config.barColor
               anchors { left: parent.left; top: parent.top }
               height: config.barHeight
               width: leftRow.implicitWidth + config.barPadding
 
+              Behavior on width {
+                NumberAnimation {
+                  duration: leftBar.slideDuration
+                  easing.type: Easing.InOutQuad
+                }
+              }
+
               RowLayout {
                 id: leftRow
 
-                anchors.centerIn: parent
+                anchors {
+                  left: parent.left
+                  leftMargin: config.barPadding / 2
+                  verticalCenter: parent.verticalCenter
+                }
                 spacing: config.barItemSpacing
 
                 // ── Power Menu ──
                 Text {
+                  Behavior on x {
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+
                   id: powerMenuGlyph
 
                   color: config.colorText
@@ -408,6 +428,13 @@ ShellRoot {
 
                 // Separator 1
                 Text {
+                  Behavior on x {
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+
                   bottomPadding: 3
                   color: config.colorText
                   font.family: config.fontFamily
@@ -418,6 +445,13 @@ ShellRoot {
 
                 // ── Layout ──
                 Text {
+                  Behavior on x {
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+
                   id: layoutGlyph
 
                   property var layoutList: ["tile", "monocle", "grid", "scroller"]
@@ -442,6 +476,13 @@ ShellRoot {
 
                 // Separator 2
                 Text {
+                  Behavior on x {
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+
                   bottomPadding: 3
                   color: config.colorText
                   font.family: config.fontFamily
@@ -452,6 +493,13 @@ ShellRoot {
 
                 // ── Workspace ──
                 RowLayout {
+                  Behavior on x {
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+
                   id: workspaceRow
 
                   spacing: config.workspaceSpacing
@@ -460,6 +508,13 @@ ShellRoot {
                     model: bar.projection ? bar.projection.windowsets : []
 
                     delegate: Rectangle {
+                      Behavior on x {
+                        NumberAnimation {
+                          duration: leftBar.slideDuration
+                          easing.type: Easing.InOutQuad
+                        }
+                      }
+
                       id: workspaceDelegate
 
                       property color workspaceActiveColor: config.colorAccent
@@ -498,6 +553,13 @@ ShellRoot {
 
                 // Separator 3
                 Text {
+                  Behavior on x {
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+
                   bottomPadding: 3
                   color: config.colorText
                   font.family: config.fontFamily
@@ -508,6 +570,13 @@ ShellRoot {
 
                 // ── App Launcher ──
                 Text {
+                  Behavior on x {
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+
                   id: appLauncherGlyph
 
                   color: config.colorText
@@ -524,6 +593,13 @@ ShellRoot {
 
                 // ── Focus Window ──
                 RowLayout {
+                  Behavior on x {
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+
                   spacing: 8
 
                   Text {
