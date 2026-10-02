@@ -98,7 +98,7 @@ ShellRoot {
     property int visualizerBarWidth: 2
     property int visualizerBarGap: 4
     property int visualizerHeight: 12
-    property int visualizerFramerate: 180
+    property int visualizerFramerate: 60
     property int visualizerMinFreq: 20
     property int visualizerMaxFreq: 10000
   }
@@ -114,13 +114,13 @@ ShellRoot {
       var n = wallpaperFolder.count
       if (n === 0) return
 
-        var i = -1
-        for (var k = 0; k < n; k++) {
-          if (wallpaperFolder.get(k, "filePath") === current) { i = k; break }
-        }
+      var i = -1
+      for (var k = 0; k < n; k++) {
+        if (wallpaperFolder.get(k, "filePath") === current) { i = k; break }
+      }
 
-        var next = i === -1 ? 0 : (i + delta + n) % n
-        wallpaperSettings.current = wallpaperFolder.get(next, "filePath")
+      var next = i === -1 ? 0 : (i + delta + n) % n
+      wallpaperSettings.current = wallpaperFolder.get(next, "filePath")
     }
 
     Settings {
@@ -135,7 +135,7 @@ ShellRoot {
 
       property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
 
-      folder: "file://" + config.wallpaperDir
+      folder: "file://" + wallpaperDir
       nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
       showDirs: false
       sortField: FolderListModel.Name
@@ -186,13 +186,15 @@ ShellRoot {
 
     property string label: {
       if (!player) return ""
-        var parts = []
-        if (player.trackTitle) parts.push(player.trackTitle)
-          if (player.trackArtist) parts.push(player.trackArtist)
-            var text = parts.join(config.nowPlayingSeparator)
-            return text.length > config.nowPlayingMaxLength
-            ? text.substring(0, config.nowPlayingMaxLength - 1) + "…"
-            : text
+
+      var parts = []
+      if (player.trackTitle) parts.push(player.trackTitle)
+      if (player.trackArtist) parts.push(player.trackArtist)
+
+      var text = parts.join(config.nowPlayingSeparator)
+      return text.length > config.nowPlayingMaxLength
+        ? text.substring(0, config.nowPlayingMaxLength - 1) + "…"
+        : text
     }
 
     onActiveChanged: if (!active) levels = []
@@ -230,6 +232,116 @@ ShellRoot {
     }
   }
 
+  // ── Layout State ──
+  Scope {
+    id: layoutState
+
+    // Layout symbol per monitor name
+    property var symbols: ({})
+
+    Process {
+      id: layoutWatcher
+
+      command: ["mmsg", "watch", "all-monitors"]
+      running: true
+
+      stdout: SplitParser {
+        onRead: data => {
+          try {
+            var payload = JSON.parse(data)
+            var monitors = payload.monitors || []
+            if (monitors.length === 0) return
+
+            var next = {}
+            for (var key in layoutState.symbols) next[key] = layoutState.symbols[key]
+            for (var i = 0; i < monitors.length; i++) next[monitors[i].name] = monitors[i].layout_symbol
+            layoutState.symbols = next
+          } catch (e) {
+            // ignore partial/malformed JSON chunks
+          }
+        }
+      }
+
+      onRunningChanged: if (!running) layoutRestart.start()
+    }
+
+    Timer {
+      id: layoutRestart
+
+      interval: 1000
+
+      onTriggered: layoutWatcher.running = true
+    }
+  }
+
+  // ── Network State ──
+  Scope {
+    id: network
+
+    property string kind: "none" // wifi | ethernet | none
+
+    Process {
+      id: networkQuery
+
+      command: [
+        "sh", "-c",
+        "nmcli -t -f TYPE,STATE device | awk -F: '($1==\"wifi\"||$1==\"ethernet\")&&$2==\"connected\"{print $1; f=1; exit} END{if(!f)print \"none\"}'"
+      ]
+
+      stdout: SplitParser {
+        onRead: data => { if (data !== "") network.kind = data.trim() }
+      }
+    }
+
+    Timer {
+      interval: config.networkPollInterval
+      repeat: true
+      running: true
+      triggeredOnStart: true
+
+      onTriggered: if (!networkQuery.running) networkQuery.running = true
+    }
+  }
+
+  // ── Input Method State ──
+  Scope {
+    id: inputMethod
+
+    property string current: config.imLatin
+
+    function toggle() {
+      current = current === config.imJapanese ? config.imLatin : config.imJapanese
+      imHold.restart()
+      Quickshell.execDetached(["fcitx5-remote", "-t"])
+    }
+
+    Process {
+      id: imQuery
+
+      command: ["fcitx5-remote", "-n"]
+
+      stdout: SplitParser {
+        onRead: data => { if (data !== "" && !imHold.running) inputMethod.current = data.trim() }
+      }
+    }
+
+    // Pause polling after a click so a stale reply can't overwrite the new value
+    Timer {
+      id: imHold
+
+      interval: 800
+    }
+
+    Timer {
+      interval: config.imPollInterval
+      repeat: true
+      running: true
+      triggeredOnStart: true
+
+      onTriggered: if (!imQuery.running) imQuery.running = true
+    }
+  }
+
   // ── Bar ──
   Scope {
     id: root
@@ -237,7 +349,7 @@ ShellRoot {
     Variants {
       model: Quickshell.screens
 
-      Item {
+      Scope {
         id: screenRoot
 
         required property ShellScreen modelData
@@ -304,7 +416,7 @@ ShellRoot {
                   id: layoutGlyph
 
                   property var layoutList: ["tile", "monocle", "grid", "scroller"]
-                  property string currentLayout: config.layoutList[0]
+                  property string currentLayout: layoutState.symbols[screenRoot.modelData.name] || layoutList[0]
                   property int nextIndex: 0
 
                   color: config.colorText
@@ -313,38 +425,12 @@ ShellRoot {
                   font.weight: config.fontWeight
                   text: currentLayout
 
-                  Process {
-                    id: layoutWatcher
-
-                    command: ["mmsg", "watch", "all-monitors"]
-                    running: true
-
-                    stdout: SplitParser {
-                      onRead: data => {
-                        try {
-                          var payload = JSON.parse(data)
-                          var monitors = payload.monitors || []
-                          for (var i = 0; i < monitors.length; i++) {
-                            if (monitors[i].name === screenRoot.modelData.name) {
-                              layoutGlyph.currentLayout = monitors[i].layout_symbol
-                              break
-                            }
-                          }
-                        } catch (e) {
-                          // ignore partial/malformed JSON chunks
-                        }
-                      }
-                    }
-
-                    onRunningChanged: if (!running) running = true
-                  }
-
                   MouseArea {
                     anchors.fill: parent
 
                     onClicked: {
-                      layoutGlyph.nextIndex = (layoutGlyph.nextIndex + 1) % config.layoutList.length
-                      Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + config.layoutList[layoutGlyph.nextIndex]])
+                      layoutGlyph.nextIndex = (layoutGlyph.nextIndex + 1) % layoutGlyph.layoutList.length
+                      Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + layoutGlyph.layoutList[layoutGlyph.nextIndex]])
                     }
                   }
                 }
@@ -544,10 +630,11 @@ ShellRoot {
                 if (q !== "") {
                   return vals.filter(function (e) {
                     if (e.name.toLowerCase().indexOf(q) !== -1) return true
-                      if (e.genericName && e.genericName.toLowerCase().indexOf(q) !== -1) return true
-                        for (var i = 0; i < e.keywords.length; i++)
-                          if (e.keywords[i].toLowerCase().indexOf(q) !== -1) return true
-                            return false
+                    if (e.genericName && e.genericName.toLowerCase().indexOf(q) !== -1) return true
+                    for (var i = 0; i < e.keywords.length; i++) {
+                      if (e.keywords[i].toLowerCase().indexOf(q) !== -1) return true
+                    }
+                    return false
                   }).sort(function (a, b) { return a.name.localeCompare(b.name) })
                 }
 
@@ -556,9 +643,9 @@ ShellRoot {
                   var ai = recent.indexOf(a.id)
                   var bi = recent.indexOf(b.id)
                   if (ai !== -1 && bi !== -1) return ai - bi
-                    if (ai !== -1) return -1
-                      if (bi !== -1) return 1
-                        return a.name.localeCompare(b.name)
+                  if (ai !== -1) return -1
+                  if (bi !== -1) return 1
+                  return a.name.localeCompare(b.name)
                 })
               }
 
@@ -591,16 +678,16 @@ ShellRoot {
                 var list = appLauncherPopup.recentIds.slice()
                 var idx = list.indexOf(id)
                 if (idx !== -1) list.splice(idx, 1)
-                  list.unshift(id)
-                  if (list.length > 12) list = list.slice(0, 12)
-                    appLauncherPopup.recentIds = list
-                    recentAppsSettings.recentIdsSerialized = JSON.stringify(list)
+                list.unshift(id)
+                if (list.length > 12) list = list.slice(0, 12)
+                appLauncherPopup.recentIds = list
+                recentAppsSettings.recentIdsSerialized = JSON.stringify(list)
               }
 
               function navigate(delta) {
                 if (filteredApps.length === 0) return
-                  selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
-                  appList.positionViewAtIndex(selectedIndex, ListView.Contain)
+                selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
+                appList.positionViewAtIndex(selectedIndex, ListView.Contain)
               }
 
               function launchEntry(entry) {
@@ -639,7 +726,7 @@ ShellRoot {
                       anchors.leftMargin: 8
                       anchors.rightMargin: 8
                       color: config.colorText
-                      font.family: config.iconFontFamily
+                      font.family: config.fontFamily
                       font.pixelSize: config.fontSize
                       verticalAlignment: TextInput.AlignVCenter
                       clip: true
@@ -656,7 +743,7 @@ ShellRoot {
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                           if (appLauncherPopup.filteredApps.length > 0)
                             appLauncherPopup.launchEntry(appLauncherPopup.filteredApps[appLauncherPopup.selectedIndex])
-                            event.accepted = true
+                          event.accepted = true
                         } else if (event.key === Qt.Key_Escape) {
                           appLauncherPopup.visible = false
                           event.accepted = true
@@ -666,7 +753,7 @@ ShellRoot {
                       Text {
                         anchors.fill: parent
                         color: config.colorText
-                        font.family: config.iconFontFamily
+                        font.family: config.fontFamily
                         font.pixelSize: config.fontSize
                         opacity: 0.35
                         text: "Search apps…"
@@ -689,7 +776,7 @@ ShellRoot {
                     Text {
                       anchors.centerIn: parent
                       color: config.colorText
-                      font.family: config.iconFontFamily
+                      font.family: config.fontFamily
                       font.pixelSize: config.fontSize
                       opacity: 0.35
                       text: "No apps found"
@@ -898,11 +985,12 @@ ShellRoot {
 
                     onClicked: mouse => {
                       if (!media.player) return
-                        if (mouse.button === Qt.RightButton) {
-                          if (media.player.canGoNext) media.player.next()
-                        } else if (media.player.canTogglePlaying) {
-                          media.player.togglePlaying()
-                        }
+
+                      if (mouse.button === Qt.RightButton) {
+                        if (media.player.canGoNext) media.player.next()
+                      } else if (media.player.canTogglePlaying) {
+                        media.player.togglePlaying()
+                      }
                     }
                   }
                 }
@@ -1146,8 +1234,8 @@ ShellRoot {
                       font.family: config.iconFontFamily
                       font.pixelSize: config.iconSize
                       text: volumeItem.muted ? config.volumeIconMuted
-                      : volumeItem.volume < 0.5 ? config.volumeIconLow
-                      : config.volumeIconHigh
+                        : volumeItem.volume < 0.5 ? config.volumeIconLow
+                        : config.volumeIconHigh
                     }
 
                     Text {
@@ -1171,9 +1259,10 @@ ShellRoot {
 
                     onWheel: wheel => {
                       if (!volumeItem.sink || !volumeItem.sink.audio) return
-                        var delta = wheel.angleDelta.y > 0 ? config.volumeStep : -config.volumeStep
-                        volumeItem.sink.audio.muted = false
-                        volumeItem.sink.audio.volume = Math.max(0, Math.min(1, volumeItem.volume + delta))
+
+                      var delta = wheel.angleDelta.y > 0 ? config.volumeStep : -config.volumeStep
+                      volumeItem.sink.audio.muted = false
+                      volumeItem.sink.audio.volume = Math.max(0, Math.min(1, volumeItem.volume + delta))
                     }
                   }
                 }
@@ -1192,7 +1281,7 @@ ShellRoot {
                 Text {
                   id: networkGlyph
 
-                  property string kind: "none" // wifi | ethernet | none
+                  property string kind: network.kind
 
                   color: config.colorText
                   font.family: config.iconFontFamily
@@ -1200,34 +1289,12 @@ ShellRoot {
                   opacity: kind === "none" ? config.networkDisconnectedOpacity : 1
                   text: kind === "ethernet" ? config.networkIconEthernet : config.networkIconWifi
 
-                  Process {
-                    id: networkQuery
-
-                    command: [
-                      "sh", "-c",
-                      "nmcli -t -f TYPE,STATE device | awk -F: '($1==\"wifi\"||$1==\"ethernet\")&&$2==\"connected\"{print $1; f=1; exit} END{if(!f)print \"none\"}'"
-                    ]
-
-                    stdout: SplitParser {
-                      onRead: data => { if (data !== "") networkGlyph.kind = data.trim() }
-                    }
-                  }
-
-                  Timer {
-                    interval: config.networkPollInterval
-                    repeat: true
-                    running: true
-                    triggeredOnStart: true
-
-                    onTriggered: if (!networkQuery.running) networkQuery.running = true
-                  }
-
                   MouseArea {
                     anchors.fill: parent
 
                     property var networkCommand: ["foot", "-e", "nmtui"]
 
-                    onClicked: Quickshell.execDetached(config.networkCommand)
+                    onClicked: Quickshell.execDetached(networkCommand)
                   }
                 }
 
@@ -1235,49 +1302,16 @@ ShellRoot {
                 Text {
                   id: imText
 
-                  property string current: config.imLatin
-
                   color: config.colorText
                   font.family: config.fontFamily
                   font.pixelSize: config.fontSize
                   font.weight: config.fontWeight
-                  text: current === config.imJapanese ? config.imLabelJapanese : config.imLabelLatin
-
-                  Process {
-                    id: imQuery
-
-                    command: ["fcitx5-remote", "-n"]
-
-                    stdout: SplitParser {
-                      onRead: data => { if (data !== "" && !imHold.running) imText.current = data.trim() }
-                    }
-                  }
-
-                  // Pause polling after a click so a stale reply can't overwrite the new value
-                  Timer {
-                    id: imHold
-
-                    interval: 800
-                  }
-
-                  Timer {
-                    interval: config.imPollInterval
-                    repeat: true
-                    running: true
-                    triggeredOnStart: true
-
-                    onTriggered: if (!imQuery.running) imQuery.running = true
-                  }
+                  text: inputMethod.current === config.imJapanese ? config.imLabelJapanese : config.imLabelLatin
 
                   MouseArea {
                     anchors.fill: parent
 
-                    onClicked: {
-                      var target = imText.current === config.imJapanese ? config.imLatin : config.imJapanese
-                      imText.current = target
-                      imHold.restart()
-                      Quickshell.execDetached(["fcitx5-remote", "-t"])
-                    }
+                    onClicked: inputMethod.toggle()
                   }
                 }
               }
@@ -1287,6 +1321,8 @@ ShellRoot {
             PanelWindow {
               anchors { left: true; top: true }
               color: "transparent"
+              exclusionMode: ExclusionMode.Ignore
+              screen: screenRoot.modelData
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
 
@@ -1332,6 +1368,8 @@ ShellRoot {
             PanelWindow {
               anchors { right: true; top: true }
               color: "transparent"
+              exclusionMode: ExclusionMode.Ignore
+              screen: screenRoot.modelData
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
 
