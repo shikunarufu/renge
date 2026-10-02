@@ -37,6 +37,9 @@ ShellRoot {
     property int barPadding: 44
     property int barRadius: 22
 
+    // Bar Corners (layout symbols from mmsg: S = scroller, VS = vertical scroller)
+    property var cornerHiddenLayouts: ["S"]
+
     // Power Menu
     property int powerMenuWidth: 160
     property string powerMenuIcon: "\uf303" // nf-linux-archlinux
@@ -353,6 +356,8 @@ ShellRoot {
         id: screenRoot
 
         required property ShellScreen modelData
+
+        property bool cornersHidden: config.cornerHiddenLayouts.indexOf(layoutState.symbols[modelData.name]) !== -1
 
         PanelWindow {
           id: bar
@@ -1325,6 +1330,7 @@ ShellRoot {
               mask: Region {} // click-through
               screen: screenRoot.modelData
               margins.top: config.barHeight
+              visible: !screenRoot.cornersHidden
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
 
@@ -1374,6 +1380,7 @@ ShellRoot {
               mask: Region {} // click-through
               screen: screenRoot.modelData
               margins.top: config.barHeight
+              visible: !screenRoot.cornersHidden
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
 
