@@ -36,8 +36,6 @@ ShellRoot {
     property int barItemSpacing: 16
     property int barPadding: 44
     property int barRadius: 22
-    property int barAnimationDuration: 250
-    property int barAnimationEasing: Easing.OutCubic
 
     // Power Menu
     property int powerMenuWidth: 160
@@ -266,21 +264,13 @@ ShellRoot {
               bottomRightRadius: config.barRadius
               color: config.barColor
               anchors { left: parent.left; top: parent.top }
-              clip: true
               height: config.barHeight
               width: leftRow.implicitWidth + config.barPadding
-
-              Behavior on width {
-                NumberAnimation {
-                  duration: config.barAnimationDuration
-                  easing.type: config.barAnimationEasing
-                }
-              }
 
               RowLayout {
                 id: leftRow
 
-                anchors { left: parent.left; leftMargin: config.barPadding / 2; verticalCenter: parent.verticalCenter }
+                anchors.centerIn: parent
                 spacing: config.barItemSpacing
 
                 // ── Power Menu ──
@@ -840,16 +830,8 @@ ShellRoot {
               bottomRightRadius: config.barRadius
               color: config.barColor
               anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
-              clip: true
               height: config.barHeight
               width: centerRow.implicitWidth + config.barPadding
-
-              Behavior on width {
-                NumberAnimation {
-                  duration: config.barAnimationDuration
-                  easing.type: config.barAnimationEasing
-                }
-              }
 
               SystemClock {
                 id: clock
@@ -1012,21 +994,13 @@ ShellRoot {
               bottomLeftRadius: config.barRadius
               color: config.barColor
               anchors { right: parent.right; top: parent.top }
-              clip: true
               height: config.barHeight
               width: rightRow.implicitWidth + config.barPadding
-
-              Behavior on width {
-                NumberAnimation {
-                  duration: config.barAnimationDuration
-                  easing.type: config.barAnimationEasing
-                }
-              }
 
               RowLayout {
                 id: rightRow
 
-                anchors { right: parent.right; rightMargin: config.barPadding / 2; verticalCenter: parent.verticalCenter }
+                anchors.centerIn: parent
                 spacing: config.barItemSpacing
 
                 // ── System Tray ──
