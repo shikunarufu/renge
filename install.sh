@@ -566,7 +566,7 @@ cp --recursive /renge/.config/. /home/"${USERNAME}"/.config/
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.config
 mkdir --parents /home/"${USERNAME}"/Pictures/Wallpapers
 cp --recursive /renge/pictures/wallpapers/. /home/"${USERNAME}"/Pictures/Wallpapers
-chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures/Wallpapers
+chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
 
 # Audio players
 runuser --user="${USERNAME}" -- mkdir --parents \
