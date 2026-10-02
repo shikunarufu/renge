@@ -1322,7 +1322,9 @@ ShellRoot {
               anchors { left: true; top: true }
               color: "transparent"
               exclusionMode: ExclusionMode.Ignore
+              mask: Region {} // click-through
               screen: screenRoot.modelData
+              margins.top: config.barHeight
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
 
@@ -1369,7 +1371,9 @@ ShellRoot {
               anchors { right: true; top: true }
               color: "transparent"
               exclusionMode: ExclusionMode.Ignore
+              mask: Region {} // click-through
               screen: screenRoot.modelData
+              margins.top: config.barHeight
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
 
