@@ -393,7 +393,7 @@ ShellRoot {
                 }
               }
 
-              RowLayout {
+              Row {
                 id: leftRow
 
                 anchors {
@@ -403,15 +403,17 @@ ShellRoot {
                 }
                 spacing: config.barItemSpacing
 
+                move: Transition {
+                  NumberAnimation {
+                    properties: "x"
+                    duration: leftBar.slideDuration
+                    easing.type: Easing.InOutQuad
+                  }
+                }
+
                 // ── Power Menu ──
                 Text {
-                  Behavior on x {
-                    NumberAnimation {
-                      duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuad
-                    }
-                  }
-
+                  anchors.verticalCenter: parent.verticalCenter
                   id: powerMenuGlyph
 
                   color: config.colorText
@@ -428,13 +430,7 @@ ShellRoot {
 
                 // Separator 1
                 Text {
-                  Behavior on x {
-                    NumberAnimation {
-                      duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuad
-                    }
-                  }
-
+                  anchors.verticalCenter: parent.verticalCenter
                   bottomPadding: 3
                   color: config.colorText
                   font.family: config.fontFamily
@@ -445,13 +441,7 @@ ShellRoot {
 
                 // ── Layout ──
                 Text {
-                  Behavior on x {
-                    NumberAnimation {
-                      duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuad
-                    }
-                  }
-
+                  anchors.verticalCenter: parent.verticalCenter
                   id: layoutGlyph
 
                   property var layoutList: ["tile", "monocle", "grid", "scroller"]
@@ -476,13 +466,7 @@ ShellRoot {
 
                 // Separator 2
                 Text {
-                  Behavior on x {
-                    NumberAnimation {
-                      duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuad
-                    }
-                  }
-
+                  anchors.verticalCenter: parent.verticalCenter
                   bottomPadding: 3
                   color: config.colorText
                   font.family: config.fontFamily
@@ -492,31 +476,27 @@ ShellRoot {
                 }
 
                 // ── Workspace ──
-                RowLayout {
-                  Behavior on x {
+                Row {
+                  id: workspaceRow
+
+                  anchors.verticalCenter: parent.verticalCenter
+                  spacing: config.workspaceSpacing
+
+                  move: Transition {
                     NumberAnimation {
+                      properties: "x"
                       duration: leftBar.slideDuration
                       easing.type: Easing.InOutQuad
                     }
                   }
 
-                  id: workspaceRow
-
-                  spacing: config.workspaceSpacing
-
                   Repeater {
                     model: bar.projection ? bar.projection.windowsets : []
 
                     delegate: Rectangle {
-                      Behavior on x {
-                        NumberAnimation {
-                          duration: leftBar.slideDuration
-                          easing.type: Easing.InOutQuad
-                        }
-                      }
-
                       id: workspaceDelegate
 
+                      anchors.verticalCenter: parent.verticalCenter
                       property color workspaceActiveColor: config.colorAccent
                       property color workspaceActiveTextColor: config.colorAccentText
                       property color workspaceInactiveColor: "transparent"
@@ -553,13 +533,7 @@ ShellRoot {
 
                 // Separator 3
                 Text {
-                  Behavior on x {
-                    NumberAnimation {
-                      duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuad
-                    }
-                  }
-
+                  anchors.verticalCenter: parent.verticalCenter
                   bottomPadding: 3
                   color: config.colorText
                   font.family: config.fontFamily
@@ -570,13 +544,7 @@ ShellRoot {
 
                 // ── App Launcher ──
                 Text {
-                  Behavior on x {
-                    NumberAnimation {
-                      duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuad
-                    }
-                  }
-
+                  anchors.verticalCenter: parent.verticalCenter
                   id: appLauncherGlyph
 
                   color: config.colorText
@@ -593,13 +561,7 @@ ShellRoot {
 
                 // ── Focus Window ──
                 RowLayout {
-                  Behavior on x {
-                    NumberAnimation {
-                      duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuad
-                    }
-                  }
-
+                  anchors.verticalCenter: parent.verticalCenter
                   spacing: 8
 
                   Text {
