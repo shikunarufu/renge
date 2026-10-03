@@ -520,7 +520,8 @@ ShellRoot {
                       radius: config.workspaceRadius
                       implicitHeight: config.workspaceHeight
                       implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
-                      visible: ws.shouldDisplay
+                      // Stay mapped while fading out so the row only slides after the fade.
+                      visible: shouldShow || opacity > 0
 
                       // Reveal: the row slides first (slideDuration), then the button fades in.
                       property bool revealed: false
@@ -578,6 +579,7 @@ ShellRoot {
                       }
 
                       MouseArea {
+                        enabled: workspaceDelegate.shouldShow
                         onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
 
                         anchors.fill: parent
