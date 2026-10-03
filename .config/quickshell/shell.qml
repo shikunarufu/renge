@@ -386,7 +386,10 @@ ShellRoot {
               color: config.barColor
               anchors { left: parent.left; top: parent.top }
               height: config.barHeight
-              width: leftRow.implicitWidth + config.barPadding
+              // Animated width target. The rendered width is rounded to whole pixels
+              // so the bar edge and leftConcave2 meet without a sub-pixel seam.
+              property real animatedWidth: leftRow.implicitWidth + config.barPadding
+              width: Math.round(animatedWidth)
 
               Timer {
                 interval: 1000
@@ -394,7 +397,7 @@ ShellRoot {
                 onTriggered: leftBar.ready = true
               }
 
-              Behavior on width {
+              Behavior on animatedWidth {
                 NumberAnimation {
                   duration: leftBar.slideDuration
                   easing.type: Easing.InOutQuad
