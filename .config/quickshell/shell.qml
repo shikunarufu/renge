@@ -1423,12 +1423,23 @@ ShellRoot {
               mask: Region {} // click-through
               screen: screenRoot.modelData
               margins.top: config.barHeight
-              visible: !screenRoot.cornersHidden
+              // Stay mapped until the slide-out finishes.
+              visible: !screenRoot.cornersHidden || leftConcave1.x > -config.barRadius
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
 
               Shape {
                 id: leftConcave1
+
+                // Slides in from / out to the left screen edge (window clips the overflow).
+                x: screenRoot.cornersHidden ? -config.barRadius : 0
+
+                Behavior on x {
+                  NumberAnimation {
+                    duration: leftBar.slideDuration
+                    easing.type: Easing.InOutQuad
+                  }
+                }
 
                 preferredRendererType: Shape.CurveRenderer
                 implicitHeight: config.barRadius
