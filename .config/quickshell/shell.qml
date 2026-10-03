@@ -379,12 +379,20 @@ ShellRoot {
               id: leftBar
 
               property int slideDuration: 300
+              // Becomes true after startup so existing workspaces do not fade in.
+              property bool ready: false
               clip: true
               bottomRightRadius: config.barRadius
               color: config.barColor
               anchors { left: parent.left; top: parent.top }
               height: config.barHeight
               width: leftRow.implicitWidth + config.barPadding
+
+              Timer {
+                interval: 1000
+                running: true
+                onTriggered: leftBar.ready = true
+              }
 
               Behavior on width {
                 NumberAnimation {
@@ -503,12 +511,56 @@ ShellRoot {
                       property color workspaceInactiveTextColor: config.colorText
                       property color workspaceUrgentColor: config.colorAccent
                       property var ws: modelData
+                      property bool shouldShow: ws.shouldDisplay
 
                       color: ws.urgent ? workspaceUrgentColor : (ws.active ? workspaceActiveColor : workspaceInactiveColor)
                       radius: config.workspaceRadius
                       implicitHeight: config.workspaceHeight
                       implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
                       visible: ws.shouldDisplay
+
+                      // Reveal: the row slides first (slideDuration), then the button fades in.
+                      property bool revealed: false
+
+                      opacity: revealed ? 1 : 0
+
+                      // Disabled during startup so existing workspaces do not fade in.
+                      Behavior on opacity {
+                        enabled: leftBar.ready
+
+                        NumberAnimation {
+                          duration: 200
+                          easing.type: Easing.OutQuad
+                        }
+                      }
+
+                      Timer {
+                        id: revealTimer
+
+                        interval: leftBar.slideDuration
+                        onTriggered: workspaceDelegate.revealed = true
+                      }
+
+                      function reveal() {
+                        revealTimer.stop()
+                        if (leftBar.ready) {
+                          revealed = false
+                          revealTimer.restart()
+                        } else {
+                          revealed = true
+                        }
+                      }
+
+                      Component.onCompleted: if (shouldShow) reveal()
+
+                      onShouldShowChanged: {
+                        if (shouldShow) {
+                          reveal()
+                        } else {
+                          revealTimer.stop()
+                          revealed = false
+                        }
+                      }
 
                       Text {
                         id: workspaceLabel
