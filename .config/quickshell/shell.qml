@@ -58,7 +58,18 @@ ShellRoot {
     property string appLauncherIcon: "\uea6d" // nf-cod-search
 
     // Focus Window
-    property string focusWindowGlyph: "\uebc4" // nf-cod-terminal
+    property string focusWindowGlyph: "\uebc4" // nf-cod-terminal (fallback)
+    // Per-app icons. Keys are lowercase appIds, the same text the bar shows for the focused window.
+    property var focusWindowIcons: ({
+      "firefox": "\uf269",   // nf-fa-firefox
+      "google-chrome": "\uf268", // nf-fa-chrome
+      "kitty": "\uf120",     // nf-fa-terminal
+      "alacritty": "\uf120", // nf-fa-terminal
+      "code": "\uf121",      // nf-fa-code
+      "spotify": "\uf1bc",   // nf-fa-spotify
+      "discord": "\uf392",   // nf-fa-discord
+      "steam": "\uf1b6"      // nf-fa-steam
+    })
     property string focusWindowPlaceholder: "Desktop"
 
     // Wallpaper
@@ -627,7 +638,11 @@ ShellRoot {
                     color: config.colorText
                     font.family: config.iconFontFamily
                     font.pixelSize: config.iconSize
-                    text: config.focusWindowGlyph
+                    text: {
+                      var t = ToplevelManager.activeToplevel
+                      if (!t) return config.focusWindowGlyph
+                      return config.focusWindowIcons[t.appId.toLowerCase()] || config.focusWindowGlyph
+                    }
                   }
 
                   Text {
