@@ -27,6 +27,7 @@ ShellRoot {
     property string fontFamily: "Segoe UI Variable"
     property int fontSize: 12
     property int fontWeight: Font.DemiBold
+
     property string iconFontFamily: "JetBrainsMono Nerd Font"
     property int iconSize: 16
 
@@ -37,12 +38,9 @@ ShellRoot {
     property int barPadding: 44
     property int barRadius: 22
 
-    // Bar Corners (layout symbols from mmsg: S = scroller, VS = vertical scroller)
-    property var cornerHiddenLayouts: ["S"]
-
     // Power Menu
     property int powerMenuWidth: 160
-    property string powerMenuIcon: "\uf303" // nf-linux-archlinux
+    property string powerMenuIcon: "\udb82\udcc7"
 
     // Workspace
     property int workspaceHeight: 16
@@ -55,66 +53,60 @@ ShellRoot {
     property int appLauncherWidth: 360
     property int appLauncherMaxVisible: 7
     property int appLauncherItemHeight: 42
-    property string appLauncherIcon: "\uea6d" // nf-cod-search
+    property string appLauncherIcon: "\uf002"
 
     // Focus Window
-    property string focusWindowGlyph: "\uebc4" // nf-cod-terminal (fallback)
-    // Per-app icons. Keys are lowercase appIds, the same text the bar shows for the focused window.
-    property var focusWindowIcons: ({
-      "firefox": "\uf269",   // nf-fa-firefox
-      "google-chrome": "\uf268", // nf-fa-chrome
-      "kitty": "\uf120",     // nf-fa-terminal
-      "alacritty": "\uf120", // nf-fa-terminal
-      "code": "\uf121",      // nf-fa-code
-      "spotify": "\uf1bc",   // nf-fa-spotify
-      "discord": "\uf392",   // nf-fa-discord
-      "steam": "\uf1b6"      // nf-fa-steam
-    })
-    property string focusWindowPlaceholder: "Desktop"
+    property string focusWindowGlyph: "\uf2d0"
 
+    // App Icon
+    property var focusWindowIcons: ({
+      "foot": "\uf489",
+      "zen": "\udb83\ude95"
+    })
+
+    // Window Title
+    property string focusWindowPlaceholder: "Desktop"
+    property var focusWindowNames: ({
+      "foot": "Foot",
+      "zen": "Zen"
+    })
+    
     // Wallpaper
-    property string wallpaperIcon: "\uf03e" // nf-fa-image
+    property string wallpaperIcon: "\udb80\udeeb"
 
     // Volume
     property real volumeStep: 0.05
-    property string volumeIconHigh: "\uf028" // nf-fa-volume_up
-    property string volumeIconLow: "\uf027" // nf-fa-volume_down
-    property string volumeIconMuted: "\uf026" // nf-fa-volume_off
+    property string volumeIconHigh: "\uf028"
+    property string volumeIconLow: "\uf027"
+    property string volumeIconMuted: "\ueee8"
 
     // System Tray
     property int trayIconSize: 16
     property int trayIconSpacing: 8
-    property int trayPopupPadding: 10
     property int trayPopupMargin: 6
+    property int trayPopupPadding: 10
     property int trayPopupRadius: 12
-    property string trayIconExpand: "\uf0d7" // nf-fa-caret_down
-    property string trayIconCollapse: "\uf0d8" // nf-fa-caret_up
-
-    // Networks
+    property string trayIconCollapse: "\uf0d8"
+    property string trayIconExpand: "\uf0d7"
+    
+    // Network
     property int networkPollInterval: 3000
-    property string networkIconWifi: "\uf1eb" // nf-fa-wifi
-    property string networkIconEthernet: "\uf0e8" // nf-fa-sitemap
-    property real networkDisconnectedOpacity: 0.4
-
-    // Input Method
-    property string imLatin: "keyboard-us"
-    property string imJapanese: "mozc"
-    property string imLabelLatin: "en"
-    property string imLabelJapanese: "jp"
-    property int imPollInterval: 500
+    property real networkDisconnectedOpacity: 0.5
+    property string networkIconEthernet: "\uef44"
+    property string networkIconWifi: "\uf1eb"
 
     // Now Playing
-    property string nowPlayingSeparator: " - "
     property int nowPlayingMaxLength: 45
+    property string nowPlayingSeparator: " - "
 
     // Visualizer
     property int visualizerBars: 10
-    property int visualizerBarWidth: 2
     property int visualizerBarGap: 4
-    property int visualizerHeight: 12
+    property int visualizerBarWidth: 2
     property int visualizerFramerate: 60
-    property int visualizerMinFreq: 20
+    property int visualizerHeight: 12
     property int visualizerMaxFreq: 10000
+    property int visualizerMinFreq: 20
   }
   // ─────────────────────────────────────────────────────
 
@@ -250,7 +242,6 @@ ShellRoot {
   Scope {
     id: layoutState
 
-    // Layout symbol per monitor name
     property var symbols: ({})
 
     Process {
@@ -271,7 +262,6 @@ ShellRoot {
             for (var i = 0; i < monitors.length; i++) next[monitors[i].name] = monitors[i].layout_symbol
             layoutState.symbols = next
           } catch (e) {
-            // ignore partial/malformed JSON chunks
           }
         }
       }
@@ -292,7 +282,7 @@ ShellRoot {
   Scope {
     id: network
 
-    property string kind: "none" // wifi | ethernet | none
+    property string kind: "none"
 
     Process {
       id: networkQuery
@@ -321,10 +311,13 @@ ShellRoot {
   Scope {
     id: inputMethod
 
-    property string current: config.imLatin
+    property string current: imLatin
+    property int imPollInterval: 500
+    property string imLatin: "keyboard-us"
+    property string imJapanese: "mozc"
 
     function toggle() {
-      current = current === config.imJapanese ? config.imLatin : config.imJapanese
+      current = current === imJapanese ? imLatin : imJapanese
       imHold.restart()
       Quickshell.execDetached(["fcitx5-remote", "-t"])
     }
@@ -339,7 +332,6 @@ ShellRoot {
       }
     }
 
-    // Pause polling after a click so a stale reply can't overwrite the new value
     Timer {
       id: imHold
 
@@ -347,7 +339,7 @@ ShellRoot {
     }
 
     Timer {
-      interval: config.imPollInterval
+      interval: imPollInterval
       repeat: true
       running: true
       triggeredOnStart: true
@@ -368,7 +360,8 @@ ShellRoot {
 
         required property ShellScreen modelData
 
-        property bool cornersHidden: config.cornerHiddenLayouts.indexOf(layoutState.symbols[modelData.name]) !== -1
+        property var cornerHiddenLayouts: ["S"]
+        property bool cornersHidden: cornerHiddenLayouts.indexOf(layoutState.symbols[modelData.name]) !== -1
 
         PanelWindow {
           id: bar
@@ -390,15 +383,14 @@ ShellRoot {
               id: leftBar
 
               property int slideDuration: 300
-              // Becomes true after startup so existing workspaces do not fade in.
               property bool ready: false
+
               clip: true
               bottomRightRadius: config.barRadius
               color: config.barColor
               anchors { left: parent.left; top: parent.top }
               height: config.barHeight
-              // Animated width target. The rendered width is rounded to whole pixels
-              // so the bar edge and leftConcave2 meet without a sub-pixel seam.
+
               property real animatedWidth: leftRow.implicitWidth + config.barPadding
               width: Math.round(animatedWidth)
 
@@ -531,15 +523,13 @@ ShellRoot {
                       radius: config.workspaceRadius
                       implicitHeight: config.workspaceHeight
                       implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
-                      // Stay mapped while fading out so the row only slides after the fade.
+
                       visible: shouldShow || opacity > 0
 
-                      // Reveal: the row slides first (slideDuration), then the button fades in.
                       property bool revealed: false
 
                       opacity: revealed ? 1 : 0
 
-                      // Disabled during startup so existing workspaces do not fade in.
                       Behavior on opacity {
                         enabled: leftBar.ready
 
@@ -629,8 +619,59 @@ ShellRoot {
 
                 // ── Focus Window ──
                 RowLayout {
+                  id: focusWindow
+
+                  // Targets follow the active window; shown values change only while faded out.
+                  property string targetIcon: {
+                    var t = ToplevelManager.activeToplevel
+                    if (!t) return config.focusWindowGlyph
+                    return config.focusWindowIcons[t.appId.toLowerCase()] || config.focusWindowGlyph
+                  }
+                  property string targetLabel: {
+                    var t = ToplevelManager.activeToplevel
+                    if (!t) return config.focusWindowPlaceholder
+                    return config.focusWindowNames[t.appId.toLowerCase()] || t.appId
+                  }
+                  property string shownIcon: targetIcon
+                  property string shownLabel: targetLabel
+
+                  function apply() {
+                    shownIcon = targetIcon
+                    shownLabel = targetLabel
+                  }
+
+                  function update() {
+                    if (leftBar.ready) swap.restart()
+                    else apply()
+                  }
+
+                  onTargetIconChanged: update()
+                  onTargetLabelChanged: update()
+
                   anchors.verticalCenter: parent.verticalCenter
                   spacing: 8
+
+                  SequentialAnimation {
+                    id: swap
+
+                    NumberAnimation {
+                      target: focusWindow
+                      property: "opacity"
+                      to: 0
+                      duration: 120
+                      easing.type: Easing.OutQuad
+                    }
+
+                    ScriptAction { script: focusWindow.apply() }
+
+                    NumberAnimation {
+                      target: focusWindow
+                      property: "opacity"
+                      to: 1
+                      duration: 200
+                      easing.type: Easing.OutQuad
+                    }
+                  }
 
                   Text {
                     id: focusWindowIcon
@@ -638,11 +679,7 @@ ShellRoot {
                     color: config.colorText
                     font.family: config.iconFontFamily
                     font.pixelSize: config.iconSize
-                    text: {
-                      var t = ToplevelManager.activeToplevel
-                      if (!t) return config.focusWindowGlyph
-                      return config.focusWindowIcons[t.appId.toLowerCase()] || config.focusWindowGlyph
-                    }
+                    text: focusWindow.shownIcon
                   }
 
                   Text {
@@ -653,7 +690,7 @@ ShellRoot {
                     font.family: config.fontFamily
                     font.pixelSize: config.fontSize
                     font.weight: config.fontWeight
-                    text: ToplevelManager.activeToplevel ? ToplevelManager.activeToplevel.appId : config.focusWindowPlaceholder
+                    text: focusWindow.shownLabel
                   }
                 }
               }
@@ -1417,11 +1454,15 @@ ShellRoot {
                 Text {
                   id: imText
 
+                  property string imJapanese: "mozc"
+                  property string imLabelLatin: "en"
+                  property string imLabelJapanese: "jp"
+
                   color: config.colorText
                   font.family: config.fontFamily
                   font.pixelSize: config.fontSize
                   font.weight: config.fontWeight
-                  text: inputMethod.current === config.imJapanese ? config.imLabelJapanese : config.imLabelLatin
+                  text: inputMethod.current === imJapanese ? imLabelJapanese : imLabelLatin
 
                   MouseArea {
                     anchors.fill: parent
