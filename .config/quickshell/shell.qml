@@ -1081,7 +1081,12 @@ ShellRoot {
               // Bar edges follow the right edge of the last item, so the bar stretches
               // in the same frames as the contents slide. Parity is matched to the
               // parent width so both edges land on whole pixels.
-              property real rawWidth: centerRow.x + mediaSlot.x + mediaSlot.width + config.barPadding / 2
+              // While the media slot has zero width, the Row may not position it, so its x
+              // is unreliable; use the clock's edge instead.
+              property real contentEdge: mediaSlot.width > 0
+                ? mediaSlot.x + mediaSlot.width
+                : clockLabel.x + clockLabel.width
+              property real rawWidth: centerRow.x + contentEdge + config.barPadding / 2
               property int roundedWidth: Math.round(rawWidth)
 
               clip: true
