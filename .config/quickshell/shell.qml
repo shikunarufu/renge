@@ -391,20 +391,14 @@ ShellRoot {
               anchors { left: parent.left; top: parent.top }
               height: config.barHeight
 
-              property real animatedWidth: leftRow.implicitWidth + config.barPadding
-              width: Math.round(animatedWidth)
+              // Bar edge follows the right edge of the last item, so it stretches
+              // in the same frames as the contents slide. Rounded to whole pixels.
+              width: Math.round(leftRow.x + focusSlot.x + focusSlot.width + config.barPadding / 2)
 
               Timer {
                 interval: 1000
                 running: true
                 onTriggered: leftBar.ready = true
-              }
-
-              Behavior on animatedWidth {
-                NumberAnimation {
-                  duration: leftBar.slideDuration
-                  easing.type: Easing.InOutQuad
-                }
               }
 
               Row {
@@ -618,79 +612,98 @@ ShellRoot {
                 }
 
                 // ── Focus Window ──
-                RowLayout {
-                  id: focusWindow
-
-                  // Targets follow the active window; shown values change only while faded out.
-                  property string targetIcon: {
-                    var t = ToplevelManager.activeToplevel
-                    if (!t) return config.focusWindowGlyph
-                    return config.focusWindowIcons[t.appId.toLowerCase()] || config.focusWindowGlyph
-                  }
-                  property string targetLabel: {
-                    var t = ToplevelManager.activeToplevel
-                    if (!t) return config.focusWindowPlaceholder
-                    return config.focusWindowNames[t.appId.toLowerCase()] || t.appId
-                  }
-                  property string shownIcon: targetIcon
-                  property string shownLabel: targetLabel
-
-                  function apply() {
-                    shownIcon = targetIcon
-                    shownLabel = targetLabel
-                  }
-
-                  function update() {
-                    if (leftBar.ready) swap.restart()
-                    else apply()
-                  }
-
-                  onTargetIconChanged: update()
-                  onTargetLabelChanged: update()
+                // Slot width animates so the bar (which tracks its right edge) stretches with it.
+                Item {
+                  id: focusSlot
 
                   anchors.verticalCenter: parent.verticalCenter
-                  spacing: 8
+                  clip: true
+                  width: focusWindow.implicitWidth
+                  height: focusWindow.implicitHeight
 
-                  SequentialAnimation {
-                    id: swap
-
-                    NumberAnimation {
-                      target: focusWindow
-                      property: "opacity"
-                      to: 0
-                      duration: 120
-                      easing.type: Easing.OutQuad
-                    }
-
-                    ScriptAction { script: focusWindow.apply() }
+                  Behavior on width {
+                    enabled: leftBar.ready
 
                     NumberAnimation {
-                      target: focusWindow
-                      property: "opacity"
-                      to: 1
-                      duration: 200
-                      easing.type: Easing.OutQuad
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuad
                     }
                   }
 
-                  Text {
-                    id: focusWindowIcon
+                  RowLayout {
+                    id: focusWindow
 
-                    color: config.colorText
-                    font.family: config.iconFontFamily
-                    font.pixelSize: config.iconSize
-                    text: focusWindow.shownIcon
-                  }
+                    // Targets follow the active window; shown values change only while faded out.
+                    property string targetIcon: {
+                      var t = ToplevelManager.activeToplevel
+                      if (!t) return config.focusWindowGlyph
+                      return config.focusWindowIcons[t.appId.toLowerCase()] || config.focusWindowGlyph
+                    }
+                    property string targetLabel: {
+                      var t = ToplevelManager.activeToplevel
+                      if (!t) return config.focusWindowPlaceholder
+                      return config.focusWindowNames[t.appId.toLowerCase()] || t.appId
+                    }
+                    property string shownIcon: targetIcon
+                    property string shownLabel: targetLabel
 
-                  Text {
-                    id: focusWindowLabel
+                    function apply() {
+                      shownIcon = targetIcon
+                      shownLabel = targetLabel
+                    }
 
-                    elide: Text.ElideRight
-                    color: config.colorText
-                    font.family: config.fontFamily
-                    font.pixelSize: config.fontSize
-                    font.weight: config.fontWeight
-                    text: focusWindow.shownLabel
+                    function update() {
+                      if (leftBar.ready) swap.restart()
+                      else apply()
+                    }
+
+                    onTargetIconChanged: update()
+                    onTargetLabelChanged: update()
+
+                    anchors { left: parent.left; verticalCenter: parent.verticalCenter }
+                    spacing: 8
+
+                    SequentialAnimation {
+                      id: swap
+
+                      NumberAnimation {
+                        target: focusWindow
+                        property: "opacity"
+                        to: 0
+                        duration: 120
+                        easing.type: Easing.OutQuad
+                      }
+
+                      ScriptAction { script: focusWindow.apply() }
+
+                      NumberAnimation {
+                        target: focusWindow
+                        property: "opacity"
+                        to: 1
+                        duration: 200
+                        easing.type: Easing.OutQuad
+                      }
+                    }
+
+                    Text {
+                      id: focusWindowIcon
+
+                      color: config.colorText
+                      font.family: config.iconFontFamily
+                      font.pixelSize: config.iconSize
+                      text: focusWindow.shownIcon
+                    }
+
+                    Text {
+                      id: focusWindowLabel
+
+                      elide: Text.ElideRight
+                      color: config.colorText
+                      font.family: config.fontFamily
+                      font.pixelSize: config.fontSize
+                      font.weight: config.fontWeight
+                      text: focusWindow.shownLabel
+                    }
                   }
                 }
               }
