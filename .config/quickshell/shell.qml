@@ -1078,12 +1078,19 @@ ShellRoot {
             Rectangle {
               id: centerBar
 
+              // Bar edges follow the right edge of the last item, so the bar stretches
+              // in the same frames as the contents slide. Parity is matched to the
+              // parent width so both edges land on whole pixels.
+              property real rawWidth: centerRow.x + mediaSlot.x + mediaSlot.width + config.barPadding / 2
+              property int roundedWidth: Math.round(rawWidth)
+
+              clip: true
               bottomLeftRadius: config.barRadius
               bottomRightRadius: config.barRadius
               color: config.barColor
               anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
               height: config.barHeight
-              width: centerRow.implicitWidth + config.barPadding
+              width: ((parent.width - roundedWidth) % 2 !== 0) ? roundedWidth + 1 : roundedWidth
 
               SystemClock {
                 id: clock
@@ -1091,16 +1098,29 @@ ShellRoot {
                 precision: SystemClock.Minutes
               }
 
-              RowLayout {
+              Row {
                 id: centerRow
 
-                anchors.centerIn: parent
-                spacing: config.barItemSpacing
+                anchors {
+                  left: parent.left
+                  leftMargin: config.barPadding / 2
+                  verticalCenter: parent.verticalCenter
+                }
+                spacing: 0
+
+                move: Transition {
+                  NumberAnimation {
+                    properties: "x"
+                    duration: leftBar.slideDuration
+                    easing.type: Easing.InOutQuad
+                  }
+                }
 
                 // ── Clock ──
                 Text {
                   id: clockLabel
 
+                  anchors.verticalCenter: parent.verticalCenter
                   color: config.colorText
                   font.family: config.fontFamily
                   font.pixelSize: config.fontSize
@@ -1108,53 +1128,166 @@ ShellRoot {
                   text: Qt.formatDateTime(clock.date, "ddd, d MMM   HH:mm")
                 }
 
-                // ── Visualizer ──
-                Row {
-                  id: visualizer
+                // ── Media (visualizer + now playing) ──
+                // Always present; its width animates to 0 when nothing plays. Order on show:
+                // the bar stretches first, then the content fades in. On hide: fade out, then shrink.
+                Item {
+                  id: mediaSlot
 
-                  Layout.alignment: Qt.AlignVCenter
-                  Layout.preferredHeight: config.visualizerHeight
-                  spacing: config.visualizerBarGap
-                  visible: media.active
+                  property bool wanted: media.active
+                  property bool expanded: false
+                  property bool contentShown: false
 
-                  Repeater {
-                    model: config.visualizerBars
-
-                    delegate: Rectangle {
-                      required property int index
-
-                      anchors.verticalCenter: parent.verticalCenter
-                      color: config.colorAccent
-                      height: Math.max(config.visualizerBarWidth, ((media.levels[index] || 0) / 100) * config.visualizerHeight)
-                      width: config.visualizerBarWidth
-
-                      Behavior on height { NumberAnimation { duration: 60 } }
+                  function show() {
+                    hideTimer.stop()
+                    expanded = true
+                    if (leftBar.ready) {
+                      contentShown = false
+                      showTimer.restart()
+                    } else {
+                      contentShown = true
                     }
                   }
-                }
 
-                // ── Now Playing ──
-                Text {
-                  id: nowPlayingLabel
+                  function hide() {
+                    showTimer.stop()
+                    contentShown = false
+                    if (leftBar.ready) hideTimer.restart()
+                    else expanded = false
+                  }
 
-                  color: config.colorText
-                  font.family: config.fontFamily
-                  font.pixelSize: config.fontSize
-                  font.weight: config.fontWeight
-                  text: media.label
-                  visible: media.active
+                  Component.onCompleted: if (wanted) show()
+                  onWantedChanged: wanted ? show() : hide()
 
-                  MouseArea {
-                    anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                  anchors.verticalCenter: parent.verticalCenter
+                  clip: true
+                  height: mediaRow.implicitHeight
+                  width: expanded ? config.barItemSpacing + mediaRow.implicitWidth : 0
 
-                    onClicked: mouse => {
-                      if (!media.player) return
+                  Behavior on width {
+                    enabled: leftBar.ready
 
-                      if (mouse.button === Qt.RightButton) {
-                        if (media.player.canGoNext) media.player.next()
-                      } else if (media.player.canTogglePlaying) {
-                        media.player.togglePlaying()
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
+
+                  Timer {
+                    id: showTimer
+
+                    interval: leftBar.slideDuration
+                    onTriggered: mediaSlot.contentShown = true
+                  }
+
+                  Timer {
+                    id: hideTimer
+
+                    interval: 200
+                    onTriggered: mediaSlot.expanded = false
+                  }
+
+                  RowLayout {
+                    id: mediaRow
+
+                    // Keep the last label while fading out, so the text does not vanish early.
+                    property string targetLabel: media.label
+                    property string shownLabel: targetLabel
+
+                    function update() {
+                      if (!mediaSlot.wanted) return
+                      if (leftBar.ready && mediaSlot.contentShown) labelSwap.restart()
+                      else shownLabel = targetLabel
+                    }
+
+                    onTargetLabelChanged: update()
+
+                    anchors {
+                      left: parent.left
+                      leftMargin: config.barItemSpacing
+                      verticalCenter: parent.verticalCenter
+                    }
+                    opacity: mediaSlot.contentShown ? 1 : 0
+                    spacing: config.barItemSpacing
+
+                    Behavior on opacity {
+                      enabled: leftBar.ready && !labelSwap.running
+
+                      NumberAnimation {
+                        duration: 200
+                        easing.type: Easing.OutQuad
+                      }
+                    }
+
+                    SequentialAnimation {
+                      id: labelSwap
+
+                      NumberAnimation {
+                        target: mediaRow
+                        property: "opacity"
+                        to: 0
+                        duration: 120
+                        easing.type: Easing.OutQuad
+                      }
+
+                      ScriptAction { script: mediaRow.shownLabel = mediaRow.targetLabel }
+
+                      NumberAnimation {
+                        target: mediaRow
+                        property: "opacity"
+                        to: 1
+                        duration: 200
+                        easing.type: Easing.OutQuad
+                      }
+                    }
+
+                    // ── Visualizer ──
+                    Row {
+                      id: visualizer
+
+                      Layout.alignment: Qt.AlignVCenter
+                      Layout.preferredHeight: config.visualizerHeight
+                      spacing: config.visualizerBarGap
+
+                      Repeater {
+                        model: config.visualizerBars
+
+                        delegate: Rectangle {
+                          required property int index
+
+                          anchors.verticalCenter: parent.verticalCenter
+                          color: config.colorAccent
+                          height: Math.max(config.visualizerBarWidth, ((media.levels[index] || 0) / 100) * config.visualizerHeight)
+                          width: config.visualizerBarWidth
+
+                          Behavior on height { NumberAnimation { duration: 60 } }
+                        }
+                      }
+                    }
+
+                    // ── Now Playing ──
+                    Text {
+                      id: nowPlayingLabel
+
+                      color: config.colorText
+                      font.family: config.fontFamily
+                      font.pixelSize: config.fontSize
+                      font.weight: config.fontWeight
+                      text: mediaRow.shownLabel
+
+                      MouseArea {
+                        anchors.fill: parent
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+                        onClicked: mouse => {
+                          if (!media.player) return
+
+                          if (mouse.button === Qt.RightButton) {
+                            if (media.player.canGoNext) media.player.next()
+                          } else if (media.player.canTogglePlaying) {
+                            media.player.togglePlaying()
+                          }
+                        }
                       }
                     }
                   }
@@ -1244,89 +1377,161 @@ ShellRoot {
             Rectangle {
               id: rightBar
 
+              // Bar edge follows the right edge of the last item (animated), so the bar
+              // stretches in the same frames as the contents slide.
+              clip: true
               bottomLeftRadius: config.barRadius
               color: config.barColor
               anchors { right: parent.right; top: parent.top }
               height: config.barHeight
-              width: rightRow.implicitWidth + config.barPadding
+              width: Math.round(rightRow.x + imSlot.x + imSlot.width + config.barPadding / 2)
 
-              RowLayout {
+              Row {
                 id: rightRow
 
-                anchors.centerIn: parent
+                anchors {
+                  left: parent.left
+                  leftMargin: config.barPadding / 2
+                  verticalCenter: parent.verticalCenter
+                }
                 spacing: config.barItemSpacing
 
-                // ── System Tray ──
-                Text {
-                  id: trayArrow
+                move: Transition {
+                  NumberAnimation {
+                    properties: "x"
+                    duration: leftBar.slideDuration
+                    easing.type: Easing.InOutQuad
+                  }
+                }
 
-                  color: config.colorText
-                  font.family: config.iconFontFamily
-                  font.pixelSize: config.iconSize
-                  text: trayPopup.visible ? config.trayIconCollapse : config.trayIconExpand
-                  visible: SystemTray.items.values.length > 0
+                // ── System Tray (arrow + separator) ──
+                // Fades out before the row slides, and fades in after it has slid.
+                Item {
+                  id: traySlot
 
-                  MouseArea {
-                    anchors.fill: parent
+                  property bool shouldShow: SystemTray.items.values.length > 0
+                  property bool revealed: false
 
-                    onClicked: trayPopup.visible = !trayPopup.visible
+                  function reveal() {
+                    trayTimer.stop()
+                    if (leftBar.ready) {
+                      revealed = false
+                      trayTimer.restart()
+                    } else {
+                      revealed = true
+                    }
                   }
 
-                  PopupWindow {
-                    id: trayPopup
+                  Component.onCompleted: if (shouldShow) reveal()
 
-                    anchor.item: trayArrow
-                    anchor.edges: Edges.Bottom | Edges.Right
-                    anchor.gravity: Edges.Bottom | Edges.Left
-                    anchor.margins.top: config.trayPopupMargin
-                    color: "transparent"
-                    implicitHeight: config.trayIconSize + config.trayPopupPadding * 2
-                    implicitWidth: trayIcons.implicitWidth + config.trayPopupPadding * 2
-                    visible: false
-                    grabFocus: true
+                  onShouldShowChanged: {
+                    if (shouldShow) {
+                      reveal()
+                    } else {
+                      trayTimer.stop()
+                      revealed = false
+                    }
+                  }
 
-                    Rectangle {
-                      anchors.fill: parent
-                      color: config.barColor
-                      radius: config.trayPopupRadius
+                  anchors.verticalCenter: parent.verticalCenter
+                  implicitHeight: trayContent.implicitHeight
+                  implicitWidth: trayContent.implicitWidth
+                  opacity: revealed ? 1 : 0
+                  visible: shouldShow || opacity > 0
 
-                      RowLayout {
-                        id: trayIcons
+                  Behavior on opacity {
+                    enabled: leftBar.ready
 
-                        anchors.centerIn: parent
-                        spacing: config.trayIconSpacing
+                    NumberAnimation {
+                      duration: 200
+                      easing.type: Easing.OutQuad
+                    }
+                  }
 
-                        Repeater {
-                          model: SystemTray.items
+                  Timer {
+                    id: trayTimer
 
-                          delegate: Item {
-                            id: trayDelegate
+                    interval: leftBar.slideDuration
+                    onTriggered: traySlot.revealed = true
+                  }
 
-                            required property SystemTrayItem modelData
+                  Row {
+                    id: trayContent
 
-                            implicitHeight: config.trayIconSize
-                            implicitWidth: config.trayIconSize
+                    spacing: config.barItemSpacing
 
-                            IconImage {
-                              anchors.fill: parent
-                              source: trayDelegate.modelData.icon
-                            }
+                    Text {
+                      id: trayArrow
 
-                            MouseArea {
-                              anchors.fill: parent
-                              acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
+                      anchors.verticalCenter: parent.verticalCenter
+                      color: config.colorText
+                      font.family: config.iconFontFamily
+                      font.pixelSize: config.iconSize
+                      text: trayPopup.visible ? config.trayIconCollapse : config.trayIconExpand
 
-                              onClicked: mouse => {
-                                var item = trayDelegate.modelData
-                                if (mouse.button === Qt.LeftButton && !item.onlyMenu) {
-                                  item.activate()
-                                  trayPopup.visible = false
-                                } else if (mouse.button === Qt.MiddleButton) {
-                                  item.secondaryActivate()
-                                  trayPopup.visible = false
-                                } else if (item.hasMenu) {
-                                  var pos = trayDelegate.mapToItem(null, 0, trayDelegate.height)
-                                  item.display(trayDelegate.QsWindow.window, pos.x, pos.y)
+                      MouseArea {
+                        anchors.fill: parent
+
+                        onClicked: trayPopup.visible = !trayPopup.visible
+                      }
+
+                      PopupWindow {
+                        id: trayPopup
+
+                        anchor.item: trayArrow
+                        anchor.edges: Edges.Bottom | Edges.Right
+                        anchor.gravity: Edges.Bottom | Edges.Left
+                        anchor.margins.top: config.trayPopupMargin
+                        color: "transparent"
+                        implicitHeight: config.trayIconSize + config.trayPopupPadding * 2
+                        implicitWidth: trayIcons.implicitWidth + config.trayPopupPadding * 2
+                        visible: false
+                        grabFocus: true
+
+                        Rectangle {
+                          anchors.fill: parent
+                          color: config.barColor
+                          radius: config.trayPopupRadius
+
+                          RowLayout {
+                            id: trayIcons
+
+                            anchors.centerIn: parent
+                            spacing: config.trayIconSpacing
+
+                            Repeater {
+                              model: SystemTray.items
+
+                              delegate: Item {
+                                id: trayDelegate
+
+                                required property SystemTrayItem modelData
+
+                                implicitHeight: config.trayIconSize
+                                implicitWidth: config.trayIconSize
+
+                                IconImage {
+                                  anchors.fill: parent
+                                  source: trayDelegate.modelData.icon
+                                }
+
+                                MouseArea {
+                                  anchors.fill: parent
+                                  acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
+
+                                  onClicked: mouse => {
+                                    var item = trayDelegate.modelData
+                                    if (mouse.button === Qt.LeftButton && !item.onlyMenu) {
+                                      item.activate()
+                                      trayPopup.visible = false
+                                    } else if (mouse.button === Qt.MiddleButton) {
+                                      item.secondaryActivate()
+                                      trayPopup.visible = false
+                                    } else if (item.hasMenu) {
+                                      var pos = trayDelegate.mapToItem(null, 0, trayDelegate.height)
+                                      item.display(trayDelegate.QsWindow.window, pos.x, pos.y)
+                                    }
+                                  }
                                 }
                               }
                             }
@@ -1334,24 +1539,25 @@ ShellRoot {
                         }
                       }
                     }
-                  }
-                }
 
-                // Separator 4
-                Text {
-                  bottomPadding: 3
-                  color: config.colorText
-                  font.family: config.fontFamily
-                  font.pixelSize: config.fontSize
-                  font.weight: config.fontWeight
-                  text: "|"
-                  visible: trayArrow.visible
+                    // Separator 4
+                    Text {
+                      anchors.verticalCenter: parent.verticalCenter
+                      bottomPadding: 3
+                      color: config.colorText
+                      font.family: config.fontFamily
+                      font.pixelSize: config.fontSize
+                      font.weight: config.fontWeight
+                      text: "|"
+                    }
+                  }
                 }
 
                 // ── Wallpaper ──
                 Text {
                   id: wallpaperGlyph
 
+                  anchors.verticalCenter: parent.verticalCenter
                   color: config.colorText
                   font.family: config.iconFontFamily
                   font.pixelSize: config.iconSize
@@ -1367,6 +1573,7 @@ ShellRoot {
 
                 // Separator 5
                 Text {
+                  anchors.verticalCenter: parent.verticalCenter
                   bottomPadding: 3
                   color: config.colorText
                   font.family: config.fontFamily
@@ -1379,6 +1586,7 @@ ShellRoot {
                 Item {
                   id: volumeItem
 
+                  anchors.verticalCenter: parent.verticalCenter
                   property var sink: Pipewire.defaultAudioSink
                   property real volume: sink && sink.audio ? sink.audio.volume : 0
                   property bool muted: sink && sink.audio ? sink.audio.muted : false
@@ -1434,6 +1642,7 @@ ShellRoot {
 
                 // Separator 6
                 Text {
+                  anchors.verticalCenter: parent.verticalCenter
                   bottomPadding: 3
                   color: config.colorText
                   font.family: config.fontFamily
@@ -1446,6 +1655,7 @@ ShellRoot {
                 Text {
                   id: networkGlyph
 
+                  anchors.verticalCenter: parent.verticalCenter
                   property string kind: network.kind
 
                   color: config.colorText
@@ -1464,23 +1674,72 @@ ShellRoot {
                 }
 
                 // ── Input Method ──
-                Text {
-                  id: imText
+                // Last item: its slot width animates, and the bar tracks the slot's right edge.
+                Item {
+                  id: imSlot
 
-                  property string imJapanese: "mozc"
-                  property string imLabelLatin: "en"
-                  property string imLabelJapanese: "jp"
+                  anchors.verticalCenter: parent.verticalCenter
+                  clip: true
+                  width: imText.implicitWidth
+                  height: imText.implicitHeight
 
-                  color: config.colorText
-                  font.family: config.fontFamily
-                  font.pixelSize: config.fontSize
-                  font.weight: config.fontWeight
-                  text: inputMethod.current === imJapanese ? imLabelJapanese : imLabelLatin
+                  Behavior on width {
+                    enabled: leftBar.ready
 
-                  MouseArea {
-                    anchors.fill: parent
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuad
+                    }
+                  }
 
-                    onClicked: inputMethod.toggle()
+                  Text {
+                    id: imText
+
+                    property string imJapanese: "mozc"
+                    property string imLabelLatin: "en"
+                    property string imLabelJapanese: "jp"
+                    property string targetText: inputMethod.current === imJapanese ? imLabelJapanese : imLabelLatin
+                    property string shownText: targetText
+
+                    onTargetTextChanged: {
+                      if (leftBar.ready) imSwap.restart()
+                      else shownText = targetText
+                    }
+
+                    anchors { left: parent.left; verticalCenter: parent.verticalCenter }
+                    color: config.colorText
+                    font.family: config.fontFamily
+                    font.pixelSize: config.fontSize
+                    font.weight: config.fontWeight
+                    text: shownText
+
+                    SequentialAnimation {
+                      id: imSwap
+
+                      NumberAnimation {
+                        target: imText
+                        property: "opacity"
+                        to: 0
+                        duration: 120
+                        easing.type: Easing.OutQuad
+                      }
+
+                      ScriptAction { script: imText.shownText = imText.targetText }
+
+                      NumberAnimation {
+                        target: imText
+                        property: "opacity"
+                        to: 1
+                        duration: 200
+                        easing.type: Easing.OutQuad
+                      }
+                    }
+
+                    MouseArea {
+                      anchors.fill: parent
+
+                      onClicked: inputMethod.toggle()
+                    }
                   }
                 }
               }
