@@ -6,6 +6,7 @@ import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
+import Quickshell.Services.Notifications
 import Quickshell.Services.Pipewire
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
@@ -99,6 +100,16 @@ ShellRoot {
     property real networkDisconnectedOpacity: 0.5
     property string networkIconEthernet: "\uef44"
     property string networkIconWifi: "\uf1eb"
+
+    // Notifications
+    property int notificationWidth: 360
+    property int notificationMargin: 8
+    property int notificationSpacing: 8
+    property int notificationPadding: 12
+    property int notificationRadius: 12
+    property int notificationIconSize: 32
+    property int notificationMax: 4
+    property int notificationTimeout: 5000
 
     // Now Playing
     property int nowPlayingMaxLength: 45
@@ -430,6 +441,227 @@ ShellRoot {
       triggeredOnStart: true
 
       onTriggered: if (!imQuery.running) imQuery.running = true
+    }
+  }
+
+  // ── Notifications ──
+  // Stop other notification daemons (dunst, mako, swaync) first; only one can own the D-Bus name.
+  Scope {
+    id: notifications
+
+    // Newest first.
+    property var items: {
+      var list = server.trackedNotifications.values
+      var out = []
+      for (var i = list.length - 1; i >= 0; i--) out.push(list[i])
+      return out
+    }
+
+    NotificationServer {
+      id: server
+
+      actionsSupported: true
+      bodySupported: true
+      bodyMarkupSupported: true
+      imageSupported: true
+
+      onNotification: n => { n.tracked = true }
+    }
+
+    PanelWindow {
+      screen: Quickshell.screens[0]
+      WlrLayershell.layer: WlrLayer.Overlay
+      WlrLayershell.namespace: "notifications"
+      anchors { top: true; right: true }
+      margins { top: config.notificationMargin; right: config.notificationMargin }
+      exclusiveZone: 0
+      color: "transparent"
+      implicitWidth: config.notificationWidth
+      implicitHeight: Math.max(1, notificationColumn.implicitHeight)
+      visible: notifications.items.length > 0
+
+      ColumnLayout {
+        id: notificationColumn
+
+        anchors { left: parent.left; right: parent.right; top: parent.top }
+        spacing: config.notificationSpacing
+
+        Repeater {
+          model: notifications.items
+
+          delegate: Rectangle {
+            id: card
+
+            required property var modelData
+            required property int index
+
+            property var notification: modelData
+            property bool critical: notification.urgency === NotificationUrgency.Critical
+            // Critical notifications stay until dismissed. Others use their own timeout, or the default.
+            property int timeout: critical ? 0
+              : notification.expireTimeout > 0 ? notification.expireTimeout * 1000
+              : config.notificationTimeout
+            property bool hasActions: {
+              var list = notification.actions
+              for (var i = 0; i < list.length; i++) {
+                if (list[i].identifier !== "default") return true
+              }
+              return false
+            }
+            property string iconSource: {
+              if (notification.image !== "") return notification.image
+              var icon = notification.appIcon
+              if (icon === "") return ""
+              return icon.startsWith("/") ? "file://" + icon : Quickshell.iconPath(icon, true)
+            }
+
+            Layout.fillWidth: true
+            // Only the first notificationMax are shown; the rest wait in the queue.
+            visible: index < config.notificationMax
+            color: config.barColor
+            radius: config.notificationRadius
+            border.width: critical ? 2 : 0
+            border.color: config.colorAccent
+            implicitHeight: cardContent.implicitHeight + config.notificationPadding * 2
+
+            NumberAnimation on opacity { from: 0; to: 1; duration: 200 }
+
+            HoverHandler { id: cardHover }
+
+            Timer {
+              interval: card.timeout
+              running: card.timeout > 0 && card.visible && !cardHover.hovered
+              onTriggered: card.notification.expire()
+            }
+
+            MouseArea {
+              anchors.fill: parent
+              acceptedButtons: Qt.LeftButton | Qt.RightButton
+
+              onClicked: mouse => {
+                if (mouse.button === Qt.LeftButton) {
+                  var list = card.notification.actions
+                  for (var i = 0; i < list.length; i++) {
+                    if (list[i].identifier === "default") {
+                      list[i].invoke()
+                      return
+                    }
+                  }
+                }
+                card.notification.dismiss()
+              }
+            }
+
+            ColumnLayout {
+              id: cardContent
+
+              anchors {
+                left: parent.left
+                right: parent.right
+                top: parent.top
+                margins: config.notificationPadding
+              }
+              spacing: 8
+
+              RowLayout {
+                Layout.fillWidth: true
+                spacing: 12
+
+                Image {
+                  Layout.alignment: Qt.AlignTop
+                  Layout.preferredWidth: config.notificationIconSize
+                  Layout.preferredHeight: config.notificationIconSize
+                  fillMode: Image.PreserveAspectFit
+                  source: card.iconSource
+                  sourceSize: Qt.size(config.notificationIconSize * 2, config.notificationIconSize * 2)
+                  visible: source != ""
+                }
+
+                ColumnLayout {
+                  Layout.fillWidth: true
+                  spacing: 2
+
+                  Text {
+                    Layout.fillWidth: true
+                    color: config.colorText
+                    opacity: 0.6
+                    elide: Text.ElideRight
+                    font.family: config.fontFamily
+                    font.pixelSize: config.fontSize - 2
+                    font.weight: config.fontWeight
+                    text: card.notification.appName
+                    visible: text !== ""
+                  }
+
+                  Text {
+                    Layout.fillWidth: true
+                    color: config.colorText
+                    elide: Text.ElideRight
+                    font.family: config.fontFamily
+                    font.pixelSize: config.fontSize
+                    font.weight: Font.Bold
+                    text: card.notification.summary
+                  }
+
+                  Text {
+                    Layout.fillWidth: true
+                    color: config.colorText
+                    elide: Text.ElideRight
+                    font.family: config.fontFamily
+                    font.pixelSize: config.fontSize
+                    maximumLineCount: 3
+                    textFormat: Text.StyledText
+                    text: card.notification.body
+                    visible: text !== ""
+                    wrapMode: Text.Wrap
+                  }
+                }
+              }
+
+              RowLayout {
+                Layout.fillWidth: true
+                spacing: 8
+                visible: card.hasActions
+
+                Repeater {
+                  model: card.notification.actions
+
+                  delegate: Rectangle {
+                    id: actionButton
+
+                    required property var modelData
+
+                    Layout.fillWidth: true
+                    color: actionArea.containsMouse ? config.colorAccent : "transparent"
+                    border.width: 1
+                    border.color: config.colorAccent
+                    radius: config.barRadius
+                    implicitHeight: 28
+                    visible: modelData.identifier !== "default"
+
+                    Text {
+                      anchors.centerIn: parent
+                      color: actionArea.containsMouse ? config.colorAccentText : config.colorText
+                      font.family: config.fontFamily
+                      font.pixelSize: config.fontSize
+                      font.weight: config.fontWeight
+                      text: actionButton.modelData.text
+                    }
+
+                    MouseArea {
+                      id: actionArea
+
+                      anchors.fill: parent
+                      hoverEnabled: true
+                      onClicked: actionButton.modelData.invoke()
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 
