@@ -110,6 +110,7 @@ ShellRoot {
     property int notificationIconSize: 32
     property int notificationMax: 4
     property int notificationTimeout: 5000
+    property int notificationSlideDuration: 220
 
     // Now Playing
     property int nowPlayingMaxLength: 45
@@ -473,17 +474,17 @@ ShellRoot {
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.namespace: "notifications"
       anchors { top: true; right: true }
-      margins { top: config.notificationMargin; right: config.notificationMargin }
+      margins { top: config.notificationMargin }
       exclusiveZone: 0
       color: "transparent"
-      implicitWidth: config.notificationWidth
+      implicitWidth: config.notificationWidth + config.notificationMargin
       implicitHeight: Math.max(1, notificationColumn.implicitHeight)
       visible: notifications.items.length > 0
 
       ColumnLayout {
         id: notificationColumn
 
-        anchors { left: parent.left; right: parent.right; top: parent.top }
+        anchors { left: parent.left; right: parent.right; top: parent.top; rightMargin: config.notificationMargin }
         spacing: config.notificationSpacing
 
         Repeater {
@@ -515,6 +516,22 @@ ShellRoot {
               return icon.startsWith("/") ? "file://" + icon : Quickshell.iconPath(icon, true)
             }
 
+            // Horizontal offset in px: offscreen to the right (hidden) -> 0 (shown).
+            property real slideX: config.notificationWidth + config.notificationMargin
+            property bool leaving: false
+            property bool expireOnClose: false
+            property var pendingAction: null
+
+            // Slide out to the right, then expire/dismiss, or invoke the given action.
+            function close(expired, action) {
+              if (leaving) return
+              leaving = true
+              expireOnClose = expired
+              pendingAction = action || null
+              slideIn.stop()
+              slideOut.start()
+            }
+
             Layout.fillWidth: true
             // Only the first notificationMax are shown; the rest wait in the queue.
             visible: index < config.notificationMax
@@ -524,14 +541,52 @@ ShellRoot {
             border.color: config.colorAccent
             implicitHeight: cardContent.implicitHeight + config.notificationPadding * 2
 
-            NumberAnimation on opacity { from: 0; to: 1; duration: 200 }
+            transform: Translate { x: card.slideX }
+
+            // Slide in from the right when shown (new, or promoted from the queue).
+            Component.onCompleted: if (visible) slideIn.start()
+            onVisibleChanged: if (visible && !leaving) slideIn.start()
+
+            NumberAnimation {
+              id: slideIn
+
+              target: card
+              property: "slideX"
+              to: 0
+              duration: config.notificationSlideDuration
+              easing.type: Easing.OutCubic
+            }
+
+            NumberAnimation {
+              id: slideOut
+
+              target: card
+              property: "slideX"
+              to: config.notificationWidth + config.notificationMargin
+              duration: config.notificationSlideDuration
+              easing.type: Easing.InCubic
+
+              onFinished: {
+                var n = card.notification
+                var action = card.pendingAction
+                if (action) {
+                  var keep = n.resident
+                  action.invoke()
+                  if (keep) n.dismiss()
+                } else if (card.expireOnClose) {
+                  n.expire()
+                } else {
+                  n.dismiss()
+                }
+              }
+            }
 
             HoverHandler { id: cardHover }
 
             Timer {
               interval: card.timeout
-              running: card.timeout > 0 && card.visible && !cardHover.hovered
-              onTriggered: card.notification.expire()
+              running: card.timeout > 0 && card.visible && !card.leaving && !cardHover.hovered
+              onTriggered: card.close(true)
             }
 
             MouseArea {
@@ -543,12 +598,12 @@ ShellRoot {
                   var list = card.notification.actions
                   for (var i = 0; i < list.length; i++) {
                     if (list[i].identifier === "default") {
-                      list[i].invoke()
+                      card.close(false, list[i])
                       return
                     }
                   }
                 }
-                card.notification.dismiss()
+                card.close(false)
               }
             }
 
@@ -653,7 +708,7 @@ ShellRoot {
 
                       anchors.fill: parent
                       hoverEnabled: true
-                      onClicked: actionButton.modelData.invoke()
+                      onClicked: card.close(false, actionButton.modelData)
                     }
                   }
                 }
