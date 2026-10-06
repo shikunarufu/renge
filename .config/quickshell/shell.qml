@@ -23,6 +23,11 @@ ShellRoot {
     property color colorAccent: "#e2a97b"
     property color colorAccentText: "#18181b"
 
+    Behavior on colorText { ColorAnimation { duration: 400 } }
+    Behavior on colorAccent { ColorAnimation { duration: 400 } }
+    Behavior on colorAccentText { ColorAnimation { duration: 400 } }
+    Behavior on barColor { ColorAnimation { duration: 400 } }
+
     // Font
     property string fontFamily: "Segoe UI Variable"
     property int fontSize: 12
@@ -70,7 +75,7 @@ ShellRoot {
       "foot": "Foot",
       "zen": "Zen"
     })
-    
+
     // Wallpaper
     property string wallpaperIcon: "\udb80\udeeb"
 
@@ -88,7 +93,7 @@ ShellRoot {
     property int trayPopupRadius: 12
     property string trayIconCollapse: "\uf0d8"
     property string trayIconExpand: "\uf0d7"
-    
+
     // Network
     property int networkPollInterval: 3000
     property real networkDisconnectedOpacity: 0.5
@@ -120,13 +125,56 @@ ShellRoot {
       var n = wallpaperFolder.count
       if (n === 0) return
 
-      var i = -1
-      for (var k = 0; k < n; k++) {
-        if (wallpaperFolder.get(k, "filePath") === current) { i = k; break }
+        var i = -1
+        for (var k = 0; k < n; k++) {
+          if (wallpaperFolder.get(k, "filePath") === current) { i = k; break }
+        }
+
+        var next = i === -1 ? 0 : (i + delta + n) % n
+        wallpaperSettings.current = wallpaperFolder.get(next, "filePath")
+    }
+
+    // Build a palette from RGBA pixel data (most frequent colors first),
+    // then derive the bar, text and accent colors from it.
+    function applyPixels(data) {
+      var buckets = {}
+      for (var i = 0; i < data.length; i += 4) {
+        if (data[i + 3] < 128) continue
+        var key = ((data[i] >> 4) << 8) | ((data[i + 1] >> 4) << 4) | (data[i + 2] >> 4)
+        var b = buckets[key]
+        if (!b) b = buckets[key] = { n: 0, r: 0, g: 0, b: 0 }
+        b.n++
+        b.r += data[i]
+        b.g += data[i + 1]
+        b.b += data[i + 2]
       }
 
-      var next = i === -1 ? 0 : (i + delta + n) % n
-      wallpaperSettings.current = wallpaperFolder.get(next, "filePath")
+      var list = Object.keys(buckets).map(k => buckets[k])
+      list.sort((x, y) => y.n - x.n)
+
+      var colors = list.slice(0, 8).map(c => Qt.rgba(c.r / c.n / 255, c.g / c.n / 255, c.b / c.n / 255, 1))
+      if (colors.length === 0) return
+
+      var base = colors[0]
+      var accent = base
+      var best = -1
+      for (var j = 0; j < colors.length; j++) {
+        var l = colors[j].hslLightness
+        if (l < 0.2 || l > 0.9) continue
+        var score = colors[j].hslSaturation * (1 - Math.abs(l - 0.5))
+        if (score > best) { best = score; accent = colors[j] }
+      }
+
+      var accentHue = accent.hslHue >= 0 ? accent.hslHue : 0
+      var hue = base.hslSaturation > 0.08 && base.hslHue >= 0 ? base.hslHue : accentHue
+      var accentSat = accent.hslSaturation < 0.1
+        ? accent.hslSaturation
+        : Math.min(Math.max(accent.hslSaturation, 0.45), 0.8)
+
+      config.barColor = Qt.hsla(hue, Math.min(base.hslSaturation, 0.3), 0.10, 1)
+      config.colorText = Qt.hsla(hue, 0.15, 0.90, 1)
+      config.colorAccent = Qt.hsla(accentHue, accentSat, 0.68, 1)
+      config.colorAccentText = config.barColor
     }
 
     Settings {
@@ -146,9 +194,13 @@ ShellRoot {
       showDirs: false
       sortField: FolderListModel.Name
 
+      property bool picked: false
+
+      // Pick a random wallpaper once per shell start.
       onStatusChanged: {
-        if (status === FolderListModel.Ready && wallpaper.current === "" && count > 0)
-          wallpaperSettings.current = get(0, "filePath")
+        if (status !== FolderListModel.Ready || picked || count === 0) return
+        picked = true
+        wallpaperSettings.current = get(Math.floor(Math.random() * count), "filePath")
       }
     }
   }
@@ -157,6 +209,8 @@ ShellRoot {
     model: Quickshell.screens
 
     PanelWindow {
+      id: wallpaperWindow
+
       required property ShellScreen modelData
 
       WlrLayershell.layer: WlrLayer.Background
@@ -165,6 +219,37 @@ ShellRoot {
       anchors { left: true; right: true; top: true; bottom: true }
       color: config.barColor
       screen: modelData
+
+      // Samples the wallpaper at low resolution to read its colors.
+      // Placed off-screen (but still visible, so it paints); only the first screen runs it.
+      Canvas {
+        id: sampler
+
+        property string source: wallpaper.current
+        property string loadedUrl: ""
+
+        x: -width
+        width: 48
+        height: 48
+
+        onSourceChanged: requestPaint()
+        onImageLoaded: requestPaint()
+
+        onPaint: {
+          if (wallpaperWindow.modelData !== Quickshell.screens[0] || source === "") return
+
+          var url = "file://" + source
+          if (!isImageLoaded(url)) { loadImage(url); return }
+
+          var ctx = getContext("2d")
+          ctx.clearRect(0, 0, width, height)
+          ctx.drawImage(url, 0, 0, width, height)
+          wallpaper.applyPixels(ctx.getImageData(0, 0, width, height).data)
+
+          if (loadedUrl !== "" && loadedUrl !== url) unloadImage(loadedUrl)
+          loadedUrl = url
+        }
+      }
 
       Image {
         anchors.fill: parent
@@ -193,14 +278,14 @@ ShellRoot {
     property string label: {
       if (!player) return ""
 
-      var parts = []
-      if (player.trackTitle) parts.push(player.trackTitle)
-      if (player.trackArtist) parts.push(player.trackArtist)
+        var parts = []
+        if (player.trackTitle) parts.push(player.trackTitle)
+          if (player.trackArtist) parts.push(player.trackArtist)
 
-      var text = parts.join(config.nowPlayingSeparator)
-      return text.length > config.nowPlayingMaxLength
-        ? text.substring(0, config.nowPlayingMaxLength - 1) + "…"
-        : text
+            var text = parts.join(config.nowPlayingSeparator)
+            return text.length > config.nowPlayingMaxLength
+            ? text.substring(0, config.nowPlayingMaxLength - 1) + "…"
+            : text
     }
 
     onActiveChanged: if (!active) levels = []
@@ -257,10 +342,10 @@ ShellRoot {
             var monitors = payload.monitors || []
             if (monitors.length === 0) return
 
-            var next = {}
-            for (var key in layoutState.symbols) next[key] = layoutState.symbols[key]
-            for (var i = 0; i < monitors.length; i++) next[monitors[i].name] = monitors[i].layout_symbol
-            layoutState.symbols = next
+              var next = {}
+              for (var key in layoutState.symbols) next[key] = layoutState.symbols[key]
+                for (var i = 0; i < monitors.length; i++) next[monitors[i].name] = monitors[i].layout_symbol
+                  layoutState.symbols = next
           } catch (e) {
           }
         }
@@ -637,12 +722,12 @@ ShellRoot {
                     property string targetIcon: {
                       var t = ToplevelManager.activeToplevel
                       if (!t) return config.focusWindowGlyph
-                      return config.focusWindowIcons[t.appId.toLowerCase()] || config.focusWindowGlyph
+                        return config.focusWindowIcons[t.appId.toLowerCase()] || config.focusWindowGlyph
                     }
                     property string targetLabel: {
                       var t = ToplevelManager.activeToplevel
                       if (!t) return config.focusWindowPlaceholder
-                      return config.focusWindowNames[t.appId.toLowerCase()] || t.appId
+                        return config.focusWindowNames[t.appId.toLowerCase()] || t.appId
                     }
                     property string shownIcon: targetIcon
                     property string shownLabel: targetLabel
@@ -654,7 +739,7 @@ ShellRoot {
 
                     function update() {
                       if (leftBar.ready) swap.restart()
-                      else apply()
+                        else apply()
                     }
 
                     onTargetIconChanged: update()
@@ -795,11 +880,11 @@ ShellRoot {
                 if (q !== "") {
                   return vals.filter(function (e) {
                     if (e.name.toLowerCase().indexOf(q) !== -1) return true
-                    if (e.genericName && e.genericName.toLowerCase().indexOf(q) !== -1) return true
-                    for (var i = 0; i < e.keywords.length; i++) {
-                      if (e.keywords[i].toLowerCase().indexOf(q) !== -1) return true
-                    }
-                    return false
+                      if (e.genericName && e.genericName.toLowerCase().indexOf(q) !== -1) return true
+                        for (var i = 0; i < e.keywords.length; i++) {
+                          if (e.keywords[i].toLowerCase().indexOf(q) !== -1) return true
+                        }
+                        return false
                   }).sort(function (a, b) { return a.name.localeCompare(b.name) })
                 }
 
@@ -808,9 +893,9 @@ ShellRoot {
                   var ai = recent.indexOf(a.id)
                   var bi = recent.indexOf(b.id)
                   if (ai !== -1 && bi !== -1) return ai - bi
-                  if (ai !== -1) return -1
-                  if (bi !== -1) return 1
-                  return a.name.localeCompare(b.name)
+                    if (ai !== -1) return -1
+                      if (bi !== -1) return 1
+                        return a.name.localeCompare(b.name)
                 })
               }
 
@@ -843,16 +928,16 @@ ShellRoot {
                 var list = appLauncherPopup.recentIds.slice()
                 var idx = list.indexOf(id)
                 if (idx !== -1) list.splice(idx, 1)
-                list.unshift(id)
-                if (list.length > 12) list = list.slice(0, 12)
-                appLauncherPopup.recentIds = list
-                recentAppsSettings.recentIdsSerialized = JSON.stringify(list)
+                  list.unshift(id)
+                  if (list.length > 12) list = list.slice(0, 12)
+                    appLauncherPopup.recentIds = list
+                    recentAppsSettings.recentIdsSerialized = JSON.stringify(list)
               }
 
               function navigate(delta) {
                 if (filteredApps.length === 0) return
-                selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
-                appList.positionViewAtIndex(selectedIndex, ListView.Contain)
+                  selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
+                  appList.positionViewAtIndex(selectedIndex, ListView.Contain)
               }
 
               function launchEntry(entry) {
@@ -908,7 +993,7 @@ ShellRoot {
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                           if (appLauncherPopup.filteredApps.length > 0)
                             appLauncherPopup.launchEntry(appLauncherPopup.filteredApps[appLauncherPopup.selectedIndex])
-                          event.accepted = true
+                            event.accepted = true
                         } else if (event.key === Qt.Key_Escape) {
                           appLauncherPopup.visible = false
                           event.accepted = true
@@ -1084,8 +1169,8 @@ ShellRoot {
               // While the media slot has zero width, the Row may not position it, so its x
               // is unreliable; use the clock's edge instead.
               property real contentEdge: mediaSlot.width > 0
-                ? mediaSlot.x + mediaSlot.width
-                : clockLabel.x + clockLabel.width
+              ? mediaSlot.x + mediaSlot.width
+              : clockLabel.x + clockLabel.width
               property real rawWidth: centerRow.x + contentEdge + config.barPadding / 2
               property int roundedWidth: Math.round(rawWidth)
 
@@ -1158,7 +1243,7 @@ ShellRoot {
                     showTimer.stop()
                     contentShown = false
                     if (leftBar.ready) hideTimer.restart()
-                    else expanded = false
+                      else expanded = false
                   }
 
                   Component.onCompleted: if (wanted) show()
@@ -1201,8 +1286,8 @@ ShellRoot {
 
                     function update() {
                       if (!mediaSlot.wanted) return
-                      if (leftBar.ready && mediaSlot.contentShown) labelSwap.restart()
-                      else shownLabel = targetLabel
+                        if (leftBar.ready && mediaSlot.contentShown) labelSwap.restart()
+                          else shownLabel = targetLabel
                     }
 
                     onTargetLabelChanged: update()
@@ -1287,11 +1372,11 @@ ShellRoot {
                         onClicked: mouse => {
                           if (!media.player) return
 
-                          if (mouse.button === Qt.RightButton) {
-                            if (media.player.canGoNext) media.player.next()
-                          } else if (media.player.canTogglePlaying) {
-                            media.player.togglePlaying()
-                          }
+                            if (mouse.button === Qt.RightButton) {
+                              if (media.player.canGoNext) media.player.next()
+                            } else if (media.player.canTogglePlaying) {
+                              media.player.togglePlaying()
+                            }
                         }
                       }
                     }
@@ -1612,8 +1697,8 @@ ShellRoot {
                       font.family: config.iconFontFamily
                       font.pixelSize: config.iconSize
                       text: volumeItem.muted ? config.volumeIconMuted
-                        : volumeItem.volume < 0.5 ? config.volumeIconLow
-                        : config.volumeIconHigh
+                      : volumeItem.volume < 0.5 ? config.volumeIconLow
+                      : config.volumeIconHigh
                     }
 
                     Text {
@@ -1638,9 +1723,9 @@ ShellRoot {
                     onWheel: wheel => {
                       if (!volumeItem.sink || !volumeItem.sink.audio) return
 
-                      var delta = wheel.angleDelta.y > 0 ? config.volumeStep : -config.volumeStep
-                      volumeItem.sink.audio.muted = false
-                      volumeItem.sink.audio.volume = Math.max(0, Math.min(1, volumeItem.volume + delta))
+                        var delta = wheel.angleDelta.y > 0 ? config.volumeStep : -config.volumeStep
+                        volumeItem.sink.audio.muted = false
+                        volumeItem.sink.audio.volume = Math.max(0, Math.min(1, volumeItem.volume + delta))
                     }
                   }
                 }
@@ -1708,7 +1793,7 @@ ShellRoot {
 
                     onTargetTextChanged: {
                       if (leftBar.ready) imSwap.restart()
-                      else shownText = targetText
+                        else shownText = targetText
                     }
 
                     anchors { left: parent.left; verticalCenter: parent.verticalCenter }
