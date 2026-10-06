@@ -1241,6 +1241,7 @@ ShellRoot {
 
                   function hide() {
                     showTimer.stop()
+                    labelSwap.stop()
                     contentShown = false
                     if (leftBar.ready) hideTimer.restart()
                       else expanded = false
@@ -1285,7 +1286,9 @@ ShellRoot {
                     property string shownLabel: targetLabel
 
                     function update() {
-                      if (!mediaSlot.wanted) return
+                      // media.player is already updated here, unlike mediaSlot.wanted,
+                      // which may still hold the old value when the label changes first.
+                      if (media.player === null) return
                         if (leftBar.ready && mediaSlot.contentShown) labelSwap.restart()
                           else shownLabel = targetLabel
                     }
