@@ -43,7 +43,7 @@ QtObject {
   property int barSlideDuration: 500
 
   // ── Power Menu ──
-  property int powerMenuWidth: 100
+  property int powerMenuWidth: 95
   property int powerMenuMargin: 8
   property int powerMenuRadius: 8
   property int powerMenuPopupRadius: 12
