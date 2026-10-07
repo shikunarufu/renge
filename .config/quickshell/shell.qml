@@ -444,13 +444,6 @@ ShellRoot {
   Scope {
     id: notifications
 
-    property var items: {
-      var list = server.trackedNotifications.values
-      var out = []
-      for (var i = 0; i < list.length; i++) out.push(list[i])
-        return out
-    }
-
     NotificationServer {
       id: server
 
@@ -481,7 +474,9 @@ ShellRoot {
         spacing: config.notificationSpacing
 
         Repeater {
-          model: notifications.items
+          // Live model (oldest first): cards are added and removed one by one,
+          // so the card on screen is not recreated.
+          model: server.trackedNotifications
 
           delegate: Rectangle {
             id: card
