@@ -1,3 +1,14 @@
+// shell.qml — Quickshell bar, launcher, wallpaper and notifications.
+//
+// Settings: edit Config.qml (same folder). This file only holds the layout and logic.
+// Structure (search for the section name):
+//   Config          settings object, `config`
+//   Wallpaper       random wallpaper per start + theme colors from the image
+//   Now Playing Function   media player state and visualizer
+//   Layout State / Network State / Input Method State
+//   Notifications   notification server and popup
+//   Bar             left, center and right bar
+
 import QtCore
 import QtQuick
 import QtQuick.Layouts
@@ -15,117 +26,8 @@ import Quickshell.WindowManager
 
 ShellRoot {
 
-  // ─────────────────── Configuration ───────────────────
-  QtObject {
-    id: config
-
-    // Color
-    property color colorText: "#e5e7eb"
-    property color colorAccent: "#e2a97b"
-    property color colorAccentText: "#18181b"
-
-    Behavior on colorText { ColorAnimation { duration: 500 } }
-    Behavior on colorAccent { ColorAnimation { duration: 500 } }
-    Behavior on colorAccentText { ColorAnimation { duration: 500 } }
-    Behavior on barColor { ColorAnimation { duration: 500 } }
-
-    // Font
-    property string fontFamily: "Segoe UI Variable"
-    property int fontSize: 12
-    property int fontWeight: Font.DemiBold
-
-    property string iconFontFamily: "JetBrainsMono Nerd Font"
-    property int iconSize: 16
-
-    // Bar
-    property color barColor: "#18181b"
-    property int barHeight: 35
-    property int barItemSpacing: 16
-    property int barPadding: 44
-    property int barRadius: 22
-
-    // Power Menu
-    property int powerMenuWidth: 160
-    property string powerMenuIcon: "\udb82\udcc7"
-
-    // Workspace
-    property int workspaceHeight: 16
-    property int workspaceWidth: 16
-    property int workspacePadding: 8
-    property int workspaceRadius: 4
-    property int workspaceSpacing: 8
-
-    // App Launcher
-    property int appLauncherWidth: 360
-    property int appLauncherMaxVisible: 7
-    property int appLauncherItemHeight: 42
-    property string appLauncherIcon: "\uf002"
-
-    // Focus Window
-    property string focusWindowGlyph: "\uf2d0"
-
-    // App Icon
-    property var focusWindowIcons: ({
-      "foot": "\uf489",
-      "zen": "\udb83\ude95"
-    })
-
-    // Window Title
-    property string focusWindowPlaceholder: "Desktop"
-    property var focusWindowNames: ({
-      "foot": "Foot",
-      "zen": "Zen"
-    })
-
-    // Wallpaper
-    property string wallpaperIcon: "\udb80\udeeb"
-
-    // Volume
-    property real volumeStep: 0.05
-    property string volumeIconHigh: "\uf028"
-    property string volumeIconLow: "\uf027"
-    property string volumeIconMuted: "\ueee8"
-
-    // System Tray
-    property int trayIconSize: 16
-    property int trayIconSpacing: 8
-    property int trayPopupMargin: 6
-    property int trayPopupPadding: 10
-    property int trayPopupRadius: 12
-    property string trayIconCollapse: "\uf0d8"
-    property string trayIconExpand: "\uf0d7"
-
-    // Network
-    property int networkPollInterval: 3000
-    property real networkDisconnectedOpacity: 0.5
-    property string networkIconEthernet: "\uef44"
-    property string networkIconWifi: "\uf1eb"
-
-    // Notifications
-    property int notificationWidth: 360
-    property int notificationMargin: 8
-    property int notificationSpacing: 8
-    property int notificationPadding: 12
-    property int notificationRadius: 12
-    property int notificationIconSize: 32
-    property int notificationMax: 1
-    property int notificationTimeout: 5000
-    property int notificationSlideDuration: 500
-
-    // Now Playing
-    property int nowPlayingMaxLength: 45
-    property string nowPlayingSeparator: " - "
-
-    // Visualizer
-    property int visualizerBars: 10
-    property int visualizerBarGap: 4
-    property int visualizerBarWidth: 2
-    property int visualizerFramerate: 60
-    property int visualizerHeight: 12
-    property int visualizerMaxFreq: 10000
-    property int visualizerMinFreq: 20
-  }
-  // ─────────────────────────────────────────────────────
+  // ── Config ──
+  Config { id: config }
 
   // ── Wallpaper ──
   Scope {
@@ -147,44 +49,63 @@ ShellRoot {
     }
 
     function applyPixels(data) {
+      if (!config.themeFromWallpaper) {
+        return
+      }
+
       var buckets = {}
       for (var i = 0; i < data.length; i += 4) {
-        if (data[i + 3] < 128) continue
-          var key = ((data[i] >> 4) << 8) | ((data[i + 1] >> 4) << 4) | (data[i + 2] >> 4)
-          var b = buckets[key]
-          if (!b) b = buckets[key] = { n: 0, r: 0, g: 0, b: 0 }
-          b.n++
-          b.r += data[i]
-          b.g += data[i + 1]
-          b.b += data[i + 2]
+        if (data[i + 3] < 128) {
+          continue
+        }
+
+        var key = ((data[i] >> 4) << 8) | ((data[i + 1] >> 4) << 4) | (data[i + 2] >> 4)
+        var bucket = buckets[key]
+        if (!bucket) {
+          bucket = buckets[key] = { n: 0, r: 0, g: 0, b: 0 }
+        }
+
+        bucket.n++
+        bucket.r += data[i]
+        bucket.g += data[i + 1]
+        bucket.b += data[i + 2]
       }
 
       var list = Object.keys(buckets).map(k => buckets[k])
       list.sort((x, y) => y.n - x.n)
 
-      var colors = list.slice(0, 8).map(c => Qt.rgba(c.r / c.n / 255, c.g / c.n / 255, c.b / c.n / 255, 1))
-      if (colors.length === 0) return
+      var colors = list.slice(0, config.themePaletteSize)
+        .map(c => Qt.rgba(c.r / c.n / 255, c.g / c.n / 255, c.b / c.n / 255, 1))
+      if (colors.length === 0) {
+        return
+      }
 
-        var base = colors[0]
-        var accent = base
-        var best = -1
-        for (var j = 0; j < colors.length; j++) {
-          var l = colors[j].hslLightness
-          if (l < 0.2 || l > 0.9) continue
-            var score = colors[j].hslSaturation * (1 - Math.abs(l - 0.5))
-            if (score > best) { best = score; accent = colors[j] }
+      var base = colors[0]
+      var accent = base
+      var best = -1
+      for (var j = 0; j < colors.length; j++) {
+        var lightness = colors[j].hslLightness
+        if (lightness < 0.2 || lightness > 0.9) {
+          continue
         }
 
-        var accentHue = accent.hslHue >= 0 ? accent.hslHue : 0
-        var hue = base.hslSaturation > 0.08 && base.hslHue >= 0 ? base.hslHue : accentHue
-        var accentSat = accent.hslSaturation < 0.1
-        ? accent.hslSaturation
-        : Math.min(Math.max(accent.hslSaturation, 0.45), 0.8)
+        var score = colors[j].hslSaturation * (1 - Math.abs(lightness - 0.5))
+        if (score > best) {
+          best = score
+          accent = colors[j]
+        }
+      }
 
-        config.barColor = Qt.hsla(hue, Math.min(base.hslSaturation, 0.3), 0.10, 1)
-        config.colorText = Qt.hsla(hue, 0.15, 0.90, 1)
-        config.colorAccent = Qt.hsla(accentHue, accentSat, 0.68, 1)
-        config.colorAccentText = config.barColor
+      var accentHue = accent.hslHue >= 0 ? accent.hslHue : 0
+      var hue = base.hslSaturation > 0.08 && base.hslHue >= 0 ? base.hslHue : accentHue
+      var accentSaturation = accent.hslSaturation < 0.1
+        ? accent.hslSaturation
+        : Math.min(Math.max(accent.hslSaturation, config.themeAccentMinSaturation), config.themeAccentMaxSaturation)
+
+      config.barColor = Qt.hsla(hue, Math.min(base.hslSaturation, config.themeBarMaxSaturation), config.themeBarLightness, 1)
+      config.colorText = Qt.hsla(hue, config.themeTextSaturation, config.themeTextLightness, 1)
+      config.colorAccent = Qt.hsla(accentHue, accentSaturation, config.themeAccentLightness, 1)
+      config.colorAccentText = config.barColor
     }
 
     Settings {
@@ -197,19 +118,24 @@ ShellRoot {
     FolderListModel {
       id: wallpaperFolder
 
-      property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
-
-      folder: "file://" + wallpaperDir
-      nameFilters: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
+      folder: "file://" + config.wallpaperDir
+      nameFilters: config.wallpaperFormats
       showDirs: false
       sortField: FolderListModel.Name
 
       property bool picked: false
 
       onStatusChanged: {
-        if (status !== FolderListModel.Ready || picked || count === 0) return
-          picked = true
-          wallpaperSettings.current = get(Math.floor(Math.random() * count), "filePath")
+        if (status !== FolderListModel.Ready || picked || count === 0) {
+          return
+        }
+
+        picked = true
+        if (!config.wallpaperRandomOnStart && wallpaperSettings.current !== "") {
+          return
+        }
+
+        wallpaperSettings.current = get(Math.floor(Math.random() * count), "filePath")
       }
     }
   }
@@ -236,8 +162,8 @@ ShellRoot {
         property string loadedUrl: ""
 
         x: -width
-        width: 48
-        height: 48
+        width: config.themeSampleSize
+        height: config.themeSampleSize
 
         onSourceChanged: requestPaint()
         onImageLoaded: requestPaint()
@@ -737,7 +663,7 @@ ShellRoot {
             Rectangle {
               id: leftBar
 
-              property int slideDuration: 500
+              property int slideDuration: config.barSlideDuration
               property bool ready: false
 
               clip: true
@@ -774,9 +700,9 @@ ShellRoot {
 
                 // ── Power Menu ──
                 Text {
-                  anchors.verticalCenter: parent.verticalCenter
                   id: powerMenuGlyph
 
+                  anchors.verticalCenter: parent.verticalCenter
                   color: config.colorText
                   font.family: config.iconFontFamily
                   font.pixelSize: config.iconSize
@@ -802,13 +728,13 @@ ShellRoot {
 
                 // ── Layout ──
                 Text {
-                  anchors.verticalCenter: parent.verticalCenter
                   id: layoutGlyph
 
-                  property var layoutList: ["tile", "monocle", "grid", "scroller"]
+                  property var layoutList: config.layoutCycle
                   property string currentLayout: layoutState.symbols[screenRoot.modelData.name] || layoutList[0]
                   property int nextIndex: 0
 
+                  anchors.verticalCenter: parent.verticalCenter
                   color: config.colorText
                   font.family: config.fontFamily
                   font.pixelSize: config.fontSize
@@ -881,7 +807,7 @@ ShellRoot {
                         enabled: leftBar.ready
 
                         NumberAnimation {
-                          duration: 200
+                          duration: config.animationDuration
                           easing.type: Easing.OutQuint
                         }
                       }
@@ -949,9 +875,9 @@ ShellRoot {
 
                 // ── App Launcher ──
                 Text {
-                  anchors.verticalCenter: parent.verticalCenter
                   id: appLauncherGlyph
 
+                  anchors.verticalCenter: parent.verticalCenter
                   color: config.colorText
                   font.family: config.iconFontFamily
                   font.pixelSize: config.iconSize
@@ -1021,7 +947,7 @@ ShellRoot {
                         target: focusWindow
                         property: "opacity"
                         to: 0
-                        duration: 200
+                        duration: config.animationDuration
                         easing.type: Easing.OutQuint
                       }
 
@@ -1031,7 +957,7 @@ ShellRoot {
                         target: focusWindow
                         property: "opacity"
                         to: 1
-                        duration: 200
+                        duration: config.animationDuration
                         easing.type: Easing.OutQuint
                       }
                     }
@@ -1064,8 +990,11 @@ ShellRoot {
             PopupWindow {
               id: powerMenuPopup
 
-              anchor.item: powerMenuGlyph
-              anchor.edges: Edges.Bottom | Edges.Left
+              // Anchored to the bar window: left screen edge, just below the bar.
+              anchor.window: bar
+              anchor.rect.x: config.powerMenuMargin
+              anchor.rect.y: bar.height + config.powerMenuMargin
+              anchor.edges: Edges.Top | Edges.Left
               anchor.gravity: Edges.Bottom | Edges.Right
               implicitWidth: config.powerMenuWidth
               implicitHeight: powerMenuColumn.implicitHeight + (powerMenuColumn.anchors.margins * 2)
@@ -1076,7 +1005,7 @@ ShellRoot {
               Rectangle {
                 anchors.fill: parent
                 color: config.barColor
-                radius: config.workspaceRadius
+                radius: config.powerMenuPopupRadius
 
                 ColumnLayout {
                   id: powerMenuColumn
@@ -1086,13 +1015,7 @@ ShellRoot {
                   spacing: 2
 
                   Repeater {
-                    model: [
-                      { label: "Shut Down", command: "systemctl poweroff" },
-                      { label: "Restart", command: "systemctl reboot" },
-                      { label: "Sleep", command: "systemctl suspend" },
-                      { label: "Lock", command: "loginctl lock-session" },
-                      { label: "Log Out", command: "loginctl terminate-session self" }
-                    ]
+                    model: config.powerMenuActions
 
                     delegate: Rectangle {
                       id: powerMenuOption
@@ -1101,7 +1024,7 @@ ShellRoot {
 
                       Layout.fillWidth: true
                       color: powerMenuOptionArea.containsMouse ? config.colorAccent : "transparent"
-                      radius: config.barRadius
+                      radius: config.powerMenuRadius
                       implicitHeight: 28
 
                       Text {
@@ -1233,7 +1156,7 @@ ShellRoot {
                     Layout.fillWidth: true
                     implicitHeight: 32
                     radius: config.workspaceRadius
-                    color: Qt.rgba(1, 1, 1, 0.07)
+                    color: config.colorInput
 
                     TextInput {
                       id: searchField
@@ -1533,7 +1456,7 @@ ShellRoot {
                   Timer {
                     id: hideTimer
 
-                    interval: 200
+                    interval: config.animationDuration
                     onTriggered: mediaSlot.expanded = false
                   }
 
@@ -1563,7 +1486,7 @@ ShellRoot {
                       enabled: leftBar.ready && !labelSwap.running
 
                       NumberAnimation {
-                        duration: 200
+                        duration: config.animationDuration
                         easing.type: Easing.OutQuint
                       }
                     }
@@ -1575,7 +1498,7 @@ ShellRoot {
                         target: mediaRow
                         property: "opacity"
                         to: 0
-                        duration: 200
+                        duration: config.animationDuration
                         easing.type: Easing.OutQuint
                       }
 
@@ -1585,7 +1508,7 @@ ShellRoot {
                         target: mediaRow
                         property: "opacity"
                         to: 1
-                        duration: 200
+                        duration: config.animationDuration
                         easing.type: Easing.OutQuint
                       }
                     }
@@ -1609,7 +1532,7 @@ ShellRoot {
                           height: Math.max(config.visualizerBarWidth, ((media.levels[index] || 0) / 100) * config.visualizerHeight)
                           width: config.visualizerBarWidth
 
-                          Behavior on height { NumberAnimation { duration: 200 } }
+                          Behavior on height { NumberAnimation { duration: config.animationDuration } }
                         }
                       }
                     }
@@ -1789,7 +1712,7 @@ ShellRoot {
                     enabled: leftBar.ready
 
                     NumberAnimation {
-                      duration: 200
+                      duration: config.animationDuration
                       easing.type: Easing.OutQuint
                     }
                   }
@@ -2065,7 +1988,7 @@ ShellRoot {
                         target: imText
                         property: "opacity"
                         to: 0
-                        duration: 200
+                        duration: config.animationDuration
                         easing.type: Easing.OutQuint
                       }
 
@@ -2075,7 +1998,7 @@ ShellRoot {
                         target: imText
                         property: "opacity"
                         to: 1
-                        duration: 200
+                        duration: config.animationDuration
                         easing.type: Easing.OutQuint
                       }
                     }
