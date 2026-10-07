@@ -25,6 +25,10 @@ import Quickshell.Wayland
 import Quickshell.WindowManager
 
 ShellRoot {
+  id: shellRoot
+
+  // Emitted to close every popup (power menu, app launcher, tray) on all screens.
+  signal dismissPopups()
 
   // ── Config ──
   Config { id: config }
@@ -75,7 +79,7 @@ ShellRoot {
       list.sort((x, y) => y.n - x.n)
 
       var colors = list.slice(0, config.themePaletteSize)
-        .map(c => Qt.rgba(c.r / c.n / 255, c.g / c.n / 255, c.b / c.n / 255, 1))
+      .map(c => Qt.rgba(c.r / c.n / 255, c.g / c.n / 255, c.b / c.n / 255, 1))
       if (colors.length === 0) {
         return
       }
@@ -99,8 +103,8 @@ ShellRoot {
       var accentHue = accent.hslHue >= 0 ? accent.hslHue : 0
       var hue = base.hslSaturation > 0.08 && base.hslHue >= 0 ? base.hslHue : accentHue
       var accentSaturation = accent.hslSaturation < 0.1
-        ? accent.hslSaturation
-        : Math.min(Math.max(accent.hslSaturation, config.themeAccentMinSaturation), config.themeAccentMaxSaturation)
+      ? accent.hslSaturation
+      : Math.min(Math.max(accent.hslSaturation, config.themeAccentMinSaturation), config.themeAccentMaxSaturation)
 
       config.barColor = Qt.hsla(hue, Math.min(base.hslSaturation, config.themeBarMaxSaturation), config.themeBarLightness, 1)
       config.colorText = Qt.hsla(hue, config.themeTextSaturation, config.themeTextLightness, 1)
@@ -190,6 +194,13 @@ ShellRoot {
         fillMode: Image.PreserveAspectCrop
         source: wallpaper.current !== "" ? "file://" + wallpaper.current : ""
         sourceSize: Qt.size(modelData.width, modelData.height)
+      }
+
+      // Click on the desktop closes open popups.
+      MouseArea {
+        anchors.fill: parent
+
+        onClicked: shellRoot.dismissPopups()
       }
     }
   }
@@ -644,6 +655,26 @@ ShellRoot {
         property var cornerHiddenLayouts: ["S"]
         property bool cornersHidden: cornerHiddenLayouts.indexOf(layoutState.symbols[modelData.name]) !== -1
 
+        // Only one popup is open at a time. Two popups with a focus grab open together
+        // get placed relative to each other instead of the bar.
+        function togglePopup(popup) {
+          var wasOpen = popup.visible
+          shellRoot.dismissPopups()
+          if (!wasOpen) {
+            Qt.callLater(() => { popup.visible = true })
+          }
+        }
+
+        Connections {
+          target: shellRoot
+
+          function onDismissPopups() {
+            powerMenuPopup.visible = false
+            appLauncherPopup.visible = false
+            trayPopup.visible = false
+          }
+        }
+
         PanelWindow {
           id: bar
 
@@ -658,6 +689,13 @@ ShellRoot {
 
           Item {
             anchors.fill: parent
+
+            // Click on empty bar space closes open popups.
+            MouseArea {
+              anchors.fill: parent
+
+              onClicked: shellRoot.dismissPopups()
+            }
 
             // ── Left Bar ──
             Rectangle {
@@ -711,7 +749,7 @@ ShellRoot {
                   MouseArea {
                     anchors.fill: parent
 
-                    onClicked: powerMenuPopup.visible = !powerMenuPopup.visible
+                    onClicked: screenRoot.togglePopup(powerMenuPopup)
                   }
                 }
 
@@ -886,7 +924,7 @@ ShellRoot {
                   MouseArea {
                     anchors.fill: parent
 
-                    onClicked: appLauncherPopup.visible = !appLauncherPopup.visible
+                    onClicked: screenRoot.togglePopup(appLauncherPopup)
                   }
                 }
 
@@ -1171,6 +1209,13 @@ ShellRoot {
                       clip: true
 
                       onTextChanged: appLauncherPopup.searchQuery = text
+
+                      // Clicking another window takes keyboard focus away: close the launcher.
+                      onActiveFocusChanged: {
+                        if (!activeFocus && appLauncherPopup.visible) {
+                          appLauncherPopup.visible = false
+                        }
+                      }
 
                       Keys.onPressed: function (event) {
                         if (event.key === Qt.Key_Up) {
@@ -1741,7 +1786,7 @@ ShellRoot {
                       MouseArea {
                         anchors.fill: parent
 
-                        onClicked: trayPopup.visible = !trayPopup.visible
+                        onClicked: screenRoot.togglePopup(trayPopup)
                       }
 
                       PopupWindow {
