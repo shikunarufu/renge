@@ -397,7 +397,7 @@ ShellRoot {
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.namespace: "notifications"
       anchors { top: true; left: true; right: true }
-      margins { top: config.notificationMargin }
+      margins { top: config.notificationTop }
       exclusiveZone: 0
       color: "transparent"
       implicitHeight: Math.max(1, notificationColumn.implicitHeight)
@@ -1793,8 +1793,8 @@ ShellRoot {
                         id: trayPopup
 
                         anchor.item: trayArrow
-                        anchor.edges: Edges.Bottom | Edges.Right
-                        anchor.gravity: Edges.Bottom | Edges.Left
+                        anchor.edges: Edges.Bottom
+                        anchor.gravity: Edges.Bottom
                         anchor.margins.top: config.trayPopupMargin
                         color: "transparent"
                         implicitHeight: config.trayIconSize + config.trayPopupPadding * 2
