@@ -24,10 +24,10 @@ ShellRoot {
     property color colorAccent: "#e2a97b"
     property color colorAccentText: "#18181b"
 
-    Behavior on colorText { ColorAnimation { duration: 400 } }
-    Behavior on colorAccent { ColorAnimation { duration: 400 } }
-    Behavior on colorAccentText { ColorAnimation { duration: 400 } }
-    Behavior on barColor { ColorAnimation { duration: 400 } }
+    Behavior on colorText { ColorAnimation { duration: 500 } }
+    Behavior on colorAccent { ColorAnimation { duration: 500 } }
+    Behavior on colorAccentText { ColorAnimation { duration: 500 } }
+    Behavior on barColor { ColorAnimation { duration: 500 } }
 
     // Font
     property string fontFamily: "Segoe UI Variable"
@@ -108,9 +108,9 @@ ShellRoot {
     property int notificationPadding: 12
     property int notificationRadius: 12
     property int notificationIconSize: 32
-    property int notificationMax: 4
+    property int notificationMax: 1
     property int notificationTimeout: 5000
-    property int notificationSlideDuration: 220
+    property int notificationSlideDuration: 500
 
     // Now Playing
     property int nowPlayingMaxLength: 45
@@ -450,12 +450,12 @@ ShellRoot {
   Scope {
     id: notifications
 
-    // Newest first.
+    // Oldest first: the earliest notification is shown, later ones wait in the queue.
     property var items: {
       var list = server.trackedNotifications.values
       var out = []
-      for (var i = list.length - 1; i >= 0; i--) out.push(list[i])
-        return out
+      for (var i = 0; i < list.length; i++) out.push(list[i])
+      return out
     }
 
     NotificationServer {
@@ -756,7 +756,7 @@ ShellRoot {
             Rectangle {
               id: leftBar
 
-              property int slideDuration: 300
+              property int slideDuration: 500
               property bool ready: false
 
               clip: true
@@ -1044,7 +1044,7 @@ ShellRoot {
                         target: focusWindow
                         property: "opacity"
                         to: 0
-                        duration: 120
+                        duration: 200
                         easing.type: Easing.OutQuint
                       }
 
@@ -1608,7 +1608,7 @@ ShellRoot {
                         target: mediaRow
                         property: "opacity"
                         to: 0
-                        duration: 120
+                        duration: 200
                         easing.type: Easing.OutQuint
                       }
 
@@ -1642,7 +1642,7 @@ ShellRoot {
                           height: Math.max(config.visualizerBarWidth, ((media.levels[index] || 0) / 100) * config.visualizerHeight)
                           width: config.visualizerBarWidth
 
-                          Behavior on height { NumberAnimation { duration: 60 } }
+                          Behavior on height { NumberAnimation { duration: 200 } }
                         }
                       }
                     }
@@ -2102,7 +2102,7 @@ ShellRoot {
                         target: imText
                         property: "opacity"
                         to: 0
-                        duration: 120
+                        duration: 200
                         easing.type: Easing.OutQuint
                       }
 
