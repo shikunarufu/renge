@@ -43,10 +43,10 @@ QtObject {
   property int barSlideDuration: 500
 
   // ── Power Menu ──
-  property int powerMenuWidth: 160
-  property int powerMenuMargin: notificationMargin  // Gap from the left edge and from the bar
-  property int powerMenuRadius: 12
-  property int powerMenuPopupRadius: 4
+  property int powerMenuWidth: 100
+  property int powerMenuMargin: 8
+  property int powerMenuRadius: 8
+  property int powerMenuPopupRadius: 12
   property string powerMenuIcon: "\udb82\udcc7"
   property var powerMenuActions: [
     { label: "Shut Down", command: "systemctl poweroff" },
