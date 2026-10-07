@@ -146,8 +146,6 @@ ShellRoot {
         wallpaperSettings.current = wallpaperFolder.get(next, "filePath")
     }
 
-    // Build a palette from RGBA pixel data (most frequent colors first),
-    // then derive the bar, text and accent colors from it.
     function applyPixels(data) {
       var buckets = {}
       for (var i = 0; i < data.length; i += 4) {
@@ -208,7 +206,6 @@ ShellRoot {
 
       property bool picked: false
 
-      // Pick a random wallpaper once per shell start.
       onStatusChanged: {
         if (status !== FolderListModel.Ready || picked || count === 0) return
           picked = true
@@ -232,8 +229,6 @@ ShellRoot {
       color: config.barColor
       screen: modelData
 
-      // Samples the wallpaper at low resolution to read its colors.
-      // Placed off-screen (but still visible, so it paints); only the first screen runs it.
       Canvas {
         id: sampler
 
@@ -335,7 +330,7 @@ ShellRoot {
     }
   }
 
-  // ── Layout State ──
+  // ── Layout Function ──
   Scope {
     id: layoutState
 
@@ -375,7 +370,7 @@ ShellRoot {
     }
   }
 
-  // ── Network State ──
+  // ── Network Function ──
   Scope {
     id: network
 
@@ -404,7 +399,7 @@ ShellRoot {
     }
   }
 
-  // ── Input Method State ──
+  // ── Input Method Function ──
   Scope {
     id: inputMethod
 
@@ -446,16 +441,14 @@ ShellRoot {
   }
 
   // ── Notifications ──
-  // Stop other notification daemons (dunst, mako, swaync) first; only one can own the D-Bus name.
   Scope {
     id: notifications
 
-    // Oldest first: the earliest notification is shown, later ones wait in the queue.
     property var items: {
       var list = server.trackedNotifications.values
       var out = []
       for (var i = 0; i < list.length; i++) out.push(list[i])
-      return out
+        return out
     }
 
     NotificationServer {
@@ -473,8 +466,6 @@ ShellRoot {
       screen: Quickshell.screens[0]
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.namespace: "notifications"
-      // Full-width and always mapped: cards slide in and out inside the surface,
-      // so they start and end beyond the screen edge. Only the cards take input.
       anchors { top: true; left: true; right: true }
       margins { top: config.notificationMargin }
       exclusiveZone: 0
@@ -500,7 +491,6 @@ ShellRoot {
 
             property var notification: modelData
             property bool critical: notification.urgency === NotificationUrgency.Critical
-            // Critical notifications stay until dismissed. Others use their own timeout, or the default.
             property int timeout: critical ? 0
             : notification.expireTimeout > 0 ? notification.expireTimeout * 1000
             : config.notificationTimeout
@@ -518,13 +508,11 @@ ShellRoot {
                   return icon.startsWith("/") ? "file://" + icon : Quickshell.iconPath(icon, true)
             }
 
-            // Horizontal offset in px: offscreen to the right (hidden) -> 0 (shown).
             property real slideX: config.notificationWidth + config.notificationMargin
             property bool leaving: false
             property bool expireOnClose: false
             property var pendingAction: null
 
-            // Slide out to the right, then expire/dismiss, or invoke the given action.
             function close(expired, action) {
               if (leaving) return
                 leaving = true
@@ -535,7 +523,6 @@ ShellRoot {
             }
 
             Layout.fillWidth: true
-            // Only the first notificationMax are shown; the rest wait in the queue.
             visible: index < config.notificationMax
             color: config.barColor
             radius: config.notificationRadius
@@ -545,7 +532,6 @@ ShellRoot {
 
             transform: Translate { x: card.slideX }
 
-            // Slide in from the right when shown (new, or promoted from the queue).
             Component.onCompleted: if (visible) slideIn.start()
             onVisibleChanged: if (visible && !leaving) slideIn.start()
 
@@ -765,8 +751,6 @@ ShellRoot {
               anchors { left: parent.left; top: parent.top }
               height: config.barHeight
 
-              // Bar edge follows the right edge of the last item, so it stretches
-              // in the same frames as the contents slide. Rounded to whole pixels.
               width: Math.round(leftRow.x + focusSlot.x + focusSlot.width + config.barPadding / 2)
 
               Timer {
@@ -986,7 +970,6 @@ ShellRoot {
                 }
 
                 // ── Focus Window ──
-                // Slot width animates so the bar (which tracks its right edge) stretches with it.
                 Item {
                   id: focusSlot
 
@@ -1007,7 +990,6 @@ ShellRoot {
                   RowLayout {
                     id: focusWindow
 
-                    // Targets follow the active window; shown values change only while faded out.
                     property string targetIcon: {
                       var t = ToplevelManager.activeToplevel
                       if (!t) return config.focusWindowGlyph
@@ -1114,7 +1096,7 @@ ShellRoot {
                       { label: "Restart", command: "systemctl reboot" },
                       { label: "Sleep", command: "systemctl suspend" },
                       { label: "Lock", command: "loginctl lock-session" },
-                      { label: "Log Out", command: "loginctl terminate-session self" } // adjust for your compositor, e.g. "hyprctl dispatch exit" or "swaymsg exit"
+                      { label: "Log Out", command: "loginctl terminate-session self" }
                     ]
 
                     delegate: Rectangle {
@@ -1452,11 +1434,6 @@ ShellRoot {
             Rectangle {
               id: centerBar
 
-              // Bar edges follow the right edge of the last item, so the bar stretches
-              // in the same frames as the contents slide. Parity is matched to the
-              // parent width so both edges land on whole pixels.
-              // While the media slot has zero width, the Row may not position it, so its x
-              // is unreliable; use the clock's edge instead.
               property real contentEdge: mediaSlot.width > 0
               ? mediaSlot.x + mediaSlot.width
               : clockLabel.x + clockLabel.width
@@ -1507,9 +1484,7 @@ ShellRoot {
                   text: Qt.formatDateTime(clock.date, "ddd, d MMM   HH:mm")
                 }
 
-                // ── Media (visualizer + now playing) ──
-                // Always present; its width animates to 0 when nothing plays. Order on show:
-                // the bar stretches first, then the content fades in. On hide: fade out, then shrink.
+                // ── Media ──
                 Item {
                   id: mediaSlot
 
@@ -1570,13 +1545,10 @@ ShellRoot {
                   RowLayout {
                     id: mediaRow
 
-                    // Keep the last label while fading out, so the text does not vanish early.
                     property string targetLabel: media.label
                     property string shownLabel: targetLabel
 
                     function update() {
-                      // media.player is already updated here, unlike mediaSlot.wanted,
-                      // which may still hold the old value when the label changes first.
                       if (media.player === null) return
                         if (leftBar.ready && mediaSlot.contentShown) labelSwap.restart()
                           else shownLabel = targetLabel
@@ -1759,8 +1731,6 @@ ShellRoot {
             Rectangle {
               id: rightBar
 
-              // Bar edge follows the right edge of the last item (animated), so the bar
-              // stretches in the same frames as the contents slide.
               clip: true
               bottomLeftRadius: config.barRadius
               color: config.barColor
@@ -1786,8 +1756,7 @@ ShellRoot {
                   }
                 }
 
-                // ── System Tray (arrow + separator) ──
-                // Fades out before the row slides, and fades in after it has slid.
+                // ── System Tray ──
                 Item {
                   id: traySlot
 
@@ -2056,7 +2025,6 @@ ShellRoot {
                 }
 
                 // ── Input Method ──
-                // Last item: its slot width animates, and the bar tracks the slot's right edge.
                 Item {
                   id: imSlot
 
@@ -2132,10 +2100,9 @@ ShellRoot {
               anchors { left: true; top: true }
               color: "transparent"
               exclusionMode: ExclusionMode.Ignore
-              mask: Region {} // click-through
+              mask: Region {}
               screen: screenRoot.modelData
               margins.top: config.barHeight
-              // Stay mapped until the slide-out finishes.
               visible: !screenRoot.cornersHidden || leftConcave1.x > -config.barRadius
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
@@ -2143,7 +2110,6 @@ ShellRoot {
               Shape {
                 id: leftConcave1
 
-                // Slides in from / out to the left screen edge (window clips the overflow).
                 x: screenRoot.cornersHidden ? -config.barRadius : 0
 
                 Behavior on x {
@@ -2193,7 +2159,7 @@ ShellRoot {
               anchors { right: true; top: true }
               color: "transparent"
               exclusionMode: ExclusionMode.Ignore
-              mask: Region {} // click-through
+              mask: Region {}
               screen: screenRoot.modelData
               margins.top: config.barHeight
               visible: !screenRoot.cornersHidden
