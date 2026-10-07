@@ -152,13 +152,13 @@ ShellRoot {
       var buckets = {}
       for (var i = 0; i < data.length; i += 4) {
         if (data[i + 3] < 128) continue
-        var key = ((data[i] >> 4) << 8) | ((data[i + 1] >> 4) << 4) | (data[i + 2] >> 4)
-        var b = buckets[key]
-        if (!b) b = buckets[key] = { n: 0, r: 0, g: 0, b: 0 }
-        b.n++
-        b.r += data[i]
-        b.g += data[i + 1]
-        b.b += data[i + 2]
+          var key = ((data[i] >> 4) << 8) | ((data[i + 1] >> 4) << 4) | (data[i + 2] >> 4)
+          var b = buckets[key]
+          if (!b) b = buckets[key] = { n: 0, r: 0, g: 0, b: 0 }
+          b.n++
+          b.r += data[i]
+          b.g += data[i + 1]
+          b.b += data[i + 2]
       }
 
       var list = Object.keys(buckets).map(k => buckets[k])
@@ -167,26 +167,26 @@ ShellRoot {
       var colors = list.slice(0, 8).map(c => Qt.rgba(c.r / c.n / 255, c.g / c.n / 255, c.b / c.n / 255, 1))
       if (colors.length === 0) return
 
-      var base = colors[0]
-      var accent = base
-      var best = -1
-      for (var j = 0; j < colors.length; j++) {
-        var l = colors[j].hslLightness
-        if (l < 0.2 || l > 0.9) continue
-        var score = colors[j].hslSaturation * (1 - Math.abs(l - 0.5))
-        if (score > best) { best = score; accent = colors[j] }
-      }
+        var base = colors[0]
+        var accent = base
+        var best = -1
+        for (var j = 0; j < colors.length; j++) {
+          var l = colors[j].hslLightness
+          if (l < 0.2 || l > 0.9) continue
+            var score = colors[j].hslSaturation * (1 - Math.abs(l - 0.5))
+            if (score > best) { best = score; accent = colors[j] }
+        }
 
-      var accentHue = accent.hslHue >= 0 ? accent.hslHue : 0
-      var hue = base.hslSaturation > 0.08 && base.hslHue >= 0 ? base.hslHue : accentHue
-      var accentSat = accent.hslSaturation < 0.1
+        var accentHue = accent.hslHue >= 0 ? accent.hslHue : 0
+        var hue = base.hslSaturation > 0.08 && base.hslHue >= 0 ? base.hslHue : accentHue
+        var accentSat = accent.hslSaturation < 0.1
         ? accent.hslSaturation
         : Math.min(Math.max(accent.hslSaturation, 0.45), 0.8)
 
-      config.barColor = Qt.hsla(hue, Math.min(base.hslSaturation, 0.3), 0.10, 1)
-      config.colorText = Qt.hsla(hue, 0.15, 0.90, 1)
-      config.colorAccent = Qt.hsla(accentHue, accentSat, 0.68, 1)
-      config.colorAccentText = config.barColor
+        config.barColor = Qt.hsla(hue, Math.min(base.hslSaturation, 0.3), 0.10, 1)
+        config.colorText = Qt.hsla(hue, 0.15, 0.90, 1)
+        config.colorAccent = Qt.hsla(accentHue, accentSat, 0.68, 1)
+        config.colorAccentText = config.barColor
     }
 
     Settings {
@@ -211,8 +211,8 @@ ShellRoot {
       // Pick a random wallpaper once per shell start.
       onStatusChanged: {
         if (status !== FolderListModel.Ready || picked || count === 0) return
-        picked = true
-        wallpaperSettings.current = get(Math.floor(Math.random() * count), "filePath")
+          picked = true
+          wallpaperSettings.current = get(Math.floor(Math.random() * count), "filePath")
       }
     }
   }
@@ -250,16 +250,16 @@ ShellRoot {
         onPaint: {
           if (wallpaperWindow.modelData !== Quickshell.screens[0] || source === "") return
 
-          var url = "file://" + source
-          if (!isImageLoaded(url)) { loadImage(url); return }
+            var url = "file://" + source
+            if (!isImageLoaded(url)) { loadImage(url); return }
 
-          var ctx = getContext("2d")
-          ctx.clearRect(0, 0, width, height)
-          ctx.drawImage(url, 0, 0, width, height)
-          wallpaper.applyPixels(ctx.getImageData(0, 0, width, height).data)
+            var ctx = getContext("2d")
+            ctx.clearRect(0, 0, width, height)
+            ctx.drawImage(url, 0, 0, width, height)
+            wallpaper.applyPixels(ctx.getImageData(0, 0, width, height).data)
 
-          if (loadedUrl !== "" && loadedUrl !== url) unloadImage(loadedUrl)
-          loadedUrl = url
+            if (loadedUrl !== "" && loadedUrl !== url) unloadImage(loadedUrl)
+              loadedUrl = url
         }
       }
 
@@ -455,7 +455,7 @@ ShellRoot {
       var list = server.trackedNotifications.values
       var out = []
       for (var i = list.length - 1; i >= 0; i--) out.push(list[i])
-      return out
+        return out
     }
 
     NotificationServer {
@@ -473,18 +473,20 @@ ShellRoot {
       screen: Quickshell.screens[0]
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.namespace: "notifications"
-      anchors { top: true; right: true }
+      // Full-width and always mapped: cards slide in and out inside the surface,
+      // so they start and end beyond the screen edge. Only the cards take input.
+      anchors { top: true; left: true; right: true }
       margins { top: config.notificationMargin }
       exclusiveZone: 0
       color: "transparent"
-      implicitWidth: config.notificationWidth + config.notificationMargin
       implicitHeight: Math.max(1, notificationColumn.implicitHeight)
-      visible: notifications.items.length > 0
+      mask: Region { item: notificationColumn }
 
       ColumnLayout {
         id: notificationColumn
 
-        anchors { left: parent.left; right: parent.right; top: parent.top; rightMargin: config.notificationMargin }
+        anchors { right: parent.right; top: parent.top; rightMargin: config.notificationMargin }
+        width: config.notificationWidth
         spacing: config.notificationSpacing
 
         Repeater {
@@ -500,8 +502,8 @@ ShellRoot {
             property bool critical: notification.urgency === NotificationUrgency.Critical
             // Critical notifications stay until dismissed. Others use their own timeout, or the default.
             property int timeout: critical ? 0
-              : notification.expireTimeout > 0 ? notification.expireTimeout * 1000
-              : config.notificationTimeout
+            : notification.expireTimeout > 0 ? notification.expireTimeout * 1000
+            : config.notificationTimeout
             property bool hasActions: {
               var list = notification.actions
               for (var i = 0; i < list.length; i++) {
@@ -511,9 +513,9 @@ ShellRoot {
             }
             property string iconSource: {
               if (notification.image !== "") return notification.image
-              var icon = notification.appIcon
-              if (icon === "") return ""
-              return icon.startsWith("/") ? "file://" + icon : Quickshell.iconPath(icon, true)
+                var icon = notification.appIcon
+                if (icon === "") return ""
+                  return icon.startsWith("/") ? "file://" + icon : Quickshell.iconPath(icon, true)
             }
 
             // Horizontal offset in px: offscreen to the right (hidden) -> 0 (shown).
@@ -525,11 +527,11 @@ ShellRoot {
             // Slide out to the right, then expire/dismiss, or invoke the given action.
             function close(expired, action) {
               if (leaving) return
-              leaving = true
-              expireOnClose = expired
-              pendingAction = action || null
-              slideIn.stop()
-              slideOut.start()
+                leaving = true
+                expireOnClose = expired
+                pendingAction = action || null
+                slideIn.stop()
+                slideOut.start()
             }
 
             Layout.fillWidth: true
@@ -554,7 +556,7 @@ ShellRoot {
               property: "slideX"
               to: 0
               duration: config.notificationSlideDuration
-              easing.type: Easing.OutCubic
+              easing.type: Easing.OutQuint
             }
 
             NumberAnimation {
@@ -564,7 +566,7 @@ ShellRoot {
               property: "slideX"
               to: config.notificationWidth + config.notificationMargin
               duration: config.notificationSlideDuration
-              easing.type: Easing.InCubic
+              easing.type: Easing.InQuint
 
               onFinished: {
                 var n = card.notification
@@ -787,7 +789,7 @@ ShellRoot {
                   NumberAnimation {
                     properties: "x"
                     duration: leftBar.slideDuration
-                    easing.type: Easing.InOutQuad
+                    easing.type: Easing.InOutQuint
                   }
                 }
 
@@ -866,7 +868,7 @@ ShellRoot {
                     NumberAnimation {
                       properties: "x"
                       duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuad
+                      easing.type: Easing.InOutQuint
                     }
                   }
 
@@ -901,7 +903,7 @@ ShellRoot {
 
                         NumberAnimation {
                           duration: 200
-                          easing.type: Easing.OutQuad
+                          easing.type: Easing.OutQuint
                         }
                       }
 
@@ -998,7 +1000,7 @@ ShellRoot {
 
                     NumberAnimation {
                       duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuad
+                      easing.type: Easing.InOutQuint
                     }
                   }
 
@@ -1043,7 +1045,7 @@ ShellRoot {
                         property: "opacity"
                         to: 0
                         duration: 120
-                        easing.type: Easing.OutQuad
+                        easing.type: Easing.OutQuint
                       }
 
                       ScriptAction { script: focusWindow.apply() }
@@ -1053,7 +1055,7 @@ ShellRoot {
                         property: "opacity"
                         to: 1
                         duration: 200
-                        easing.type: Easing.OutQuad
+                        easing.type: Easing.OutQuint
                       }
                     }
 
@@ -1489,7 +1491,7 @@ ShellRoot {
                   NumberAnimation {
                     properties: "x"
                     duration: leftBar.slideDuration
-                    easing.type: Easing.InOutQuad
+                    easing.type: Easing.InOutQuint
                   }
                 }
 
@@ -1547,7 +1549,7 @@ ShellRoot {
 
                     NumberAnimation {
                       duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuad
+                      easing.type: Easing.InOutQuint
                     }
                   }
 
@@ -1595,7 +1597,7 @@ ShellRoot {
 
                       NumberAnimation {
                         duration: 200
-                        easing.type: Easing.OutQuad
+                        easing.type: Easing.OutQuint
                       }
                     }
 
@@ -1607,7 +1609,7 @@ ShellRoot {
                         property: "opacity"
                         to: 0
                         duration: 120
-                        easing.type: Easing.OutQuad
+                        easing.type: Easing.OutQuint
                       }
 
                       ScriptAction { script: mediaRow.shownLabel = mediaRow.targetLabel }
@@ -1617,7 +1619,7 @@ ShellRoot {
                         property: "opacity"
                         to: 1
                         duration: 200
-                        easing.type: Easing.OutQuad
+                        easing.type: Easing.OutQuint
                       }
                     }
 
@@ -1780,7 +1782,7 @@ ShellRoot {
                   NumberAnimation {
                     properties: "x"
                     duration: leftBar.slideDuration
-                    easing.type: Easing.InOutQuad
+                    easing.type: Easing.InOutQuint
                   }
                 }
 
@@ -1824,7 +1826,7 @@ ShellRoot {
 
                     NumberAnimation {
                       duration: 200
-                      easing.type: Easing.OutQuad
+                      easing.type: Easing.OutQuint
                     }
                   }
 
@@ -2068,7 +2070,7 @@ ShellRoot {
 
                     NumberAnimation {
                       duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuad
+                      easing.type: Easing.InOutQuint
                     }
                   }
 
@@ -2101,7 +2103,7 @@ ShellRoot {
                         property: "opacity"
                         to: 0
                         duration: 120
-                        easing.type: Easing.OutQuad
+                        easing.type: Easing.OutQuint
                       }
 
                       ScriptAction { script: imText.shownText = imText.targetText }
@@ -2111,7 +2113,7 @@ ShellRoot {
                         property: "opacity"
                         to: 1
                         duration: 200
-                        easing.type: Easing.OutQuad
+                        easing.type: Easing.OutQuint
                       }
                     }
 
@@ -2147,7 +2149,7 @@ ShellRoot {
                 Behavior on x {
                   NumberAnimation {
                     duration: leftBar.slideDuration
-                    easing.type: Easing.InOutQuad
+                    easing.type: Easing.InOutQuint
                   }
                 }
 
