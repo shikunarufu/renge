@@ -118,6 +118,8 @@ QtObject {
   // ── Notifications ──
   property int notificationWidth: 360
   property int notificationMargin: 8
+  // Distance from the bar: clears the tray popup (margin + height) plus a gap.
+  property int notificationTop: trayPopupMargin + trayIconSize + trayPopupPadding * 2 + notificationMargin
   property int notificationSpacing: 8
   property int notificationPadding: 12
   property int notificationRadius: 12
