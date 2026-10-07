@@ -121,6 +121,7 @@ QtObject {
   property int notificationSpacing: 8
   property int notificationPadding: 12
   property int notificationRadius: 12
+  property int notificationRadiusButton: 8
   property int notificationIconSize: 32
   property int notificationMax: 1
   property int notificationTimeout: 5000
