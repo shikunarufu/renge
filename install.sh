@@ -487,7 +487,7 @@ sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=$thread -z
 if ! systemd-detect-virt --quiet --vm; then
   curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
   { grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacman-pkglist.txt; \
-  printf '%s\n' 'mangowm' 'proton-cachyos-slr' 'wine-cachyos-opt'; } \
+  printf '%s\n' 'mangowm'; } \
   | sort --output=install-pacman-pkglist.txt --unique
 else
   curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
@@ -496,6 +496,15 @@ fi
 
 pacman -S --noconfirm --needed - < install-pacman-pkglist.txt
 rm --force --recursive install-pacman-pkglist.txt
+
+# Install CachyOS packages
+runuser --login "${USERNAME}" --command='
+git clone https://github.com/CachyOS/cachyos-pkgbuilds.git
+cd /home/"${USERNAME}"/cachyos-pkgbuilds
+for pkg in limine rate-mirrors mesa umu-launcher proton-cachyos-slr wine-cachyos-opt; do
+  (cd "$pkg" && makepkg -si --noconfirm) || echo "FAILED: $pkg"
+done
+'
 
 # Deploy boot loader
 mkdir --parents /boot/EFI/arch-limine
@@ -559,6 +568,15 @@ git clone https://aur.archlinux.org/fcitx5-mozc-ut.git /home/"${USERNAME}"/aur/f
 cd /home/"${USERNAME}"/aur/fcitx5-mozc-ut
 makepkg --syncdeps --install --noconfirm
 '
+
+# Gaming
+runuser --login "${USERNAME}" --command='
+git clone https://aur.archlinux.org/heroic-games-launcher-bin.git /home/"${USERNAME}"/aur/heroic-games-launcher-bin
+cd /home/"${USERNAME}"/aur/heroic-games-launcher-bin
+makepkg --syncdeps --install --noconfirm
+'
+
+# faugus-launcher
 
 # Apply config files
 mkdir --parents /home/"${USERNAME}"/.config
