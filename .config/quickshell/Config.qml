@@ -103,7 +103,7 @@ QtObject {
   // ── System Tray ──
   property int trayIconSize: 16
   property int trayIconSpacing: 8
-  property int trayPopupMargin: 6
+  property int trayPopupMargin: powerMenuMargin  // Same gap below the bar as the power menu popup
   property int trayPopupPadding: 10
   property int trayPopupRadius: 12
   property int trayPopupExtent: trayPopupMargin + trayIconSize + trayPopupPadding * 2  // Space below the bar used by the open tray popup
