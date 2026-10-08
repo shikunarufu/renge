@@ -502,7 +502,7 @@ runuser --login "${USERNAME}" --command='
 git clone https://github.com/CachyOS/cachyos-pkgbuilds.git
 cd /home/"${USERNAME}"/cachyos-pkgbuilds
 for pkg in limine rate-mirrors mesa umu-launcher proton-cachyos-slr wine-cachyos-opt; do
-  (cd "$pkg" && makepkg -si --noconfirm) || echo "FAILED: $pkg"
+  (cd "\$pkg" && makepkg --syncdeps --install --noconfirm) || echo "FAILED: \$pkg"
 done
 '
 
