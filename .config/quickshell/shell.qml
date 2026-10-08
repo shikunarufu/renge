@@ -1805,10 +1805,14 @@ ShellRoot {
                       PopupWindow {
                         id: trayPopup
 
-                        anchor.item: trayArrow
+                        // Anchored to the bar window so the gap below the bar matches the power menu popup.
+                        anchor.window: bar
+                        anchor.rect.x: 0
+                        anchor.rect.y: bar.height + config.trayPopupMargin
+                        anchor.rect.width: 1
+                        anchor.rect.height: 1
                         anchor.edges: Edges.Bottom
                         anchor.gravity: Edges.Bottom
-                        anchor.margins.top: config.trayPopupMargin
                         color: "transparent"
                         implicitHeight: config.trayIconSize + config.trayPopupPadding * 2
                         implicitWidth: trayIcons.implicitWidth + config.trayPopupPadding * 2
@@ -1817,6 +1821,8 @@ ShellRoot {
 
                         onVisibleChanged: {
                           if (visible) {
+                            // Center horizontally under the arrow.
+                            anchor.rect.x = trayArrow.mapToItem(null, trayArrow.width / 2, 0).x
                             shellRoot.trayPopupScreen = screenRoot.modelData.name
                           } else if (shellRoot.trayPopupScreen === screenRoot.modelData.name) {
                             shellRoot.trayPopupScreen = ""
