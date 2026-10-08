@@ -6,6 +6,10 @@ pacman-contrib
 
 # Version control systems
 git
+make
+gcc
+binutils
+fakeroot
 
 # Display servers
 wayland
