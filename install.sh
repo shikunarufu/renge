@@ -487,7 +487,7 @@ sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=$thread -z
 if ! systemd-detect-virt --quiet --vm; then
   curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
   { grep --extended-regexp --only-matching '^[^(#|[:space:])]*' install-pacman-pkglist.txt; \
-  printf '%s\n' 'mangowm'; } \
+  printf '%s\n' 'mangowm' 'proton-cachyos-slr' 'wine-cachyos-opt'; } \
   | sort --output=install-pacman-pkglist.txt --unique
 else
   curl https://raw.githubusercontent.com/shikunarufu/renge/refs/heads/main/pkgs/install-pacman-pkglist.txt >> install-pacman-pkglist.txt
