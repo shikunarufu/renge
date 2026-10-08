@@ -497,15 +497,6 @@ fi
 pacman -S --noconfirm --needed - < install-pacman-pkglist.txt
 rm --force --recursive install-pacman-pkglist.txt
 
-# Install CachyOS packages
-runuser --login "${USERNAME}" --command='
-git clone https://github.com/CachyOS/cachyos-pkgbuilds.git
-cd /home/"${USERNAME}"/cachyos-pkgbuilds
-for pkg in limine rate-mirrors mesa umu-launcher proton-cachyos-slr wine-cachyos-opt; do
-  (cd "\$pkg" && makepkg --syncdeps --install --noconfirm) || echo "FAILED: \$pkg"
-done
-'
-
 # Deploy boot loader
 mkdir --parents /boot/EFI/arch-limine
 cp /usr/share/limine/BOOTX64.EFI /boot/EFI/arch-limine/
@@ -571,12 +562,16 @@ makepkg --syncdeps --install --noconfirm
 
 # Gaming
 runuser --login "${USERNAME}" --command='
+git clone https://aur.archlinux.org/proton-cachyos-slr.git /home/"${USERNAME}"/aur/proton-cachyos-slr
+cd /home/"${USERNAME}"/aur/proton-cachyos-slr
+makepkg --syncdeps --install --noconfirm
+git clone https://aur.archlinux.org/wine-cachyos-opt.git /home/"${USERNAME}"/aur/wine-cachyos-opt
+cd /home/"${USERNAME}"/aur/wine-cachyos-opt
+makepkg --syncdeps --install --noconfirm
 git clone https://aur.archlinux.org/heroic-games-launcher-bin.git /home/"${USERNAME}"/aur/heroic-games-launcher-bin
 cd /home/"${USERNAME}"/aur/heroic-games-launcher-bin
 makepkg --syncdeps --install --noconfirm
 '
-
-# faugus-launcher
 
 # Apply config files
 mkdir --parents /home/"${USERNAME}"/.config
