@@ -562,10 +562,11 @@ makepkg --syncdeps --install --noconfirm
 
 # Gaming
 runuser --login "${USERNAME}" --command='
-git clone https://github.com/CachyOS/cachyos-pkgbuilds.git
-cd /home/"${USERNAME}"/cachyos-pkgbuilds/proton-cachyos-slr
+git clone https://aur.archlinux.org/proton-cachyos-slr.git /home/"${USERNAME}"/aur/proton-cachyos-slr
+cd /home/"${USERNAME}"/aur/proton-cachyos-slr
 makepkg --syncdeps --install --noconfirm
-cd /home/"${USERNAME}"/cachyos-pkgbuilds/wine-cachyos-opt
+git clone https://aur.archlinux.org/wine-cachyos-opt.git /home/"${USERNAME}"/aur/wine-cachyos-opt
+cd /home/"${USERNAME}"/aur/wine-cachyos-opt
 makepkg --syncdeps --install --noconfirm
 git clone https://aur.archlinux.org/heroic-games-launcher-bin.git /home/"${USERNAME}"/aur/heroic-games-launcher-bin
 cd /home/"${USERNAME}"/aur/heroic-games-launcher-bin
