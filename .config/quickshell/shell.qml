@@ -27,6 +27,9 @@ import Quickshell.WindowManager
 ShellRoot {
   id: shellRoot
 
+  // Name of the screen whose tray popup is open ("" when closed). Notifications move below it.
+  property string trayPopupScreen: ""
+
   // Emitted to close every popup (power menu, app launcher, tray) on all screens.
   signal dismissPopups()
 
@@ -393,14 +396,24 @@ ShellRoot {
     }
 
     PanelWindow {
+      // Extra top offset while the tray popup is open on this screen.
+      property real trayShift: shellRoot.trayPopupScreen === Quickshell.screens[0].name ? config.trayPopupExtent : 0
+
       screen: Quickshell.screens[0]
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.namespace: "notifications"
       anchors { top: true; left: true; right: true }
-      margins { top: config.notificationTop }
+      margins { top: config.notificationMargin + Math.round(trayShift) }
       exclusiveZone: 0
       color: "transparent"
       implicitHeight: Math.max(1, notificationColumn.implicitHeight)
+
+      Behavior on trayShift {
+        NumberAnimation {
+          duration: config.animationDuration
+          easing.type: Easing.OutCubic
+        }
+      }
       mask: Region { item: notificationColumn }
 
       ColumnLayout {
@@ -1801,6 +1814,14 @@ ShellRoot {
                         implicitWidth: trayIcons.implicitWidth + config.trayPopupPadding * 2
                         visible: false
                         grabFocus: true
+
+                        onVisibleChanged: {
+                          if (visible) {
+                            shellRoot.trayPopupScreen = screenRoot.modelData.name
+                          } else if (shellRoot.trayPopupScreen === screenRoot.modelData.name) {
+                            shellRoot.trayPopupScreen = ""
+                          }
+                        }
 
                         Rectangle {
                           anchors.fill: parent
