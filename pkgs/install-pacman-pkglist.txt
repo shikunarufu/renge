@@ -1,20 +1,21 @@
 # Boot loader
+limine
 efibootmgr
 
 # pacman
 pacman-contrib
 
+# Mirrors
+rate-mirrors
+
 # Version control systems
 git
-make
-gcc
-binutils
-fakeroot
 
 # Display servers
 wayland
 
 # Display drivers
+mesa
 lib32-mesa
 vulkan-radeon
 lib32-vulkan-radeon
@@ -136,6 +137,7 @@ libxslt
 mpg123
 opencl-icd-loader
 openal
+umu-launcher
 protontricks
 winetricks
 vulkan-tools
