@@ -106,6 +106,7 @@ QtObject {
   property int trayPopupMargin: 6
   property int trayPopupPadding: 10
   property int trayPopupRadius: 12
+  property int trayPopupExtent: trayPopupMargin + trayIconSize + trayPopupPadding * 2  // Space below the bar used by the open tray popup
   property string trayIconCollapse: "\uf0d8"
   property string trayIconExpand: "\uf0d7"
 
@@ -119,7 +120,6 @@ QtObject {
   property int notificationWidth: 360
   property int notificationMargin: 8
   // Distance from the bar: clears the tray popup (margin + height) plus a gap.
-  property int notificationTop: trayPopupMargin + trayIconSize + trayPopupPadding * 2 + notificationMargin
   property int notificationSpacing: 8
   property int notificationPadding: 12
   property int notificationRadius: 12
