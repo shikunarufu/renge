@@ -105,6 +105,7 @@ noto-fonts-extra
 ttf-jetbrains-mono-nerd
 otf-geist-mono-nerd
 ttf-liberation
+wqy-zenhei
 
 # Terminal emulator
 foot
@@ -118,3 +119,27 @@ bash-completion
 7zip
 tar
 unzip
+
+# Gaming
+alsa-plugins
+giflib
+glfw
+gst-plugins-base-libs
+lib32-alsa-plugins
+lib32-gtk3
+lib32-libjpeg-turbo
+lib32-libva
+lib32-ocl-icd
+lib32-opencl-icd-loader
+libjpeg-turbo
+libva
+libxslt
+mpg123
+opencl-icd-loader
+openal
+umu-launcher
+protontricks
+winetricks
+vulkan-tools
+gamescope
+steam
