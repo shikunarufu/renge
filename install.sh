@@ -475,6 +475,16 @@ install_aur() {
     && makepkg --syncdeps --install --noconfirm"
 }
 
+# Optional build and install AUR package
+failed_aur=()
+install_aur_optional() {
+  if ! install_aur "$1"; then
+    echo "Warning: AUR build failed: $1" >&2
+    failed_aur+=("$1")
+  fi
+}
+
+
 # Set time zone
 ln --force --symbolic /usr/share/zoneinfo/"${TIME_ZONE}" /etc/localtime
 hwclock --systohc
@@ -611,11 +621,16 @@ install_aur zen-browser-bin
  
 # mozc-ut (fcitx5-mozc-ut dependency)
 runuser --login "${USERNAME}" --command 'rm --recursive --force "$HOME/.cache/bazel"'
-install_aur mozc-ut
- 
+install_aur_optional mozc-ut
+
 # Input method
-runuser --login "${USERNAME}" --command 'rm --recursive --force "$HOME/.cache/bazel"'
-install_aur fcitx5-mozc-ut
+if pacman --query --quiet mozc-ut > /dev/null 2>&1; then
+  runuser --login "${USERNAME}" --command 'rm --recursive --force "$HOME/.cache/bazel"'
+  install_aur_optional fcitx5-mozc-ut
+else
+  echo 'Warning: mozc-ut is missing, skipping fcitx5-mozc-ut' >&2
+  failed_aur+=(fcitx5-mozc-ut)
+fi
 
 #######################################
 # Optimization
