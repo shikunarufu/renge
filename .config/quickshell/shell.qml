@@ -1105,6 +1105,27 @@ ShellRoot {
               }
             }
 
+            // ── App Launcher Click Catcher ──
+            // Full-screen transparent window below the launcher. A click anywhere
+            // outside the launcher closes it; mouse movement does nothing.
+            PanelWindow {
+              WlrLayershell.layer: WlrLayer.Top
+              WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+              WlrLayershell.namespace: "app-launcher-catcher"
+              exclusionMode: ExclusionMode.Ignore
+              anchors { left: true; right: true; top: true; bottom: true }
+              color: "transparent"
+              screen: screenRoot.modelData
+              visible: appLauncherPopup.visible
+
+              MouseArea {
+                anchors.fill: parent
+                acceptedButtons: Qt.AllButtons
+
+                onClicked: appLauncherPopup.visible = false
+              }
+            }
+
             // ── App Launcher Popup ──
             PanelWindow {
               id: appLauncherPopup
@@ -1141,7 +1162,7 @@ ShellRoot {
 
               screen: screenRoot.modelData
               WlrLayershell.layer: WlrLayer.Overlay
-              WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
+              WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
               WlrLayershell.namespace: "app-launcher"
               exclusionMode: ExclusionMode.Ignore
               // Only `top` is anchored, so the compositor centers the window horizontally.
@@ -1223,13 +1244,6 @@ ShellRoot {
                       clip: true
 
                       onTextChanged: appLauncherPopup.searchQuery = text
-
-                      // Clicking another window takes keyboard focus away: close the launcher.
-                      onActiveFocusChanged: {
-                        if (!activeFocus && appLauncherPopup.visible) {
-                          appLauncherPopup.visible = false
-                        }
-                      }
 
                       Keys.onPressed: function (event) {
                         if (event.key === Qt.Key_Up) {
