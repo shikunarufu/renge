@@ -537,12 +537,41 @@ pacman -S --noconfirm --needed mangowm
 # '
 # fi
 
+# User directories
+runuser --user="${USERNAME}" -- xdg-user-dirs-update
+
+#######################################
+# Multimedia
+#######################################
+
+# Audio players
+runuser --user="${USERNAME}" -- mkdir --parents \
+/home/"${USERNAME}"/.config/mpd/playlists \
+/home/"${USERNAME}"/.local/state/mpd
+
+# Enable audio player daemons
+systemctl --global enable mpd
+systemctl --global enable spotifyd.service
+
+# Sound system
+amixer sset Master unmute
+amixer sset Speaker unmute
+amixer sset Headphone unmute
+
+#######################################
+# Networking
+#######################################
+
 # Web browser
 runuser --login "${USERNAME}" --command='
 git clone https://aur.archlinux.org/zen-browser-bin.git /home/"${USERNAME}"/aur/zen-browser-bin
 cd /home/"${USERNAME}"/aur/zen-browser-bin
 makepkg --syncdeps --install --noconfirm
 '
+
+#######################################
+# Input devices
+#######################################
 
 # mozc-ut (fcitx5-mozc-ut dependency)
 runuser --login "${USERNAME}" --command='
@@ -560,18 +589,16 @@ cd /home/"${USERNAME}"/aur/fcitx5-mozc-ut
 makepkg --syncdeps --install --noconfirm
 '
 
-# Gaming
-runuser --login "${USERNAME}" --command='
-git clone https://aur.archlinux.org/proton-cachyos-slr.git /home/"${USERNAME}"/aur/proton-cachyos-slr
-cd /home/"${USERNAME}"/aur/proton-cachyos-slr
-makepkg --syncdeps --install --noconfirm
-git clone https://aur.archlinux.org/wine-cachyos-opt.git /home/"${USERNAME}"/aur/wine-cachyos-opt
-cd /home/"${USERNAME}"/aur/wine-cachyos-opt
-makepkg --syncdeps --install --noconfirm
-git clone https://aur.archlinux.org/heroic-games-launcher-bin.git /home/"${USERNAME}"/aur/heroic-games-launcher-bin
-cd /home/"${USERNAME}"/aur/heroic-games-launcher-bin
-makepkg --syncdeps --install --noconfirm
-'
+#######################################
+# Optimization
+#######################################
+
+# Solid state drives
+systemctl enable fstrim.timer
+
+#######################################
+# System services
+#######################################
 
 # Apply config files
 mkdir --parents /home/"${USERNAME}"/.config
@@ -581,27 +608,35 @@ mkdir --parents /home/"${USERNAME}"/Pictures/Wallpapers
 cp --recursive /renge/pictures/wallpapers/. /home/"${USERNAME}"/Pictures/Wallpapers
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
 
-# Audio players
-runuser --user="${USERNAME}" -- mkdir --parents \
-/home/"${USERNAME}"/.config/mpd/playlists \
-/home/"${USERNAME}"/.local/state/mpd
+#######################################
+# Gaming
+#######################################
 
-# Enabling audio player daemons
-systemctl --global enable mpd
-systemctl --global enable spotifyd.service
+# proton-cachyos-slr
+runuser --login "${USERNAME}" --command='
+git clone https://aur.archlinux.org/proton-cachyos-slr.git /home/"${USERNAME}"/aur/proton-cachyos-slr
+cd /home/"${USERNAME}"/aur/proton-cachyos-slr
+makepkg --syncdeps --install --noconfirm
+'
 
-# Sound system
-amixer sset Master unmute
-amixer sset Speaker unmute
-amixer sset Headphone unmute
+# wine-cachyos-opt
+runuser --login "${USERNAME}" --command='
+git clone https://aur.archlinux.org/wine-cachyos-opt.git /home/"${USERNAME}"/aur/wine-cachyos-opt
+cd /home/"${USERNAME}"/aur/wine-cachyos-opt
+makepkg --syncdeps --install --noconfirm
+'
 
-# User directories
-runuser --user="${USERNAME}" -- xdg-user-dirs-update
+# heroic-games-launcher-bin
+runuser --login "${USERNAME}" --command='
+git clone https://aur.archlinux.org/heroic-games-launcher-bin.git /home/"${USERNAME}"/aur/heroic-games-launcher-bin
+cd /home/"${USERNAME}"/aur/heroic-games-launcher-bin
+makepkg --syncdeps --install --noconfirm
+'
 
-# Solid state drives
-systemctl enable fstrim.timer
-
+#######################################
 # Cleanup
+#######################################
+
 sed --in-place 's/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/g' /etc/sudoers
 rm --recursive --force /renge
 
