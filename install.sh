@@ -11,7 +11,7 @@ set -euo pipefail
 # exec > >(tee -a log_renge.txt >&3) 2>&1
 
 # Make sure relative paths are to be found
-cd "$(dirname "${BASH_SOURCE[0]}")"
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 #######################################
 # Configure the installation
@@ -145,6 +145,17 @@ for file in ./renge/pkgs/install-pacstrap-pkglist.txt \
   fi
 done
 
+# Check secure boot
+secure_boot_var=/sys/firmware/efi/efivars/SecureBoot-8be4df61-93ca-11d2-aa0d-00e098032b8c
+if [[ -r "${secure_boot_var}" ]]; then
+  secure_boot="$(od --address-radix=n --format=u1 --skip-bytes=4 \
+    --read-bytes=1 "${secure_boot_var}" | tr -d '[:space:]')"
+  if [[ "${secure_boot}" == '1' ]]; then
+    printf '%s\n' 'Secure Boot is enabled. Disable it in the firmware setup.' >&2
+    exit 1
+  fi
+fi
+
 # Check boot mode
 if [[ ! -f /sys/firmware/efi/fw_platform_size ]]; then
   printf '%s\n' 'Not booted in UEFI mode.' >&2
@@ -253,8 +264,6 @@ clear
 #######################################
 # Pre-installation
 #######################################
-
-# Check Secure Boot
 
 # Verify the internet connection
 ping -c 1 ping.archlinux.org
