@@ -1144,9 +1144,11 @@ ShellRoot {
               WlrLayershell.keyboardFocus: WlrKeyboardFocus.OnDemand
               WlrLayershell.namespace: "app-launcher"
               exclusionMode: ExclusionMode.Ignore
-              anchors { left: true; top: true }
-              margins.left: 0
-              margins.top: config.barHeight
+              // Only `top` is anchored, so the compositor centers the window horizontally.
+              // Top margin centers the full-size (max rows) launcher vertically, so the
+              // search box stays in place while the result list shrinks.
+              anchors { top: true }
+              margins.top: Math.max(0, Math.round((screenRoot.modelData.height - (56 + config.appLauncherMaxVisible * config.appLauncherItemHeight)) / 2))
               implicitWidth: config.appLauncherWidth
               implicitHeight: 56 + Math.min(filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
               color: "transparent"
@@ -1156,7 +1158,6 @@ ShellRoot {
 
               onVisibleChanged: {
                 if (visible) {
-                  margins.left = Math.max(0, appLauncherGlyph.mapToItem(null, 0, 0).x)
                   searchField.text = ""
                   searchQuery = ""
                   selectedIndex = 0
