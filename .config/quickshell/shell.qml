@@ -671,10 +671,14 @@ ShellRoot {
         // Only one popup is open at a time. Two popups with a focus grab open together
         // get placed relative to each other instead of the bar.
         function togglePopup(popup) {
-          var wasOpen = popup.visible
+          var animated = popup.launcherOpen !== undefined
+          var wasOpen = animated ? popup.launcherOpen : popup.visible
           shellRoot.dismissPopups()
           if (!wasOpen) {
-            Qt.callLater(() => { popup.visible = true })
+            Qt.callLater(() => {
+              if (animated) popup.launcherOpen = true
+              else popup.visible = true
+            })
           }
         }
 
@@ -683,7 +687,7 @@ ShellRoot {
 
           function onDismissPopups() {
             powerMenuPopup.visible = false
-            appLauncherPopup.visible = false
+            appLauncherPopup.launcherOpen = false
             trayPopup.visible = false
           }
         }
@@ -1116,13 +1120,13 @@ ShellRoot {
               anchors { left: true; right: true; top: true; bottom: true }
               color: "transparent"
               screen: screenRoot.modelData
-              visible: appLauncherPopup.visible
+              visible: appLauncherPopup.launcherOpen
 
               MouseArea {
                 anchors.fill: parent
                 acceptedButtons: Qt.AllButtons
 
-                onClicked: appLauncherPopup.visible = false
+                onClicked: appLauncherPopup.launcherOpen = false
               }
             }
 
@@ -1130,6 +1134,8 @@ ShellRoot {
             PanelWindow {
               id: appLauncherPopup
 
+              // Logical open state. `visible` stays true until the close animation ends.
+              property bool launcherOpen: false
               property string searchQuery: ""
               property int selectedIndex: 0
               property var recentIds: JSON.parse(recentAppsSettings.recentIdsSerialized)
@@ -1173,7 +1179,7 @@ ShellRoot {
               implicitWidth: config.appLauncherWidth
               implicitHeight: 56 + Math.min(filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
               color: "transparent"
-              visible: false
+              visible: launcherOpen || launcherBody.opacity > 0
 
               onFilteredAppsChanged: selectedIndex = 0
 
@@ -1205,7 +1211,7 @@ ShellRoot {
               function launchEntry(entry) {
                 recordLaunch(entry.id)
                 entry.execute()
-                appLauncherPopup.visible = false
+                appLauncherPopup.launcherOpen = false
               }
 
               Settings {
@@ -1216,9 +1222,27 @@ ShellRoot {
               }
 
               Rectangle {
+                id: launcherBody
+
                 anchors.fill: parent
                 color: config.barColor
                 radius: config.workspaceRadius
+                opacity: appLauncherPopup.launcherOpen ? 1 : 0
+                scale: appLauncherPopup.launcherOpen ? 1 : config.appLauncherZoomFrom
+
+                Behavior on opacity {
+                  NumberAnimation {
+                    duration: config.appLauncherAnimDuration
+                    easing.type: Easing.OutCubic
+                  }
+                }
+
+                Behavior on scale {
+                  NumberAnimation {
+                    duration: config.appLauncherAnimDuration
+                    easing.type: Easing.OutCubic
+                  }
+                }
 
                 ColumnLayout {
                   anchors.fill: parent
@@ -1257,7 +1281,7 @@ ShellRoot {
                             appLauncherPopup.launchEntry(appLauncherPopup.filteredApps[appLauncherPopup.selectedIndex])
                             event.accepted = true
                         } else if (event.key === Qt.Key_Escape) {
-                          appLauncherPopup.visible = false
+                          appLauncherPopup.launcherOpen = false
                           event.accepted = true
                         }
                       }
