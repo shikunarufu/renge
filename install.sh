@@ -346,7 +346,7 @@ sgdisk --new=2::-0 --typecode=2:8300 --change-name=2:'home' "$home_disk"
 sgdisk --new=1::-0 --typecode=1:8300 --change-name=1:'data' "$data_disk"
 
 # Confirm the new partitions
-partprobe
+partprobe "${disks[@]}"
 udevadm settle
 
 #######################################
