@@ -67,6 +67,8 @@ QtObject {
   property int appLauncherWidth: 360
   property int appLauncherMaxVisible: 7
   property int appLauncherItemHeight: 42
+  property real appLauncherZoomFrom: 0.85  // Start/end scale of the zoom (1 = no zoom)
+  property int appLauncherAnimDuration: 150  // Zoom duration in ms
   property string appLauncherIcon: "\uf002"
 
   // ── Layouts (order used when clicking the layout button) ──
