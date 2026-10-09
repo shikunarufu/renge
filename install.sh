@@ -66,7 +66,7 @@ configure_pacman () {
     --expression='s/^#VerbosePkgLists/VerbosePkgLists/' \
     --expression="s/^#\\?ParallelDownloads = .*/ParallelDownloads = ${threads}/" \
     --expression='/^#\[multilib\]/,/^#Include/ s/^#//' \
-    "${config}"
+    "${conf}"
  
   if ! grep --quiet '^ILoveCandy' "${conf}"; then
     sed --in-place '/^Color/a ILoveCandy' "${conf}"
@@ -82,7 +82,7 @@ add_cachyos_v3 () {
   local block tmp
   block='[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n\n'
   block+='[cachyos-core-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n\n'
-  block+='[cachyos-extra-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n\n'
+  block+='[cachyos-extra-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n'
  
   if grep --quiet '^\[cachyos-v3\]' "${conf}"; then
     return 0
@@ -144,6 +144,12 @@ for file in ./renge/pkgs/install-pacstrap-pkglist.txt \
     exit 1
   fi
 done
+
+# Check boot mode
+if [[ ! -f /sys/firmware/efi/fw_platform_size ]]; then
+  printf '%s\n' 'Not booted in UEFI mode.' >&2
+  exit 1
+fi
 
 #######################################
 # User and System Information
@@ -292,12 +298,6 @@ KEYMAP=$keymap
 pacman --sync --noconfirm --needed pacman-contrib terminus-font
 setfont Lat2-Terminus16
 
-# Verify the boot mode
-if [[ ! -f /sys/firmware/efi/fw_platform_size ]]; then
-  printf '%s\n' 'Not booted in UEFI mode.' >&2
-  exit 1
-fi
-
 # Update the system clock
 timedatectl set-ntp true
 
@@ -309,7 +309,7 @@ timedatectl set-ntp true
 pacman --sync --noconfirm gptfdisk btrfs-progs
 
 # Unmount all disks
-umount --all-targets --recursive /mnt
+umount --all-targets --recursive /mnt || true
 
 # Destroy old signatures, GPT and MBR data structure on all disks
 for disk in "${disks[@]}"; do
@@ -321,19 +321,19 @@ done
 # Partition the disks
 #######################################
 
-# Partition 1: UEFI Boot
+# Boot Disk, Partition 1: UEFI Boot
 sgdisk --new=1::+4096MiB --typecode=1:ef00 --change-name=1:'boot' "$boot_disk"
 
-# Partition 2: Root
+# Root Disk, Partition 2: Root
 sgdisk --new=2::-0 --typecode=2:8300 --change-name=2:'root' "$root_disk"
 
-# Partition 3: Var
+# Var Disk, Partition 1: Var
 sgdisk --new=1::+12G --typecode=1:8300 --change-name=1:'var' "$var_disk"
 
-# Partition 4: Home
+# Home Disk, Partition 2: Home
 sgdisk --new=2::-0 --typecode=2:8300 --change-name=2:'home' "$home_disk"
 
-# Partition 5: Data
+# Data Disk, Partition 1: Data
 sgdisk --new=1::-0 --typecode=1:8300 --change-name=1:'data' "$data_disk"
 
 # Confirm the new partitions
@@ -424,9 +424,6 @@ if [[ -z "${time_zone}" || ! -f "/usr/share/zoneinfo/${time_zone}" ]]; then
 fi
 
 # Configure bootloader
-root_uuid="$(blkid -s UUID -o value "$root_part")"
-
-# Prepare configuration file for bootloader
 root_uuid="$(blkid -s UUID -o value "$root_part")"
 mkdir --parents /mnt/boot/EFI/arch-limine
 cat << EOF > /mnt/boot/EFI/arch-limine/limine.conf
