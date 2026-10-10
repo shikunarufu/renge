@@ -652,6 +652,13 @@ cp --recursive /renge/pictures/wallpapers/. /home/"${USERNAME}"/Pictures/Wallpap
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
 
 #######################################
+# Appearance
+#######################################
+
+# Cursor theme
+install_aur bibata-cursor-theme-bin
+
+#######################################
 # Gaming
 #######################################
  
