@@ -587,7 +587,10 @@ pacman --sync --noconfirm --needed mangowm
 # Uncomment if mangowm is in AUR
 # install_aur scenefx0.5
 # install_aur mangowm-git
- 
+
+# Display manager
+systemctl enable greetd.service
+
 # User directories
 runuser --login "${USERNAME}" --command xdg-user-dirs-update
 
@@ -635,7 +638,7 @@ fi
 #######################################
 # Optimization
 #######################################
- 
+
 # Solid state drives
 systemctl enable fstrim.timer
 
