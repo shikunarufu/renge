@@ -32,6 +32,9 @@ cliphist
 gnome-keyring
 xdg-desktop-portal-gtk
 
+# Display manager
+greetd
+
 # User directories
 xdg-user-dirs
 
