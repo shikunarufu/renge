@@ -10,9 +10,10 @@ QtObject {
   // ── Look ──
   property string wallpaperDir: ""                   // "" = <home of user>/Pictures/Wallpapers; else absolute path
   property var wallpaperExtensions: ["gif", "png", "jpg", "jpeg", "webp"]
-  property string background: "lockscreen.png"       // Fallback: file name inside wallpaperDir, or absolute path; "" = none
+  property string background: "lockscreen.png"           // Fallback: file name inside wallpaperDir, or absolute path; "" = none
   property real overlayOpacity: 0.25                 // Black layer over the background
   property real uiScale: 1.0                         // 1.0 matches the reference layout
+  property bool showInfo: false                      // Show window and wallpaper size at the bottom (debug)
   property string fontFamily: "JetBrainsMono Nerd Font"
   property color colorText: "#e5e7eb"
   property color colorError: "#e06c75"
