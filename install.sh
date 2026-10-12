@@ -139,11 +139,11 @@ mapfile -t disks < <(
 # Check configuration files are present
 for file in ./renge/pkgs/install-pacstrap-pkglist.txt \
             ./renge/pkgs/install-pacman-pkglist.txt \
-            ./renge/greetd/greeter.qml \
-            ./renge/greetd/GreeterConfig.qml \
-            ./renge/greetd/config.toml \
-            ./renge/greetd/config-vm.toml \
-            ./renge/greetd/greeter-vm.conf; do
+            ./renge/etc/greetd/quickshell/greeter.qml \
+            ./renge/etc/greetd/quickshell/GreeterConfig.qml \
+            ./renge/etc/greetd/config.toml \
+            ./renge/etc/greetd/config-vm.toml \
+            ./renge/etc/greetd/greeter-vm.conf; do
   if [[ ! -f "${file}" ]]; then
     printf '%s\n' "Missing file: ${file}" >&2
     exit 1
