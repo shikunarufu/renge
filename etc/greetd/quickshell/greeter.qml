@@ -12,6 +12,10 @@ ShellRoot {
   id: shellRoot
 
   property string hostname: ""
+  property string loginUser: ""
+  property string homeDir: ""
+  property string wallpaperDir: ""
+  property var passwdLines: []
   property string wallpaper: ""
   property var wallpaperFiles: []
   property string status: ""
@@ -25,11 +29,16 @@ ShellRoot {
 
   // ── Login flow ──
   function startSession() {
+    if (loginUser === "") {
+      status = "No user found"
+      statusIsError = true
+      return
+    }
     if (preview) {
       awaitingPassword = true
       return
     }
-    Greetd.createSession(config.user)
+    Greetd.createSession(loginUser)
   }
 
   function submit(password) {
@@ -46,8 +55,6 @@ ShellRoot {
     }
     Greetd.respond(password)
   }
-
-  Component.onCompleted: startSession()
 
   Connections {
     target: Greetd
@@ -101,14 +108,51 @@ ShellRoot {
     precision: SystemClock.Minutes
   }
 
-  // Lists wallpapers in config.wallpaperDir and picks one at random.
+  // Finds the login user from passwd (name:x:uid:gid:gecos:home:shell).
+  // Uses config.user if set; otherwise the first account with UID 1000-59999 and a real shell.
+  // Then starts the login session and the wallpaper scan.
+  Process {
+    running: true
+    command: ["getent", "passwd"]
+
+    stdout: SplitParser {
+      onRead: data => { if (data !== "") shellRoot.passwdLines.push(data) }
+    }
+
+    onExited: {
+      for (const line of shellRoot.passwdLines) {
+        const f = line.split(":")
+        if (f.length < 7) continue
+
+        const uid = parseInt(f[2])
+        const shell = f[6]
+        const regular = uid >= 1000 && uid < 60000
+          && !shell.endsWith("/nologin") && !shell.endsWith("/false")
+        const match = config.user !== "" ? f[0] === config.user : regular
+
+        if (match) {
+          shellRoot.loginUser = f[0]
+          shellRoot.homeDir = f[5]
+          break
+        }
+      }
+
+      shellRoot.wallpaperDir = config.wallpaperDir !== ""
+        ? config.wallpaperDir
+        : shellRoot.homeDir + "/Pictures/Wallpapers"
+      shellRoot.startSession()
+      wallpaperScan.running = true
+    }
+  }
+
+  // Lists wallpapers in wallpaperDir and picks one at random.
   // If the folder is missing, empty or unreadable, wallpaper stays "" and the fallback is used.
   Process {
     id: wallpaperScan
 
-    running: true
+    running: false
     command: {
-      const args = ["find", "-L", config.wallpaperDir, "-maxdepth", "1", "-type", "f", "("]
+      const args = ["find", "-L", shellRoot.wallpaperDir, "-maxdepth", "1", "-type", "f", "("]
       config.wallpaperExtensions.forEach((ext, i) => {
         if (i > 0) args.push("-o")
         args.push("-iname", "*." + ext)
@@ -234,7 +278,7 @@ ShellRoot {
           font.letterSpacing: 1 * content.u
           font.pixelSize: 7 * content.u
           font.weight: Font.Bold
-          text: config.user.toUpperCase()
+          text: shellRoot.loginUser.toUpperCase()
         }
 
         Item {
