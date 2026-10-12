@@ -10,7 +10,7 @@ QtObject {
   // ── Look ──
   property string wallpaperDir: ""                   // "" = <home of user>/Pictures/Wallpapers; else absolute path
   property var wallpaperExtensions: ["gif", "png", "jpg", "jpeg", "webp"]
-  property string background: "sword.gif"           // Fallback, relative to greeter.qml
+  property string background: "lockscreen.png"           // Fallback, relative to greeter.qml
   property real overlayOpacity: 0.25                 // Black layer over the background
   property real uiScale: 1.0                         // 1.0 matches the reference layout
   property string fontFamily: "JetBrainsMono Nerd Font"
