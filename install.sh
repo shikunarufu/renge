@@ -589,6 +589,13 @@ pacman --sync --noconfirm --needed mangowm
 # install_aur mangowm-git
 
 # Display manager
+
+install --directory --mode=755 /etc/greetd/quickshell
+install --mode=644 greeter.qml GreeterConfig.qml /etc/greetd/quickshell/
+setfacl --modify u:greeter:x /home/"${USERNAME}"
+setfacl --recursive --modify u:greeter:rX /home/"${USERNAME}"/Pictures/Wallpapers
+setfacl --recursive --default --modify u:greeter:rX /home/"${USERNAME}"/Pictures/Wallpapers
+install --mode=644 config.toml /etc/greetd/config.toml
 systemctl enable greetd.service
 
 # User directories
