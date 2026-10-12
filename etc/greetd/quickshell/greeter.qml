@@ -213,6 +213,8 @@ ShellRoot {
 
       // ── Background ──
       AnimatedImage {
+        id: background
+
         anchors.fill: parent
         fillMode: Image.PreserveAspectCrop
         playing: true
@@ -360,6 +362,20 @@ ShellRoot {
           text: shellRoot.status.toUpperCase()
           y: 29 * content.u
         }
+      }
+
+      // ── Debug: window size and wallpaper size (config.showInfo) ──
+      Text {
+        anchors.bottom: parent.bottom
+        anchors.bottomMargin: 14 * content.u
+        anchors.horizontalCenter: parent.horizontalCenter
+        color: config.colorText
+        font.family: config.fontFamily
+        font.pixelSize: 3.8 * content.u
+        opacity: 0.6
+        text: "window " + Math.round(content.width) + "x" + Math.round(content.height)
+          + "  |  image " + background.implicitWidth + "x" + background.implicitHeight
+        visible: config.showInfo
       }
 
       // ── Hostname (bottom left) ──
