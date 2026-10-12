@@ -16,6 +16,10 @@ ShellRoot {
   property string homeDir: ""
   property string wallpaperDir: ""
   property var passwdLines: []
+  property bool wallpaperFailed: false
+  readonly property string fallbackPath: config.background === "" || wallpaperDir === ""
+    ? ""
+    : (config.background.startsWith("/") ? config.background : wallpaperDir + "/" + config.background)
   property string wallpaper: ""
   property var wallpaperFiles: []
   property string status: ""
@@ -213,9 +217,17 @@ ShellRoot {
         fillMode: Image.PreserveAspectCrop
         playing: true
         smooth: true
-        source: shellRoot.wallpaper !== ""
-          ? "file://" + encodeURI(shellRoot.wallpaper)
-          : Qt.resolvedUrl(config.background)
+        // Random wallpaper first; fallback if none was found or it failed to load.
+        readonly property string path: shellRoot.wallpaper !== "" && !shellRoot.wallpaperFailed
+          ? shellRoot.wallpaper
+          : shellRoot.fallbackPath
+
+        source: path !== "" ? "file://" + encodeURI(path) : ""
+
+        onStatusChanged: {
+          if (status === Image.Error && path === shellRoot.wallpaper)
+            shellRoot.wallpaperFailed = true
+        }
       }
 
       Rectangle {
