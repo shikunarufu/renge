@@ -139,9 +139,11 @@ mapfile -t disks < <(
 # Check configuration files are present
 for file in ./renge/pkgs/install-pacstrap-pkglist.txt \
             ./renge/pkgs/install-pacman-pkglist.txt \
-            ./renge/etc/greetd/config.toml \
-            ./renge/etc/greetd/quickshell/greeter.qml \
-            ./renge/etc/greetd/quickshell/GreeterConfig.qml; do
+            ./renge/greetd/greeter.qml \
+            ./renge/greetd/GreeterConfig.qml \
+            ./renge/greetd/config.toml \
+            ./renge/greetd/config-vm.toml \
+            ./renge/greetd/greeter-vm.conf; do
   if [[ ! -f "${file}" ]]; then
     printf '%s\n' "Missing file: ${file}" >&2
     exit 1
@@ -467,7 +469,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 # Create chroot script
 {
-  declare -f configure_pacman add_cachyos_v3 install_cachyos_v3 read_pkglist
+  declare -f check_vm configure_pacman add_cachyos_v3 install_cachyos_v3 read_pkglist
   cat << 'CHROOT_EOF'
 
 # Errors will cause the script to immediately fail
@@ -600,7 +602,12 @@ pacman --sync --noconfirm --needed mangowm
 install --directory --mode=755 /etc/greetd/quickshell
 install --mode=644 /renge/etc/greetd/quickshell/greeter.qml /renge/etc/greetd/quickshell/GreeterConfig.qml \
   /etc/greetd/quickshell/
-install --mode=644 /renge/etc/greetd/config.toml /etc/greetd/config.toml
+if check_vm; then
+  install --mode=644 /renge/etc/greetd/greeter-vm.conf /etc/greetd/greeter-vm.conf
+  install --mode=644 /renge/etc/greetd/config-vm.toml /etc/greetd/config.toml
+else
+  install --mode=644 /renge/etc/greetd/config.toml /etc/greetd/config.toml
+fi
 systemctl enable greetd.service
 
 # User directories
