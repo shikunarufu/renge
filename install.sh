@@ -138,7 +138,10 @@ mapfile -t disks < <(
 
 # Check configuration files are present
 for file in ./renge/pkgs/install-pacstrap-pkglist.txt \
-            ./renge/pkgs/install-pacman-pkglist.txt; do
+            ./renge/pkgs/install-pacman-pkglist.txt \
+            ./renge/etc/greetd/config.toml \
+            ./renge/etc/greetd/quickshell/greeter.qml \
+            ./renge/etc/greetd/quickshell/GreeterConfig.qml; do
   if [[ ! -f "${file}" ]]; then
     printf '%s\n' "Missing file: ${file}" >&2
     exit 1
@@ -591,11 +594,9 @@ pacman --sync --noconfirm --needed mangowm
 # Display manager
 
 install --directory --mode=755 /etc/greetd/quickshell
-install --mode=644 greeter.qml GreeterConfig.qml /etc/greetd/quickshell/
-setfacl --modify u:greeter:x /home/"${USERNAME}"
-setfacl --recursive --modify u:greeter:rX /home/"${USERNAME}"/Pictures/Wallpapers
-setfacl --recursive --default --modify u:greeter:rX /home/"${USERNAME}"/Pictures/Wallpapers
-install --mode=644 config.toml /etc/greetd/config.toml
+install --mode=644 /renge/etc/greetd/quickshell/greeter.qml /renge/etc/greetd/quickshell/GreeterConfig.qml \
+  /etc/greetd/quickshell/
+install --mode=644 /renge/etc/greetd/config.toml /etc/greetd/config.toml
 systemctl enable greetd.service
 
 # User directories
@@ -660,6 +661,9 @@ chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.config
 mkdir --parents /home/"${USERNAME}"/Pictures/Wallpapers
 cp --recursive /renge/pictures/wallpapers/. /home/"${USERNAME}"/Pictures/Wallpapers
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
+setfacl --modify u:greeter:x /home/"${USERNAME}"
+setfacl --recursive --modify u:greeter:rX /home/"${USERNAME}"/Pictures/Wallpapers
+setfacl --recursive --default --modify u:greeter:rX /home/"${USERNAME}"/Pictures/Wallpapers
 
 #######################################
 # Appearance
