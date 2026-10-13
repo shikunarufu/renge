@@ -1,6 +1,6 @@
 [terminal]
 vt = 1
- 
+
 [default_session]
-command = "cage -s -m last -- env QT_WAYLAND_DISABLE_WINDOWDECORATION=1 quickshell -p /etc/greetd/quickshell/greeter.qml"
+command = "mango -c /etc/greetd/mango-greeter.conf"
 user = "greeter"
