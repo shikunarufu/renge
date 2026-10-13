@@ -41,12 +41,12 @@ QtObject {
   property string errorLabel: "Wrong password"
 
   // ── Color ──
-  property color colorText: "#e5e7eb"
-  property color colorDate: "#e2a97b"
-  property color colorAccent: "#e2a97b"
-  property color colorAccentText: "#18181b"
+  property color colorText: "#bbc3c4"
+  property color colorDate: "#49503c"
+  property color colorAccent: "#49503c"
+  property color colorAccentText: "#0f2430"
   property color colorBorder: Qt.rgba(colorText.r, colorText.g, colorText.b, 0.35)
-  property color colorError: "#f38ba8"
+  property color colorError: "#be1923"
 
   // ── Power buttons (bottom right, after the session button) ──
   property var actions: [
