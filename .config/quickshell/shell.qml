@@ -660,6 +660,21 @@ ShellRoot {
 
     property string password: ""
     property bool failed: false
+    property string background: config.lockWallpaper !== ""
+      ? "file://" + config.lockWallpaper
+      : (wallpaper.current !== "" ? "file://" + wallpaper.current : "")
+
+    function format(text) {
+      return config.lockUppercase ? text.toUpperCase() : text
+    }
+
+    function submit(input) {
+      if (pam.active || input.text === "") return
+
+      lockscreen.password = input.text
+      input.text = ""
+      pam.start()
+    }
 
     // Call with: qs ipc call lock lock
     IpcHandler {
@@ -704,64 +719,181 @@ ShellRoot {
           anchors.fill: parent
           asynchronous: true
           fillMode: Image.PreserveAspectCrop
-          source: wallpaper.current !== "" ? "file://" + wallpaper.current : ""
+          source: lockscreen.background
         }
 
         Rectangle {
           anchors.fill: parent
-          color: Qt.rgba(0, 0, 0, 0.5)
+          color: "black"
+          opacity: config.lockDim
         }
 
+        // ── Top left: Now Playing (hidden when nothing is playing) ──
+        Text {
+          anchors { left: parent.left; top: parent.top; margins: config.lockMargin }
+          color: config.lockColorText
+          font.family: config.lockFontFamily
+          font.letterSpacing: config.lockLetterSpacing
+          font.pixelSize: config.lockLabelSize
+          font.weight: config.fontWeight
+          text: lockscreen.format(media.label)
+          visible: media.active
+        }
+
+        // ── Top right: date and clock ──
         Column {
-          anchors.centerIn: parent
-          spacing: 16
+          anchors { right: parent.right; top: parent.top; margins: config.lockMargin }
+          spacing: 4
 
           Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            color: config.colorText
-            font.family: config.fontFamily
-            font.pixelSize: 72
+            anchors.right: parent.right
+            color: config.lockColorDate
+            font.family: config.lockFontFamily
+            font.letterSpacing: config.lockLetterSpacing
+            font.pixelSize: config.lockDateSize
             font.weight: config.fontWeight
-            text: Qt.formatTime(lockClock.date, "HH:mm")
+            text: lockscreen.format(Qt.formatDateTime(lockClock.date, config.lockDateFormat))
           }
 
-          Rectangle {
-            width: 280
-            height: 40
-            radius: config.powerMenuRadius
-            color: config.colorInput
-            border.width: 2
-            border.color: lockscreen.failed ? "#f38ba8" : config.colorAccent
+          Text {
+            anchors.right: parent.right
+            color: config.lockColorText
+            font.family: config.lockFontFamily
+            font.pixelSize: config.lockClockSize
+            font.weight: config.fontWeight
+            text: Qt.formatTime(lockClock.date, config.lockClockFormat)
+          }
+        }
+
+        // ── Bottom left: username, password, login ──
+        Column {
+          anchors { left: parent.left; bottom: parent.bottom; margins: config.lockMargin }
+          spacing: 12
+
+          Text {
+            color: config.lockColorText
+            font.family: config.lockFontFamily
+            font.letterSpacing: config.lockLetterSpacing
+            font.pixelSize: config.lockLabelSize
+            font.weight: config.fontWeight
+            text: lockscreen.format(config.lockUsername)
+          }
+
+          Item {
+            width: config.lockInputWidth
+            height: config.lockInputHeight
 
             TextInput {
               id: lockInput
 
-              anchors.fill: parent
-              anchors.margins: 8
-              color: config.colorText
+              anchors { left: parent.left; right: parent.right; bottom: lockLine.top; bottomMargin: 4 }
+              color: config.lockColorText
               echoMode: TextInput.Password
               focus: true
-              font.family: config.fontFamily
-              font.pixelSize: 18
+              font.family: config.lockFontFamily
+              font.pixelSize: config.lockLabelSize
               readOnly: pam.active
-              verticalAlignment: TextInput.AlignVCenter
 
               onTextChanged: lockscreen.failed = false
-              onAccepted: {
-                if (pam.active || text === "") return
-                lockscreen.password = text
-                text = ""
-                pam.start()
-              }
+              onAccepted: lockscreen.submit(lockInput)
+            }
+
+            Rectangle {
+              id: lockLine
+
+              anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+              color: lockscreen.failed ? config.lockColorError : config.lockColorAccent
+              height: 2
             }
           }
 
-          Text {
-            anchors.horizontalCenter: parent.horizontalCenter
-            color: "#f38ba8"
-            font.family: config.fontFamily
-            font.pixelSize: config.fontSize
-            text: lockscreen.failed ? "Wrong password" : ""
+          Row {
+            spacing: 16
+
+            Rectangle {
+              id: loginButton
+
+              border.color: config.lockColorBorder
+              border.width: 2
+              color: loginArea.containsMouse ? config.lockColorAccent : "transparent"
+              height: config.lockButtonHeight
+              width: loginText.implicitWidth + 32
+
+              Text {
+                id: loginText
+
+                anchors.centerIn: parent
+                color: loginArea.containsMouse ? config.colorAccentText : config.lockColorText
+                font.family: config.lockFontFamily
+                font.letterSpacing: config.lockLetterSpacing
+                font.pixelSize: config.lockButtonSize
+                font.weight: config.fontWeight
+                text: lockscreen.format(config.lockLoginLabel)
+              }
+
+              MouseArea {
+                id: loginArea
+
+                anchors.fill: parent
+                hoverEnabled: true
+
+                onClicked: lockscreen.submit(lockInput)
+              }
+            }
+
+            Text {
+              anchors.verticalCenter: loginButton.verticalCenter
+              color: config.lockColorError
+              font.family: config.lockFontFamily
+              font.letterSpacing: config.lockLetterSpacing
+              font.pixelSize: config.lockButtonSize
+              font.weight: config.fontWeight
+              text: lockscreen.format(config.lockErrorLabel)
+              visible: lockscreen.failed
+            }
+          }
+        }
+
+        // ── Bottom right: power buttons ──
+        Row {
+          anchors { right: parent.right; bottom: parent.bottom; margins: config.lockMargin }
+          spacing: 12
+
+          Repeater {
+            model: config.lockActions
+
+            Rectangle {
+              id: actionButton
+
+              required property var modelData
+
+              border.color: config.lockColorBorder
+              border.width: 2
+              color: actionArea.containsMouse ? config.lockColorAccent : "transparent"
+              height: config.lockButtonHeight
+              width: actionText.implicitWidth + 24
+
+              Text {
+                id: actionText
+
+                anchors.centerIn: parent
+                color: actionArea.containsMouse ? config.colorAccentText : config.lockColorText
+                font.family: config.lockFontFamily
+                font.letterSpacing: config.lockLetterSpacing
+                font.pixelSize: config.lockButtonSize
+                font.weight: config.fontWeight
+                text: lockscreen.format(actionButton.modelData.label)
+              }
+
+              MouseArea {
+                id: actionArea
+
+                anchors.fill: parent
+                hoverEnabled: true
+
+                onClicked: Quickshell.execDetached(["sh", "-c", actionButton.modelData.command])
+              }
+            }
           }
         }
       }
