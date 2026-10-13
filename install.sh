@@ -138,7 +138,10 @@ mapfile -t disks < <(
 
 # Check configuration files are present
 for file in ./renge/pkgs/install-pacstrap-pkglist.txt \
-            ./renge/pkgs/install-pacman-pkglist.txt; do
+            ./renge/pkgs/install-pacman-pkglist.txt \
+            ./renge/etc/greetd/config.toml \
+            ./renge/etc/greetd/greeter/shell.qml \
+            ./renge/etc/greetd/greeter/wallpaper.png; do
   if [[ ! -f "${file}" ]]; then
     printf '%s\n' "Missing file: ${file}" >&2
     exit 1
@@ -593,6 +596,13 @@ pacman --sync --noconfirm --needed mangowm
 # install_aur mangowm-git
 
 # Display manager
+mkdir --parents /etc/greetd
+cp --recursive /renge/etc/greetd/. /etc/greetd/
+sed --in-place \
+  "s/\(property string username: \)\"[^\"]*\"/\1\"${USERNAME}\"/" \
+  /etc/greetd/greeter/Config.qml
+chown --recursive greeter:greeter /etc/greetd
+systemctl enable greetd.service
 
 # User directories
 runuser --login "${USERNAME}" --command xdg-user-dirs-update
