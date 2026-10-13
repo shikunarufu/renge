@@ -14,6 +14,8 @@ QtObject {
   // ── Background ──
   property string wallpaper: "/etc/greetd/greeter/wallpaper.png"  // Absolute path, readable by `greeter`
   property real dim: 0                                     // 0 to 1, black overlay on the wallpaper
+  property real shadow: 0.6                                // 0 to 1, darkness at the bottom edge (0 = off)
+  property real shadowHeight: 0.35                         // Fraction of the screen height the shadow covers
   property color backgroundColor: "#18181b"                // Shown if the wallpaper is missing
 
   // ── Font ──
