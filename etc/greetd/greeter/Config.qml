@@ -42,8 +42,8 @@ QtObject {
 
   // ── Color ──
   property color colorText: "#bbc3c4"
-  property color colorDate: "#49503c"
-  property color colorAccent: "#49503c"
+  property color colorDate: "#949f7f"
+  property color colorAccent: "#949f7f"
   property color colorAccentText: "#0f2430"
   property color colorBorder: Qt.rgba(colorText.r, colorText.g, colorText.b, 0.35)
   property color colorError: "#be1923"
