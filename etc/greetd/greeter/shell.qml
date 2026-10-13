@@ -166,6 +166,17 @@ ShellRoot {
         opacity: config.dim
       }
 
+      // Bottom shadow so the login and buttons stay readable
+      Rectangle {
+        anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+        height: parent.height * config.shadowHeight
+
+        gradient: Gradient {
+          GradientStop { position: 0; color: Qt.rgba(0, 0, 0, 0) }
+          GradientStop { position: 1; color: Qt.rgba(0, 0, 0, config.shadow) }
+        }
+      }
+
       // ── Top right: date and clock ──
       Column {
         anchors { right: parent.right; top: parent.top; margins: config.margin }
