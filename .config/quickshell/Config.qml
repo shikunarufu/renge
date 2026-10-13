@@ -158,6 +158,10 @@ QtObject {
   property int lockInputHeight: 36
   property real lockShadow: 0.75               // 0 to 1, darkness at the bottom edge (0 = off)
   property real lockShadowHeight: 0.5        // Fraction of the screen height the shadow covers
+  property real lockTextShadow: 0.8            // 0 to 1, shadow behind date, clock and Now Playing (0 = off)
+  property real lockTextShadowBlur: 0.6        // 0 to 1, softness
+  property int lockTextShadowOffset: 3         // Pixels, down and right
+  property color lockTextShadowColor: "black"
   property string lockClockFormat: "HH:mm"
   property string lockDateFormat: "dddd, MMMM d"
   property string lockUsername: Quickshell.env("USER")
