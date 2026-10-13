@@ -59,7 +59,7 @@ configure_pacman () {
   local conf=$1
   local threads
   threads="$(nproc)"
- 
+
   sed --in-place \
     --expression='s/^#Color/Color/' \
     --expression='s/^CheckSpace/#CheckSpace/' \
@@ -67,7 +67,7 @@ configure_pacman () {
     --expression="s/^#\\?ParallelDownloads = .*/ParallelDownloads = ${threads}/" \
     --expression='/^#\[multilib\]/,/^#Include/ s/^#//' \
     "${conf}"
- 
+
   if ! grep --quiet '^ILoveCandy' "${conf}"; then
     sed --in-place '/^Color/a ILoveCandy' "${conf}"
   fi
@@ -83,7 +83,7 @@ add_cachyos_v3 () {
   block='[cachyos-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n\n'
   block+='[cachyos-core-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n\n'
   block+='[cachyos-extra-v3]\nInclude = /etc/pacman.d/cachyos-v3-mirrorlist\n'
- 
+
   if grep --quiet '^\[cachyos-v3\]' "${conf}"; then
     return 0
   fi
@@ -124,13 +124,13 @@ use_cachyos=0
 if ! check_vm && check_cpu_v3; then
   use_cachyos=1
 fi
- 
+
 if (( use_cachyos )); then
   kernel='linux-cachyos'
 else
   kernel='linux-zen'
 fi
- 
+
 mapfile -t disks < <(
   printf '%s\n' "${boot_disk}" "${root_disk}" "${var_disk}" \
     "${home_disk}" "${data_disk}" | sort --unique
@@ -138,12 +138,7 @@ mapfile -t disks < <(
 
 # Check configuration files are present
 for file in ./renge/pkgs/install-pacstrap-pkglist.txt \
-            ./renge/pkgs/install-pacman-pkglist.txt \
-            ./renge/etc/greetd/quickshell/greeter.qml \
-            ./renge/etc/greetd/quickshell/GreeterConfig.qml \
-            ./renge/etc/greetd/config.toml \
-            ./renge/etc/greetd/config-vm.toml \
-            ./renge/etc/greetd/greeter-vm.conf; do
+            ./renge/pkgs/install-pacman-pkglist.txt; do
   if [[ ! -f "${file}" ]]; then
     printf '%s\n' "Missing file: ${file}" >&2
     exit 1
@@ -474,7 +469,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 # Errors will cause the script to immediately fail
 set -euo pipefail
- 
+
 # Build and install AUR package
 install_aur() {
   local pkg=$1
@@ -589,26 +584,15 @@ efibootmgr \
 #######################################
 # Graphical user interface
 #######################################
- 
+
 # Uncomment if mangowm is NOT in AUR
 pacman --sync --noconfirm --needed mangowm
- 
+
 # Uncomment if mangowm is in AUR
 # install_aur scenefx0.5
 # install_aur mangowm-git
 
 # Display manager
-
-install --directory --mode=755 /etc/greetd/quickshell
-install --mode=644 /renge/etc/greetd/quickshell/greeter.qml /renge/etc/greetd/quickshell/GreeterConfig.qml \
-  /etc/greetd/quickshell/
-if check_vm; then
-  install --mode=644 /renge/etc/greetd/greeter-vm.conf /etc/greetd/greeter-vm.conf
-  install --mode=644 /renge/etc/greetd/config-vm.toml /etc/greetd/config.toml
-else
-  install --mode=644 /renge/etc/greetd/config.toml /etc/greetd/config.toml
-fi
-systemctl enable greetd.service
 
 # User directories
 runuser --login "${USERNAME}" --command xdg-user-dirs-update
@@ -633,14 +617,14 @@ systemctl --global enable spotifyd.service
 #######################################
 # Networking
 #######################################
- 
+
 # Web browser
 install_aur zen-browser-bin
 
 #######################################
 # Input devices
 #######################################
- 
+
 # mozc-ut (fcitx5-mozc-ut dependency)
 runuser --login "${USERNAME}" --command 'rm --recursive --force "$HOME/.cache/bazel"'
 install_aur_optional mozc-ut
@@ -664,7 +648,7 @@ systemctl enable fstrim.timer
 #######################################
 # System services
 #######################################
- 
+
 # Apply config files
 mkdir --parents /home/"${USERNAME}"/.config
 cp --recursive /renge/.config/. /home/"${USERNAME}"/.config/
@@ -672,9 +656,6 @@ chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.config
 mkdir --parents /home/"${USERNAME}"/Pictures/Wallpapers
 cp --recursive /renge/pictures/wallpapers/. /home/"${USERNAME}"/Pictures/Wallpapers
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
-setfacl --modify u:greeter:x /home/"${USERNAME}"
-setfacl --recursive --modify u:greeter:rX /home/"${USERNAME}"/Pictures/Wallpapers
-setfacl --recursive --default --modify u:greeter:rX /home/"${USERNAME}"/Pictures/Wallpapers
 
 #######################################
 # Appearance
@@ -686,7 +667,7 @@ install_aur bibata-cursor-theme-bin
 #######################################
 # Gaming
 #######################################
- 
+
 install_aur proton-cachyos-slr
 install_aur wine-cachyos-opt
 install_aur heroic-games-launcher-bin
@@ -694,7 +675,7 @@ install_aur heroic-games-launcher-bin
 #######################################
 # Cleanup
 #######################################
- 
+
 # Remove renge folder
 rm --recursive --force /renge
 CHROOT_EOF
@@ -711,7 +692,7 @@ arch-chroot -S /mnt /usr/bin/env \
   BOOT_DISK="${boot_disk}" \
   USE_CACHYOS="${use_cachyos}" \
   /bin/bash /chroot-install.sh
- 
+
 rm --force /mnt/chroot-install.sh
 
 # Set root and user passwords
@@ -721,10 +702,10 @@ printf '%s:%s\n' root "${ROOT_PASSWORD}" "${USERNAME}" "${USER_PASSWORD}" \
 #######################################
 # Post-installation
 #######################################
- 
+
 # Unmount all partitions
 umount -R /mnt
- 
+
 # Restart system
 sec=15
 while [[ ${sec} -gt 1 ]]; do
