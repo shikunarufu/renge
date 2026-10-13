@@ -52,7 +52,7 @@ QtObject {
     { label: "Shut Down", command: "systemctl poweroff" },
     { label: "Restart", command: "systemctl reboot" },
     { label: "Sleep", command: "systemctl suspend" },
-    { label: "Lock", command: "loginctl lock-session" },
+    { label: "Lock", command: "qs ipc call lock lock" },
     { label: "Log Out", command: "loginctl terminate-session self" }
   ]
 
