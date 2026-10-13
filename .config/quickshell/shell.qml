@@ -726,6 +726,16 @@ ShellRoot {
           anchors.fill: parent
           color: "black"
           opacity: config.lockDim
+          // Bottom shadow so the login and buttons stay readable
+          Rectangle {
+            anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
+            height: parent.height * config.lockShadowHeight
+
+            gradient: Gradient {
+              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, 0) }
+              GradientStop { position: 1; color: Qt.rgba(0, 0, 0, config.lockShadow) }
+            }
+          }
         }
 
         // ── Top left: Now Playing (hidden when nothing is playing) ──
