@@ -142,6 +142,36 @@ QtObject {
   property int visualizerMaxFreq: 10000
   property int visualizerMinFreq: 20
 
+  // ── Lockscreen ──
+  property string lockWallpaper: ""             // Absolute path to an image. Empty = follow the desktop wallpaper
+  property real lockDim: 0                      // 0 to 1, black overlay on the wallpaper
+  property string lockFontFamily: fontFamily
+  property real lockLetterSpacing: 2
+  property bool lockUppercase: true
+  property int lockMargin: 64
+  property int lockClockSize: 96
+  property int lockDateSize: 16
+  property int lockLabelSize: 18                // Username, password text, Now Playing
+  property int lockButtonSize: 13
+  property int lockButtonHeight: 32
+  property int lockInputWidth: 360
+  property int lockInputHeight: 36
+  property string lockClockFormat: "HH:mm"
+  property string lockDateFormat: "dddd, MMMM d"
+  property string lockUsername: Quickshell.env("USER")
+  property string lockLoginLabel: "Login"
+  property string lockErrorLabel: "Wrong password"
+  property color lockColorText: colorText
+  property color lockColorDate: colorAccent
+  property color lockColorAccent: colorAccent
+  property color lockColorBorder: Qt.rgba(colorText.r, colorText.g, colorText.b, 0.35)
+  property color lockColorError: "#f38ba8"
+  property var lockActions: [
+    { label: "Sleep", command: "systemctl suspend" },
+    { label: "Restart", command: "systemctl reboot" },
+    { label: "Shut Down", command: "systemctl poweroff" }
+  ]
+
   // ── Color transitions ──
   Behavior on barColor { ColorAnimation { duration: colorTransitionDuration } }
   Behavior on colorAccent { ColorAnimation { duration: colorTransitionDuration } }
