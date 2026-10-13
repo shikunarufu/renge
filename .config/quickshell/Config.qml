@@ -156,6 +156,8 @@ QtObject {
   property int lockButtonHeight: 32
   property int lockInputWidth: 360
   property int lockInputHeight: 36
+  property real lockShadow: 0.5               // 0 to 1, darkness at the bottom edge (0 = off)
+  property real lockShadowHeight: 0.5        // Fraction of the screen height the shadow covers
   property string lockClockFormat: "HH:mm"
   property string lockDateFormat: "dddd, MMMM d"
   property string lockUsername: Quickshell.env("USER")
