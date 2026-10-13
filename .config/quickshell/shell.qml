@@ -18,6 +18,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
 import Quickshell.Services.Notifications
+import Quickshell.Services.Pam
 import Quickshell.Services.Pipewire
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
