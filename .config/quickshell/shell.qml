@@ -653,6 +653,120 @@ ShellRoot {
     }
   }
 
+  // ── Lockscreen ──
+  Scope {
+    id: lockscreen
+
+    property string password: ""
+    property bool failed: false
+
+    // Call with: qs ipc call lock lock
+    IpcHandler {
+      target: "lock"
+
+      function lock(): void {
+        if (!sessionLock.locked) sessionLock.locked = true
+      }
+    }
+
+    SystemClock {
+      id: lockClock
+      precision: SystemClock.Minutes
+    }
+
+    PamContext {
+      id: pam
+
+      configDirectory: Quickshell.shellDir + "/pam"
+      config: "password.conf"
+
+      onResponseRequiredChanged: if (responseRequired) respond(lockscreen.password)
+
+      onCompleted: result => {
+        lockscreen.password = ""
+        if (result === PamResult.Success) {
+          lockscreen.failed = false
+          sessionLock.locked = false
+        } else {
+          lockscreen.failed = true
+        }
+      }
+    }
+
+    WlSessionLock {
+      id: sessionLock
+
+      WlSessionLockSurface {
+        color: config.barColor
+
+        Image {
+          anchors.fill: parent
+          asynchronous: true
+          fillMode: Image.PreserveAspectCrop
+          source: wallpaper.current !== "" ? "file://" + wallpaper.current : ""
+        }
+
+        Rectangle {
+          anchors.fill: parent
+          color: Qt.rgba(0, 0, 0, 0.5)
+        }
+
+        Column {
+          anchors.centerIn: parent
+          spacing: 16
+
+          Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: config.colorText
+            font.family: config.fontFamily
+            font.pixelSize: 72
+            font.weight: config.fontWeight
+            text: Qt.formatTime(lockClock.date, "HH:mm")
+          }
+
+          Rectangle {
+            width: 280
+            height: 40
+            radius: config.powerMenuRadius
+            color: config.colorInput
+            border.width: 2
+            border.color: lockscreen.failed ? "#f38ba8" : config.colorAccent
+
+            TextInput {
+              id: lockInput
+
+              anchors.fill: parent
+              anchors.margins: 8
+              color: config.colorText
+              echoMode: TextInput.Password
+              focus: true
+              font.family: config.fontFamily
+              font.pixelSize: 18
+              readOnly: pam.active
+              verticalAlignment: TextInput.AlignVCenter
+
+              onTextChanged: lockscreen.failed = false
+              onAccepted: {
+                if (pam.active || text === "") return
+                lockscreen.password = text
+                text = ""
+                pam.start()
+              }
+            }
+          }
+
+          Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: "#f38ba8"
+            font.family: config.fontFamily
+            font.pixelSize: config.fontSize
+            text: lockscreen.failed ? "Wrong password" : ""
+          }
+        }
+      }
+    }
+  }
+
   // ── Bar ──
   Scope {
     id: root
