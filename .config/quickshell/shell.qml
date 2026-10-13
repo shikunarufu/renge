@@ -11,6 +11,7 @@
 
 import QtCore
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import QtQuick.Shapes
 import Qt.labs.folderlistmodel
@@ -749,12 +750,32 @@ ShellRoot {
           font.weight: config.fontWeight
           text: lockscreen.format(media.label)
           visible: media.active
+
+          layer.enabled: config.lockTextShadow > 0
+          layer.effect: MultiEffect {
+            shadowBlur: config.lockTextShadowBlur
+            shadowColor: config.lockTextShadowColor
+            shadowEnabled: true
+            shadowHorizontalOffset: config.lockTextShadowOffset
+            shadowOpacity: config.lockTextShadow
+            shadowVerticalOffset: config.lockTextShadowOffset
+          }
         }
 
         // ── Top right: date and clock ──
         Column {
           anchors { right: parent.right; top: parent.top; margins: config.lockMargin }
           spacing: 4
+
+          layer.enabled: config.lockTextShadow > 0
+          layer.effect: MultiEffect {
+            shadowBlur: config.lockTextShadowBlur
+            shadowColor: config.lockTextShadowColor
+            shadowEnabled: true
+            shadowHorizontalOffset: config.lockTextShadowOffset
+            shadowOpacity: config.lockTextShadow
+            shadowVerticalOffset: config.lockTextShadowOffset
+          }
 
           Text {
             anchors.right: parent.right
