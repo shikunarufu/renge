@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Effects
+import QtQuick.Shapes
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Greetd
@@ -178,20 +178,42 @@ ShellRoot {
         }
       }
 
+      // Top-right shadow behind the date and clock
+      Shape {
+        id: clockShadow
+
+        anchors { right: parent.right; top: parent.top }
+        height: config.cornerShadowSize
+        visible: config.cornerShadow > 0
+        width: config.cornerShadowSize
+
+        ShapePath {
+          startX: 0
+          startY: 0
+          strokeColor: "transparent"
+
+          fillGradient: RadialGradient {
+            centerRadius: clockShadow.width
+            centerX: clockShadow.width
+            centerY: 0
+            focalX: clockShadow.width
+            focalY: 0
+
+            GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.cornerShadow) }
+            GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
+          }
+
+          PathLine { x: clockShadow.width; y: 0 }
+          PathLine { x: clockShadow.width; y: clockShadow.height }
+          PathLine { x: 0; y: clockShadow.height }
+          PathLine { x: 0; y: 0 }
+        }
+      }
+
       // ── Top right: date and clock ──
       Column {
         anchors { right: parent.right; top: parent.top; margins: config.margin }
         spacing: 4
-
-        layer.enabled: config.textShadow > 0
-        layer.effect: MultiEffect {
-          shadowBlur: config.textShadowBlur
-          shadowColor: config.textShadowColor
-          shadowEnabled: true
-          shadowHorizontalOffset: config.textShadowOffset
-          shadowOpacity: config.textShadow
-          shadowVerticalOffset: config.textShadowOffset
-        }
 
         Text {
           anchors.right: parent.right
