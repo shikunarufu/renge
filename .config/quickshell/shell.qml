@@ -17,11 +17,16 @@ import Quickshell.WindowManager
 ShellRoot {
   id: shellRoot
 
+  // Name of the screen whose tray popup is open ("" when closed). Notifications move below it.
   property string trayPopupScreen: ""
 
+  // Emitted to close every popup (power menu, app launcher, tray) on all screens.
   signal dismissPopups()
 
-  // ── Separator ──
+  // ── Components ──
+  // Inline components cannot see `config` by id, so each one receives what it needs.
+
+  // Vertical bar between bar items.
   component Separator: Text {
     required property QtObject cfg
 
@@ -34,7 +39,7 @@ ShellRoot {
     text: "|"
   }
 
-  // ── Concave ──
+  // Concave corner under the bar. `mirrored` flips it horizontally.
   component Concave: Shape {
     required property QtObject cfg
     property bool mirrored: false
@@ -66,12 +71,13 @@ ShellRoot {
     }
   }
 
-  // ── Shadow ──
+  // Quarter-ellipse shadow in a top corner, shadowWidth x shadowHeight pixels.
+  // The gradient is drawn on a square, then squashed to the requested height.
   component CornerShadow: Shape {
     id: shadow
 
     property bool rightSide: false
-    property real strength: 0
+    property real strength: 0       // 0 to 1; 0 hides it
     property real shadowWidth: 1920
     property real shadowHeight: 540
 
@@ -116,7 +122,9 @@ ShellRoot {
     }
   }
 
-  // ── Lock Screen Button ──
+  // Outlined button that fills with the accent color on hover.
+  // `style` needs: borderColor, borderWidth, hoverColor, textColor, hoverTextColor,
+  // fontFamily, fontWeight, letterSpacing, fontSize, buttonHeight.
   component OutlineButton: Rectangle {
     id: button
 
@@ -158,7 +166,7 @@ ShellRoot {
   // ── Config ──
   Config { id: config }
 
-  // ── Clock ──
+  // One clock for the bar and the lockscreen.
   SystemClock {
     id: clock
 
@@ -272,6 +280,7 @@ ShellRoot {
       WlrLayershell.layer: WlrLayer.Background
       WlrLayershell.namespace: "wallpaper"
       anchors { left: true; right: true; top: true; bottom: true }
+      // Constant: a color that follows the theme would repaint the whole screen on every transition frame.
       color: config.wallpaperFallbackColor
       exclusionMode: ExclusionMode.Ignore
       screen: modelData
@@ -284,6 +293,7 @@ ShellRoot {
         sourceSize: Qt.size(wallpaperWindow.modelData.width, wallpaperWindow.modelData.height)
       }
 
+      // Only the first screen samples colors, and only when the theme is on.
       Loader {
         active: config.themeFromWallpaper && wallpaperWindow.modelData === Quickshell.screens[0]
 
@@ -312,11 +322,13 @@ ShellRoot {
             wallpaper.applyPixels(ctx.getImageData(0, 0, width, height).data)
             sampled = source
 
+            // The full-size decoded image is not needed after sampling. Free it after this paint.
             Qt.callLater(function () { sampler.unloadImage(url) })
           }
         }
       }
 
+      // Click on the desktop closes open popups.
       MouseArea {
         anchors.fill: parent
 
@@ -353,6 +365,7 @@ ShellRoot {
 
     onActiveChanged: if (!active) levels = []
 
+    // Runs only while something plays.
     Process {
       id: cava
 
@@ -407,6 +420,7 @@ ShellRoot {
             for (var i = 0; i < monitors.length; i++) next[monitors[i].name] = monitors[i].layout_symbol
             layoutState.symbols = next
           } catch (e) {
+            // Ignore partial or non-JSON lines.
           }
         }
       }
@@ -429,6 +443,7 @@ ShellRoot {
 
     property string kind: "none"
 
+    // First connected wifi or ethernet device, else "none".
     function parse(text) {
       var lines = text.split("\n")
       for (var i = 0; i < lines.length; i++) {
@@ -480,6 +495,7 @@ ShellRoot {
       }
     }
 
+    // Ignores polled values right after a toggle so the label does not flip back.
     Timer {
       id: imHold
 
@@ -497,6 +513,7 @@ ShellRoot {
   }
 
   // ── Launcher State ──
+  // Shared by every screen so recent apps stay in sync.
   Scope {
     id: launcher
 
@@ -536,6 +553,7 @@ ShellRoot {
     }
 
     PanelWindow {
+      // Extra top offset while the tray popup is open on this screen.
       property real trayShift: shellRoot.trayPopupScreen === Quickshell.screens[0].name ? config.trayPopupExtent : 0
 
       WlrLayershell.layer: WlrLayer.Overlay
@@ -563,6 +581,8 @@ ShellRoot {
         width: config.notificationWidth
 
         Repeater {
+          // Live model (oldest first): cards are added and removed one by one,
+          // so the card on screen is not recreated.
           model: server.trackedNotifications
 
           delegate: Rectangle {
@@ -700,6 +720,7 @@ ShellRoot {
                   Layout.preferredWidth: config.notificationIconSize
                   asynchronous: true
                   fillMode: Image.PreserveAspectFit
+                  // Cards waiting behind the visible one do not load their icon.
                   source: card.visible ? card.iconSource : ""
                   sourceSize: Qt.size(config.notificationIconSize * 2, config.notificationIconSize * 2)
                   visible: source != ""
@@ -816,6 +837,7 @@ ShellRoot {
       pam.start()
     }
 
+    // Call with: qs ipc call lock lock
     IpcHandler {
       target: "lock"
 
@@ -824,6 +846,7 @@ ShellRoot {
       }
     }
 
+    // Look shared by the lockscreen buttons.
     QtObject {
       id: lockStyle
 
@@ -857,6 +880,7 @@ ShellRoot {
       onResponseRequiredChanged: if (responseRequired) respond(lockscreen.password)
     }
 
+    // Surfaces exist only while locked, so none of this is kept in memory otherwise.
     WlSessionLock {
       id: sessionLock
 
@@ -867,6 +891,7 @@ ShellRoot {
           anchors.fill: parent
           asynchronous: true
           fillMode: Image.PreserveAspectCrop
+          // Wait for the real size so the wallpaper is decoded once, at screen size.
           source: width > 0 ? lockscreen.background : ""
           sourceSize: Qt.size(width, height)
         }
@@ -877,7 +902,7 @@ ShellRoot {
           opacity: config.lockDim
         }
 
-        // ── Shadow ──
+        // Bottom shadow so the login and buttons stay readable
         Rectangle {
           anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
           height: parent.height * config.lockShadowHeight
@@ -888,12 +913,14 @@ ShellRoot {
           }
         }
 
+        // Top-left shadow behind Now Playing
         CornerShadow {
           shadowHeight: config.lockPlayingShadowHeight
           shadowWidth: config.lockPlayingShadowWidth
           strength: media.active ? config.lockPlayingShadow : 0
         }
 
+        // Top-right shadow behind the date and clock
         CornerShadow {
           rightSide: true
           shadowHeight: config.lockClockShadowHeight
@@ -901,6 +928,7 @@ ShellRoot {
           strength: config.lockClockShadow
         }
 
+        // ── Top left: Now Playing (hidden when nothing is playing) ──
         Text {
           anchors { left: parent.left; top: parent.top; margins: config.lockMargin }
           color: config.lockColorText
@@ -912,6 +940,7 @@ ShellRoot {
           visible: media.active
         }
 
+        // ── Top right: date and clock ──
         Column {
           anchors { right: parent.right; top: parent.top; margins: config.lockMargin }
           spacing: 4
@@ -936,7 +965,7 @@ ShellRoot {
           }
         }
 
-        // ── Login ──
+        // ── Bottom left: username, password, login ──
         Column {
           anchors { left: parent.left; bottom: parent.bottom; margins: config.lockMargin }
           spacing: config.lockSpacing
@@ -1004,7 +1033,7 @@ ShellRoot {
           }
         }
 
-        // ── Login Power Button ──
+        // ── Bottom right: power buttons ──
         Row {
           anchors { right: parent.right; bottom: parent.bottom; margins: config.lockMargin }
           spacing: config.lockSpacing
@@ -1041,19 +1070,26 @@ ShellRoot {
 
         readonly property bool cornersHidden: config.cornerHiddenLayouts.indexOf(layoutState.symbols[modelData.name]) !== -1
 
-        function togglePopup(popup) {
-          var wasOpen = popup.visible
+        // Only one popup is open at a time. Two popups with a focus grab open together
+        // get placed relative to each other instead of the bar.
+        property string openPopup: ""  // "", "power", "launcher" or "tray"
+
+        // Closing is deferred so a popup is never destroyed from inside its own event handler.
+        function closePopup(name) {
+          Qt.callLater(() => { if (openPopup === name) openPopup = "" })
+        }
+
+        function togglePopup(name) {
+          var wasOpen = openPopup === name
           shellRoot.dismissPopups()
-          if (!wasOpen) Qt.callLater(() => { popup.visible = true })
+          if (!wasOpen) Qt.callLater(() => { openPopup = name })
         }
 
         Connections {
           target: shellRoot
 
           function onDismissPopups() {
-            powerMenuPopup.visible = false
-            appLauncherPopup.visible = false
-            trayPopup.visible = false
+            screenRoot.openPopup = ""
           }
         }
 
@@ -1072,6 +1108,7 @@ ShellRoot {
           Item {
             anchors.fill: parent
 
+            // Click on empty bar space closes open popups.
             MouseArea {
               anchors.fill: parent
 
@@ -1092,6 +1129,7 @@ ShellRoot {
               height: config.barHeight
               width: Math.round(leftRow.x + focusSlot.x + focusSlot.width + config.barPadding / 2)
 
+              // Animations stay off for the first second so startup does not slide everything in.
               Timer {
                 interval: 1000
                 running: true
@@ -1128,7 +1166,7 @@ ShellRoot {
                   MouseArea {
                     anchors.fill: parent
 
-                    onClicked: screenRoot.togglePopup(powerMenuPopup)
+                    onClicked: screenRoot.togglePopup("power")
                   }
                 }
 
@@ -1268,7 +1306,7 @@ ShellRoot {
                   MouseArea {
                     anchors.fill: parent
 
-                    onClicked: screenRoot.togglePopup(appLauncherPopup)
+                    onClicked: screenRoot.togglePopup("launcher")
                   }
                 }
 
@@ -1363,64 +1401,71 @@ ShellRoot {
             }
 
             // ── Power Menu Popup ──
-            PopupWindow {
-              id: powerMenuPopup
+            LazyLoader {
+              id: powerMenuLoader
 
-              anchor.edges: Edges.Top | Edges.Left
-              anchor.gravity: Edges.Bottom | Edges.Right
-              anchor.rect.x: config.powerMenuMargin
-              anchor.rect.y: bar.height + config.powerMenuMargin
-              anchor.window: bar
-              color: "transparent"
-              grabFocus: true
-              implicitHeight: powerMenuColumn.implicitHeight + config.powerMenuPadding * 2
-              implicitWidth: config.powerMenuWidth
-              visible: false
+              active: screenRoot.openPopup === "power"
 
-              Rectangle {
-                anchors.fill: parent
-                color: config.barColor
-                radius: config.powerMenuPopupRadius
+              PopupWindow {
+                // Anchored to the bar window: left screen edge, just below the bar.
+                anchor.edges: Edges.Top | Edges.Left
+                anchor.gravity: Edges.Bottom | Edges.Right
+                anchor.rect.x: config.powerMenuMargin
+                anchor.rect.y: bar.height + config.powerMenuMargin
+                anchor.window: bar
+                color: "transparent"
+                grabFocus: true
+                implicitHeight: powerMenuColumn.implicitHeight + config.powerMenuPadding * 2
+                implicitWidth: config.powerMenuWidth
+                visible: true
 
-                ColumnLayout {
-                  id: powerMenuColumn
+                onVisibleChanged: if (!visible) screenRoot.closePopup("power")
 
+                Rectangle {
                   anchors.fill: parent
-                  anchors.margins: config.powerMenuPadding
-                  spacing: config.powerMenuSpacing
+                  color: config.barColor
+                  radius: config.powerMenuPopupRadius
 
-                  Repeater {
-                    model: config.powerMenuActions
+                  ColumnLayout {
+                    id: powerMenuColumn
 
-                    delegate: Rectangle {
-                      id: powerMenuOption
+                    anchors.fill: parent
+                    anchors.margins: config.powerMenuPadding
+                    spacing: config.powerMenuSpacing
 
-                      required property var modelData
+                    Repeater {
+                      model: config.powerMenuActions
 
-                      Layout.fillWidth: true
-                      color: powerMenuOptionArea.containsMouse ? config.colorAccent : "transparent"
-                      implicitHeight: config.powerMenuItemHeight
-                      radius: config.powerMenuRadius
+                      delegate: Rectangle {
+                        id: powerMenuOption
 
-                      Text {
-                        anchors.verticalCenter: parent.verticalCenter
-                        color: powerMenuOptionArea.containsMouse ? config.colorAccentText : config.colorText
-                        font.family: config.fontFamily
-                        font.pixelSize: config.fontSize
-                        font.weight: config.fontWeight
-                        leftPadding: 8
-                        text: powerMenuOption.modelData.label
-                      }
+                        required property var modelData
 
-                      MouseArea {
-                        id: powerMenuOptionArea
+                        Layout.fillWidth: true
+                        color: powerMenuOptionArea.containsMouse ? config.colorAccent : "transparent"
+                        implicitHeight: config.powerMenuItemHeight
+                        radius: config.powerMenuRadius
 
-                        anchors.fill: parent
-                        hoverEnabled: true
+                        Text {
+                          anchors.verticalCenter: parent.verticalCenter
+                          color: powerMenuOptionArea.containsMouse ? config.colorAccentText : config.colorText
+                          font.family: config.fontFamily
+                          font.pixelSize: config.fontSize
+                          font.weight: config.fontWeight
+                          leftPadding: 8
+                          text: powerMenuOption.modelData.label
+                        }
 
-                        onClicked: {
-                          Quickshell.execDetached(["sh", "-c", powerMenuOption.modelData.command])
-                          powerMenuPopup.visible = false
+                        MouseArea {
+                          id: powerMenuOptionArea
+
+                          anchors.fill: parent
+                          hoverEnabled: true
+
+                          onClicked: {
+                            Quickshell.execDetached(["sh", "-c", powerMenuOption.modelData.command])
+                            screenRoot.closePopup("power")
+                          }
                         }
                       }
                     }
@@ -1428,240 +1473,247 @@ ShellRoot {
                 }
               }
             }
-
             // ── App Launcher Click Catcher ──
-            PanelWindow {
-              WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
-              WlrLayershell.layer: WlrLayer.Top
-              WlrLayershell.namespace: "app-launcher-catcher"
-              anchors { left: true; right: true; top: true; bottom: true }
-              color: "transparent"
-              exclusionMode: ExclusionMode.Ignore
-              screen: screenRoot.modelData
-              visible: appLauncherPopup.visible
+            // Full-screen transparent window below the launcher. A click anywhere
+            // outside the launcher closes it; mouse movement does nothing.
+            LazyLoader {
+              id: launcherCatcherLoader
 
-              MouseArea {
-                acceptedButtons: Qt.AllButtons
-                anchors.fill: parent
+              active: screenRoot.openPopup === "launcher"
 
-                onClicked: appLauncherPopup.visible = false
+              PanelWindow {
+                WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+                WlrLayershell.layer: WlrLayer.Top
+                WlrLayershell.namespace: "app-launcher-catcher"
+                anchors { left: true; right: true; top: true; bottom: true }
+                color: "transparent"
+                exclusionMode: ExclusionMode.Ignore
+                screen: screenRoot.modelData
+                visible: true
+
+                MouseArea {
+                  acceptedButtons: Qt.AllButtons
+                  anchors.fill: parent
+
+                  onClicked: screenRoot.closePopup("launcher")
+                }
               }
             }
 
             // ── App Launcher Popup ──
-            PanelWindow {
-              id: appLauncherPopup
+            LazyLoader {
+              id: launcherLoader
 
-              property string searchQuery: ""
-              property int selectedIndex: 0
-              readonly property int chromeHeight: config.appLauncherSearchHeight + config.appLauncherPadding * 3
-              readonly property int fullHeight: chromeHeight + config.appLauncherMaxVisible * config.appLauncherItemHeight
+              active: screenRoot.openPopup === "launcher"
 
-              readonly property var appsByName: visible
-                ? DesktopEntries.applications.values.slice().sort((a, b) => a.name.localeCompare(b.name))
-                : []
-              readonly property var filteredApps: {
-                var apps = appsByName
-                var q = searchQuery.trim().toLowerCase()
-                if (q !== "") return apps.filter(entry => matches(entry, q))
+              PanelWindow {
+                id: appLauncherPopup
 
-                var rank = new Map()
-                var recent = launcher.recentIds
-                for (var i = 0; i < recent.length; i++) rank.set(recent[i], i)
+                property string searchQuery: ""
+                property int selectedIndex: 0
+                readonly property int chromeHeight: config.appLauncherSearchHeight + config.appLauncherPadding * 3
+                readonly property int fullHeight: chromeHeight + config.appLauncherMaxVisible * config.appLauncherItemHeight
 
-                var head = []
-                var tail = []
-                for (var j = 0; j < apps.length; j++) {
-                  if (rank.has(apps[j].id)) head.push(apps[j])
-                  else tail.push(apps[j])
+                // This window exists only while the launcher is open (see the LazyLoader),
+                // so the app list is sorted once per opening and freed on close.
+                readonly property var appsByName: DesktopEntries.applications.values.slice().sort((a, b) => a.name.localeCompare(b.name))
+                readonly property var filteredApps: {
+                  var apps = appsByName
+                  var q = searchQuery.trim().toLowerCase()
+                  if (q !== "") return apps.filter(entry => matches(entry, q))
+
+                  // No search: recently launched apps first, the rest by name.
+                  var rank = new Map()
+                  var recent = launcher.recentIds
+                  for (var i = 0; i < recent.length; i++) rank.set(recent[i], i)
+
+                  var head = []
+                  var tail = []
+                  for (var j = 0; j < apps.length; j++) {
+                    if (rank.has(apps[j].id)) head.push(apps[j])
+                    else tail.push(apps[j])
+                  }
+                  head.sort((a, b) => rank.get(a.id) - rank.get(b.id))
+                  return head.concat(tail)
                 }
-                head.sort((a, b) => rank.get(a.id) - rank.get(b.id))
-                return head.concat(tail)
-              }
 
-              function matches(entry, q) {
-                if (entry.name.toLowerCase().indexOf(q) !== -1) return true
-                if (entry.genericName && entry.genericName.toLowerCase().indexOf(q) !== -1) return true
+                function matches(entry, q) {
+                  if (entry.name.toLowerCase().indexOf(q) !== -1) return true
+                  if (entry.genericName && entry.genericName.toLowerCase().indexOf(q) !== -1) return true
 
-                for (var i = 0; i < entry.keywords.length; i++) {
-                  if (entry.keywords[i].toLowerCase().indexOf(q) !== -1) return true
+                  for (var i = 0; i < entry.keywords.length; i++) {
+                    if (entry.keywords[i].toLowerCase().indexOf(q) !== -1) return true
+                  }
+                  return false
                 }
-                return false
-              }
 
-              function navigate(delta) {
-                if (filteredApps.length === 0) return
+                function navigate(delta) {
+                  if (filteredApps.length === 0) return
 
-                selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
-                appList.positionViewAtIndex(selectedIndex, ListView.Contain)
-              }
-
-              function launchEntry(entry) {
-                launcher.record(entry.id)
-                entry.execute()
-                visible = false
-              }
-
-              WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-              WlrLayershell.layer: WlrLayer.Overlay
-              WlrLayershell.namespace: "app-launcher"
-              anchors { top: true }
-              color: "transparent"
-              exclusionMode: ExclusionMode.Ignore
-              implicitHeight: fullHeight
-              implicitWidth: config.appLauncherWidth
-              margins.top: Math.max(0, Math.round((screenRoot.modelData.height - fullHeight) / 2))
-              mask: Region { item: launcherCard }
-              screen: screenRoot.modelData
-              visible: false
-
-              onFilteredAppsChanged: selectedIndex = 0
-
-              onVisibleChanged: {
-                if (visible) {
-                  searchField.text = ""
-                  searchQuery = ""
-                  selectedIndex = 0
-                  searchField.forceActiveFocus()
+                  selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
+                  appList.positionViewAtIndex(selectedIndex, ListView.Contain)
                 }
-              }
 
-              Rectangle {
-                id: launcherCard
+                function launchEntry(entry) {
+                  launcher.record(entry.id)
+                  entry.execute()
+                  screenRoot.closePopup("launcher")
+                }
 
-                anchors { left: parent.left; right: parent.right; top: parent.top }
-                color: config.barColor
-                height: appLauncherPopup.chromeHeight
-                  + Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
-                radius: config.workspaceRadius
+                WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+                WlrLayershell.layer: WlrLayer.Overlay
+                WlrLayershell.namespace: "app-launcher"
+                anchors { top: true }
+                color: "transparent"
+                exclusionMode: ExclusionMode.Ignore
+                implicitHeight: fullHeight
+                implicitWidth: config.appLauncherWidth
+                margins.top: Math.max(0, Math.round((screenRoot.modelData.height - fullHeight) / 2))
+                mask: Region { item: launcherCard }
+                screen: screenRoot.modelData
+                visible: true
 
-                ColumnLayout {
-                  anchors.fill: parent
-                  anchors.margins: config.appLauncherPadding
-                  spacing: config.appLauncherPadding
+                onFilteredAppsChanged: selectedIndex = 0
 
-                  Rectangle {
-                    Layout.fillWidth: true
-                    color: config.colorInput
-                    implicitHeight: config.appLauncherSearchHeight
-                    radius: config.workspaceRadius
+                Component.onCompleted: searchField.forceActiveFocus()
 
-                    TextInput {
-                      id: searchField
+                Rectangle {
+                  id: launcherCard
 
-                      anchors.fill: parent
-                      anchors.leftMargin: 8
-                      anchors.rightMargin: 8
-                      clip: true
-                      color: config.colorText
-                      font.family: config.fontFamily
-                      font.pixelSize: config.fontSize
-                      verticalAlignment: TextInput.AlignVCenter
+                  anchors { left: parent.left; right: parent.right; top: parent.top }
+                  color: config.barColor
+                  height: appLauncherPopup.chromeHeight
+                    + Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
+                  radius: config.workspaceRadius
 
-                      onTextChanged: appLauncherPopup.searchQuery = text
+                  ColumnLayout {
+                    anchors.fill: parent
+                    anchors.margins: config.appLauncherPadding
+                    spacing: config.appLauncherPadding
 
-                      Keys.onPressed: function (event) {
-                        if (event.key === Qt.Key_Up) {
-                          appLauncherPopup.navigate(-1)
-                          event.accepted = true
-                        } else if (event.key === Qt.Key_Down) {
-                          appLauncherPopup.navigate(1)
-                          event.accepted = true
-                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                          if (appLauncherPopup.filteredApps.length > 0)
-                            appLauncherPopup.launchEntry(appLauncherPopup.filteredApps[appLauncherPopup.selectedIndex])
-                          event.accepted = true
-                        } else if (event.key === Qt.Key_Escape) {
-                          appLauncherPopup.visible = false
-                          event.accepted = true
+                    Rectangle {
+                      Layout.fillWidth: true
+                      color: config.colorInput
+                      implicitHeight: config.appLauncherSearchHeight
+                      radius: config.workspaceRadius
+
+                      TextInput {
+                        id: searchField
+
+                        anchors.fill: parent
+                        anchors.leftMargin: 8
+                        anchors.rightMargin: 8
+                        clip: true
+                        color: config.colorText
+                        font.family: config.fontFamily
+                        font.pixelSize: config.fontSize
+                        verticalAlignment: TextInput.AlignVCenter
+
+                        onTextChanged: appLauncherPopup.searchQuery = text
+
+                        Keys.onPressed: function (event) {
+                          if (event.key === Qt.Key_Up) {
+                            appLauncherPopup.navigate(-1)
+                            event.accepted = true
+                          } else if (event.key === Qt.Key_Down) {
+                            appLauncherPopup.navigate(1)
+                            event.accepted = true
+                          } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                            if (appLauncherPopup.filteredApps.length > 0)
+                              appLauncherPopup.launchEntry(appLauncherPopup.filteredApps[appLauncherPopup.selectedIndex])
+                            event.accepted = true
+                          } else if (event.key === Qt.Key_Escape) {
+                            screenRoot.closePopup("launcher")
+                            event.accepted = true
+                          }
+                        }
+
+                        Text {
+                          anchors.fill: parent
+                          color: config.colorText
+                          font.family: config.fontFamily
+                          font.pixelSize: config.fontSize
+                          opacity: 0.35
+                          text: config.appLauncherPlaceholder
+                          verticalAlignment: Text.AlignVCenter
+                          visible: searchField.text === ""
                         }
                       }
+                    }
+
+                    ListView {
+                      id: appList
+
+                      Layout.fillWidth: true
+                      Layout.preferredHeight: Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
+                      boundsBehavior: Flickable.StopAtBounds
+                      cacheBuffer: 0
+                      clip: true
+                      model: appLauncherPopup.filteredApps
+                      reuseItems: true
 
                       Text {
-                        anchors.fill: parent
+                        anchors.centerIn: parent
                         color: config.colorText
                         font.family: config.fontFamily
                         font.pixelSize: config.fontSize
                         opacity: 0.35
-                        text: config.appLauncherPlaceholder
-                        verticalAlignment: Text.AlignVCenter
-                        visible: searchField.text === ""
-                      }
-                    }
-                  }
-
-                  ListView {
-                    id: appList
-
-                    Layout.fillWidth: true
-                    Layout.preferredHeight: Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
-                    boundsBehavior: Flickable.StopAtBounds
-                    cacheBuffer: 0
-                    clip: true
-                    model: appLauncherPopup.filteredApps
-                    reuseItems: true
-
-                    Text {
-                      anchors.centerIn: parent
-                      color: config.colorText
-                      font.family: config.fontFamily
-                      font.pixelSize: config.fontSize
-                      opacity: 0.35
-                      text: config.appLauncherEmpty
-                      visible: appLauncherPopup.filteredApps.length === 0
-                    }
-
-                    delegate: Rectangle {
-                      id: appRow
-
-                      required property var modelData
-                      required property int index
-
-                      color: appLauncherPopup.selectedIndex === index ? config.colorAccent : "transparent"
-                      height: config.appLauncherItemHeight
-                      radius: config.workspaceRadius
-                      width: appList.width
-
-                      Row {
-                        anchors.fill: parent
-                        anchors.leftMargin: 8
-                        anchors.rightMargin: 8
-                        spacing: 10
-
-                        Image {
-                          anchors.verticalCenter: parent.verticalCenter
-                          asynchronous: true
-                          height: config.appLauncherIconSize
-                          source: appRow.modelData.icon !== "" ? "image://icon/" + appRow.modelData.icon : ""
-                          sourceSize: Qt.size(config.appLauncherIconSize * 2, config.appLauncherIconSize * 2)
-                          width: config.appLauncherIconSize
-                        }
-
-                        Text {
-                          anchors.verticalCenter: parent.verticalCenter
-                          color: appLauncherPopup.selectedIndex === appRow.index ? config.colorAccentText : config.colorText
-                          elide: Text.ElideRight
-                          font.family: config.fontFamily
-                          font.pixelSize: config.fontSize
-                          font.weight: config.fontWeight
-                          text: appRow.modelData.name
-                          width: parent.width - config.appLauncherIconSize - 10
-                        }
+                        text: config.appLauncherEmpty
+                        visible: appLauncherPopup.filteredApps.length === 0
                       }
 
-                      MouseArea {
-                        anchors.fill: parent
-                        hoverEnabled: true
+                      delegate: Rectangle {
+                        id: appRow
 
-                        onClicked: appLauncherPopup.launchEntry(appRow.modelData)
-                        onEntered: appLauncherPopup.selectedIndex = appRow.index
+                        required property var modelData
+                        required property int index
+
+                        color: appLauncherPopup.selectedIndex === index ? config.colorAccent : "transparent"
+                        height: config.appLauncherItemHeight
+                        radius: config.workspaceRadius
+                        width: appList.width
+
+                        Row {
+                          anchors.fill: parent
+                          anchors.leftMargin: 8
+                          anchors.rightMargin: 8
+                          spacing: 10
+
+                          Image {
+                            anchors.verticalCenter: parent.verticalCenter
+                            asynchronous: true
+                            height: config.appLauncherIconSize
+                            // Icons are decoded at display size instead of their file size.
+                            source: appRow.modelData.icon !== "" ? "image://icon/" + appRow.modelData.icon : ""
+                            sourceSize: Qt.size(config.appLauncherIconSize * 2, config.appLauncherIconSize * 2)
+                            width: config.appLauncherIconSize
+                          }
+
+                          Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            color: appLauncherPopup.selectedIndex === appRow.index ? config.colorAccentText : config.colorText
+                            elide: Text.ElideRight
+                            font.family: config.fontFamily
+                            font.pixelSize: config.fontSize
+                            font.weight: config.fontWeight
+                            text: appRow.modelData.name
+                            width: parent.width - config.appLauncherIconSize - 10
+                          }
+                        }
+
+                        MouseArea {
+                          anchors.fill: parent
+                          hoverEnabled: true
+
+                          onClicked: appLauncherPopup.launchEntry(appRow.modelData)
+                          onEntered: appLauncherPopup.selectedIndex = appRow.index
+                        }
                       }
                     }
                   }
                 }
               }
             }
-
             // ── Left Concave 2 ──
             Concave {
               anchors { left: leftBar.right; top: parent.top }
@@ -1690,6 +1742,7 @@ ShellRoot {
               clip: true
               color: config.barColor
               height: config.barHeight
+              // Keeps the left and right margins equal so the bar stays centered on whole pixels.
               width: ((parent.width - roundedWidth) % 2 !== 0) ? roundedWidth + 1 : roundedWidth
 
               Row {
@@ -1992,82 +2045,90 @@ ShellRoot {
                       color: config.colorText
                       font.family: config.iconFontFamily
                       font.pixelSize: config.iconSize
-                      text: trayPopup.visible ? config.trayIconCollapse : config.trayIconExpand
+                      text: screenRoot.openPopup === "tray" ? config.trayIconCollapse : config.trayIconExpand
 
                       MouseArea {
                         anchors.fill: parent
 
-                        onClicked: screenRoot.togglePopup(trayPopup)
+                        onClicked: screenRoot.togglePopup("tray")
                       }
 
-                      PopupWindow {
-                        id: trayPopup
+                      LazyLoader {
+                        id: trayLoader
 
-                        anchor.edges: Edges.Bottom
-                        anchor.gravity: Edges.Bottom
-                        anchor.rect.height: 1
-                        anchor.rect.width: 1
-                        anchor.rect.x: 0
-                        anchor.rect.y: bar.height + config.trayPopupMargin
-                        anchor.window: bar
-                        color: "transparent"
-                        grabFocus: true
-                        implicitHeight: config.trayIconSize + config.trayPopupPadding * 2
-                        implicitWidth: trayIcons.implicitWidth + config.trayPopupPadding * 2
-                        visible: false
+                        active: screenRoot.openPopup === "tray"
 
-                        onVisibleChanged: {
-                          if (visible) {
+                        PopupWindow {
+                          anchor.edges: Edges.Bottom
+                          anchor.gravity: Edges.Bottom
+                          anchor.rect.height: 1
+                          anchor.rect.width: 1
+                          anchor.rect.x: 0
+                          anchor.rect.y: bar.height + config.trayPopupMargin
+                          anchor.window: bar
+                          color: "transparent"
+                          grabFocus: true
+                          implicitHeight: config.trayIconSize + config.trayPopupPadding * 2
+                          implicitWidth: trayIcons.implicitWidth + config.trayPopupPadding * 2
+                          visible: false
+
+                          Component.onCompleted: {
+                            // Position under the arrow, then show.
                             anchor.rect.x = trayArrow.mapToItem(null, trayArrow.width / 2, 0).x
                             shellRoot.trayPopupScreen = screenRoot.modelData.name
-                          } else if (shellRoot.trayPopupScreen === screenRoot.modelData.name) {
-                            shellRoot.trayPopupScreen = ""
+                            visible = true
                           }
-                        }
 
-                        Rectangle {
-                          anchors.fill: parent
-                          color: config.barColor
-                          radius: config.trayPopupRadius
+                          Component.onDestruction: {
+                            if (shellRoot.trayPopupScreen === screenRoot.modelData.name) shellRoot.trayPopupScreen = ""
+                          }
 
-                          RowLayout {
-                            id: trayIcons
+                          onVisibleChanged: if (!visible) screenRoot.closePopup("tray")
 
-                            anchors.centerIn: parent
-                            spacing: config.trayIconSpacing
+                          Rectangle {
+                            anchors.fill: parent
+                            color: config.barColor
+                            radius: config.trayPopupRadius
 
-                            Repeater {
-                              model: SystemTray.items
+                            RowLayout {
+                              id: trayIcons
 
-                              delegate: Item {
-                                id: trayDelegate
+                              anchors.centerIn: parent
+                              spacing: config.trayIconSpacing
 
-                                required property SystemTrayItem modelData
+                              Repeater {
+                                model: SystemTray.items
 
-                                implicitHeight: config.trayIconSize
-                                implicitWidth: config.trayIconSize
+                                delegate: Item {
+                                  id: trayDelegate
 
-                                IconImage {
-                                  anchors.fill: parent
-                                  asynchronous: true
-                                  source: trayDelegate.modelData.icon
-                                }
+                                  required property SystemTrayItem modelData
 
-                                MouseArea {
-                                  acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
-                                  anchors.fill: parent
+                                  implicitHeight: config.trayIconSize
+                                  implicitWidth: config.trayIconSize
 
-                                  onClicked: mouse => {
-                                    var item = trayDelegate.modelData
-                                    if (mouse.button === Qt.LeftButton && !item.onlyMenu) {
-                                      item.activate()
-                                      trayPopup.visible = false
-                                    } else if (mouse.button === Qt.MiddleButton) {
-                                      item.secondaryActivate()
-                                      trayPopup.visible = false
-                                    } else if (item.hasMenu) {
-                                      var pos = trayDelegate.mapToItem(null, 0, trayDelegate.height)
-                                      item.display(trayDelegate.QsWindow.window, pos.x, pos.y)
+                                  IconImage {
+                                    anchors.fill: parent
+                                    asynchronous: true
+                                    source: trayDelegate.modelData.icon
+                                  }
+
+                                  MouseArea {
+                                    acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
+                                    anchors.fill: parent
+
+                                    onClicked: mouse => {
+                                      var item = trayDelegate.modelData
+                                      if (mouse.button === Qt.LeftButton && !item.onlyMenu) {
+                                        item.activate()
+                                        screenRoot.closePopup("tray")
+                                      } else if (mouse.button === Qt.MiddleButton) {
+                                        item.secondaryActivate()
+                                        screenRoot.closePopup("tray")
+                                      } else if (item.hasMenu) {
+                                        var pos = trayDelegate.mapToItem(null, 0, trayDelegate.height)
+                                        item.display(trayDelegate.QsWindow.window, pos.x, pos.y)
+                                      }
                                     }
                                   }
                                 }
@@ -2247,6 +2308,7 @@ ShellRoot {
             }
 
             // ── Left Concave 1 ──
+            // Separate small windows below the bar. A single wide window would need a much larger buffer.
             PanelWindow {
               anchors { left: true; top: true }
               color: "transparent"
