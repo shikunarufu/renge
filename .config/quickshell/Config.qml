@@ -1,18 +1,22 @@
 import QtQuick
 import Quickshell
 
-// All user settings live here. Edit values only; shell.qml reads them as `config.<name>`.
-// Colors are the defaults; with themeFromWallpaper they are replaced after each wallpaper change.
 QtObject {
-  // ── Animation (milliseconds) ──
+  // ── Performance ──
+  property bool visualizerEnabled: true
+  property bool networkEnabled: true
+  property bool inputMethodEnabled: true
+  property int inputMethodPollInterval: 500
+
+  // ── Animation ──
   property int animationDuration: 200
   property int colorTransitionDuration: 500
 
-  // ── Theme from wallpaper ──
+  // ── Theme ──
   property bool themeFromWallpaper: true
-  property int themeSampleSize: 48              // Wallpaper is scaled to NxN before reading colors
-  property int themePaletteSize: 8              // Number of dominant colors considered
-  property real themeBarLightness: 0.10         // 0 = black, 1 = white
+  property int themeSampleSize: 48
+  property int themePaletteSize: 8
+  property real themeBarLightness: 0.10
   property real themeBarMaxSaturation: 0.3
   property real themeTextLightness: 0.90
   property real themeTextSaturation: 0.15
@@ -24,7 +28,7 @@ QtObject {
   property color colorText: "#e5e7eb"
   property color colorAccent: "#e2a97b"
   property color colorAccentText: "#18181b"
-  property color colorInput: Qt.rgba(1, 1, 1, 0.07)  // Launcher search box background
+  property color colorInput: Qt.rgba(1, 1, 1, 0.07)
 
   // ── Font ──
   property string fontFamily: "Segoe UI Variable"
@@ -41,10 +45,15 @@ QtObject {
   property int barPadding: 44
   property int barRadius: 22
   property int barSlideDuration: 500
+  property string barClockFormat: "ddd, d MMM   HH:mm"
+  property var cornerHiddenLayouts: ["S"]
 
   // ── Power Menu ──
   property int powerMenuWidth: 95
   property int powerMenuMargin: 8
+  property int powerMenuPadding: 8
+  property int powerMenuSpacing: 2
+  property int powerMenuItemHeight: 28
   property int powerMenuRadius: 8
   property int powerMenuPopupRadius: 12
   property string powerMenuIcon: "\udb82\udcc7"
@@ -67,9 +76,15 @@ QtObject {
   property int appLauncherWidth: 360
   property int appLauncherMaxVisible: 7
   property int appLauncherItemHeight: 42
+  property int appLauncherPadding: 8
+  property int appLauncherSearchHeight: 32
+  property int appLauncherIconSize: 24
+  property int appLauncherRecentMax: 12
   property string appLauncherIcon: "\uf002"
+  property string appLauncherPlaceholder: "Search apps…"
+  property string appLauncherEmpty: "No apps found"
 
-  // ── Layouts (order used when clicking the layout button) ──
+  // ── Layout ──
   property var layoutCycle: ["tile", "monocle", "grid", "scroller"]
 
   // ── Focus Window ──
@@ -93,6 +108,7 @@ QtObject {
   property string wallpaperDir: Quickshell.env("HOME") + "/Pictures/Wallpapers"
   property var wallpaperFormats: ["*.jpg", "*.jpeg", "*.png", "*.webp"]
   property bool wallpaperRandomOnStart: true
+  property color wallpaperFallbackColor: "#18181b"
 
   // ── Volume ──
   property real volumeStep: 0.05
@@ -103,10 +119,10 @@ QtObject {
   // ── System Tray ──
   property int trayIconSize: 16
   property int trayIconSpacing: 8
-  property int trayPopupMargin: powerMenuMargin  // Same gap below the bar as the power menu popup
+  property int trayPopupMargin: powerMenuMargin
   property int trayPopupPadding: 10
   property int trayPopupRadius: 12
-  property int trayPopupExtent: trayPopupMargin + trayIconSize + trayPopupPadding * 2  // Space below the bar used by the open tray popup
+  property int trayPopupExtent: trayPopupMargin + trayIconSize + trayPopupPadding * 2
   property string trayIconCollapse: "\uf0d8"
   property string trayIconExpand: "\uf0d7"
 
@@ -115,15 +131,22 @@ QtObject {
   property real networkDisconnectedOpacity: 0.5
   property string networkIconEthernet: "\uef44"
   property string networkIconWifi: "\uf1eb"
+  property var networkCommand: ["foot", "-e", "nmtui"]
 
-  // ── Notifications ──
+  // ── Input Method ──
+  property string inputMethodLatin: "keyboard-us"
+  property string inputMethodJapanese: "mozc"
+  property string inputMethodLabelLatin: "en"
+  property string inputMethodLabelJapanese: "jp"
+
+  // ── Notification ──
   property int notificationWidth: 360
   property int notificationMargin: 8
-  // Distance from the bar: clears the tray popup (margin + height) plus a gap.
   property int notificationSpacing: 8
   property int notificationPadding: 12
   property int notificationRadius: 12
-  property int notificationRadiusButton: 8
+  property int notificationRadiusButton: 14
+  property int notificationButtonHeight: 28
   property int notificationIconSize: 32
   property int notificationMax: 1
   property int notificationTimeout: 5000
@@ -137,33 +160,38 @@ QtObject {
   property int visualizerBars: 10
   property int visualizerBarGap: 4
   property int visualizerBarWidth: 2
-  property int visualizerFramerate: 60
+  property int visualizerFramerate: 30
   property int visualizerHeight: 12
   property int visualizerMaxFreq: 10000
   property int visualizerMinFreq: 20
 
-  // ── Lockscreen ──
-  property string lockWallpaper: ""             // Absolute path to an image. Empty = follow the desktop wallpaper
-  property real lockDim: 0                      // 0 to 1, black overlay on the wallpaper
+  // ── Lock Screen ──
+  property string lockWallpaper: ""
+  property real lockDim: 0
   property string lockFontFamily: fontFamily
+  property int lockFontWeight: fontWeight
   property real lockLetterSpacing: 2
   property bool lockUppercase: true
   property int lockMargin: 64
+  property int lockSpacing: 12
   property int lockClockSize: 96
   property int lockDateSize: 16
-  property int lockLabelSize: 18                // Username, password text, Now Playing
+  property int lockLabelSize: 18
   property int lockButtonSize: 13
   property int lockButtonHeight: 32
+  property int lockButtonBorder: 2
+  property int lockButtonPadding: 24
+  property int lockLoginPadding: 32
   property int lockInputWidth: 360
   property int lockInputHeight: 36
-  property real lockShadow: 0.75               // 0 to 1, darkness at the bottom edge (0 = off)
-  property real lockShadowHeight: 0.5        // Fraction of the screen height the shadow covers
-  property real lockClockShadow: 0.7           // 0 to 1, darkness at the top right corner (0 = off)
-  property int lockClockShadowWidth: 1920       // Pixels
-  property int lockClockShadowHeight: 540      // Pixels
-  property real lockPlayingShadow: 0.7         // 0 to 1, darkness at the top left corner behind Now Playing (0 = off)
-  property int lockPlayingShadowWidth: 1920     // Pixels
-  property int lockPlayingShadowHeight: 540    // Pixels
+  property real lockShadow: 0.75
+  property real lockShadowHeight: 0.5
+  property real lockClockShadow: 0.75
+  property int lockClockShadowWidth: 1920
+  property int lockClockShadowHeight: 540
+  property real lockPlayingShadow: 0.75
+  property int lockPlayingShadowWidth: 1920
+  property int lockPlayingShadowHeight: 540
   property string lockClockFormat: "HH:mm"
   property string lockDateFormat: "dddd, MMMM d"
   property string lockUsername: Quickshell.env("USER")
@@ -172,6 +200,7 @@ QtObject {
   property color lockColorText: colorText
   property color lockColorDate: colorAccent
   property color lockColorAccent: colorAccent
+  property color lockColorAccentText: colorAccentText
   property color lockColorBorder: Qt.rgba(colorText.r, colorText.g, colorText.b, 0.35)
   property color lockColorError: "#f38ba8"
   property var lockActions: [
@@ -180,7 +209,7 @@ QtObject {
     { label: "Shut Down", command: "systemctl poweroff" }
   ]
 
-  // ── Color transitions ──
+  // ── Color Animation ──
   Behavior on barColor { ColorAnimation { duration: colorTransitionDuration } }
   Behavior on colorAccent { ColorAnimation { duration: colorTransitionDuration } }
   Behavior on colorAccentText { ColorAnimation { duration: colorTransitionDuration } }
