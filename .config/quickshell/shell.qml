@@ -11,6 +11,7 @@
 
 import QtCore
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import QtQuick.Shapes
 import Qt.labs.folderlistmodel
@@ -740,66 +741,94 @@ ShellRoot {
         }
 
         // Top-left shadow behind Now Playing
-        Shape {
+        Item {
           id: playingShadow
 
           anchors { left: parent.left; top: parent.top }
-          height: config.lockCornerShadowSize
-          visible: media.active && config.lockCornerShadow > 0
-          width: config.lockCornerShadowSize
+          height: config.lockPlayingShadowHeight
+          visible: media.active && config.lockPlayingShadow > 0
+          width: config.lockPlayingShadowWidth
 
-          ShapePath {
-            startX: 0
-            startY: 0
-            strokeColor: "transparent"
+          layer.enabled: true
+          layer.effect: MultiEffect {
+            maskEnabled: true
+            maskSource: playingShadowMask
+          }
 
-            fillGradient: RadialGradient {
-              centerRadius: playingShadow.width
-              centerX: 0
-              centerY: 0
-              focalX: 0
-              focalY: 0
+          Rectangle {
+            anchors.fill: parent
 
-              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockCornerShadow) }
+            gradient: Gradient {
+              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow) }
               GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
             }
+          }
+        }
 
-            PathLine { x: playingShadow.width; y: 0 }
-            PathLine { x: playingShadow.width; y: playingShadow.height }
-            PathLine { x: 0; y: playingShadow.height }
-            PathLine { x: 0; y: 0 }
+        // Fades the shadow sideways so only the corner side stays dark
+        Item {
+          id: playingShadowMask
+
+          height: playingShadow.height
+          layer.enabled: true
+          visible: false
+          width: playingShadow.width
+
+          Rectangle {
+            anchors.fill: parent
+
+            gradient: Gradient {
+              orientation: Gradient.Horizontal
+
+              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, 1) }
+              GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
+            }
           }
         }
 
         // Top-right shadow behind the date and clock
-        Shape {
+        Item {
           id: clockShadow
 
           anchors { right: parent.right; top: parent.top }
-          height: config.lockCornerShadowSize
-          visible: config.lockCornerShadow > 0
-          width: config.lockCornerShadowSize
+          height: config.lockClockShadowHeight
+          visible: config.lockClockShadow > 0
+          width: config.lockClockShadowWidth
 
-          ShapePath {
-            startX: 0
-            startY: 0
-            strokeColor: "transparent"
+          layer.enabled: true
+          layer.effect: MultiEffect {
+            maskEnabled: true
+            maskSource: clockShadowMask
+          }
 
-            fillGradient: RadialGradient {
-              centerRadius: clockShadow.width
-              centerX: clockShadow.width
-              centerY: 0
-              focalX: clockShadow.width
-              focalY: 0
+          Rectangle {
+            anchors.fill: parent
 
-              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockCornerShadow) }
+            gradient: Gradient {
+              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockClockShadow) }
               GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
             }
+          }
+        }
 
-            PathLine { x: clockShadow.width; y: 0 }
-            PathLine { x: clockShadow.width; y: clockShadow.height }
-            PathLine { x: 0; y: clockShadow.height }
-            PathLine { x: 0; y: 0 }
+        // Fades the shadow sideways so only the corner side stays dark
+        Item {
+          id: clockShadowMask
+
+          height: clockShadow.height
+          layer.enabled: true
+          visible: false
+          width: clockShadow.width
+
+          Rectangle {
+            anchors.fill: parent
+
+            gradient: Gradient {
+              orientation: Gradient.Horizontal
+
+              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, 0) }
+              GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 1) }
+            }
           }
         }
 
