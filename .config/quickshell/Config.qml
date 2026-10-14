@@ -158,8 +158,12 @@ QtObject {
   property int lockInputHeight: 36
   property real lockShadow: 0.75               // 0 to 1, darkness at the bottom edge (0 = off)
   property real lockShadowHeight: 0.5        // Fraction of the screen height the shadow covers
-  property real lockCornerShadow: 0.7          // 0 to 1, darkness at the top corners (0 = off)
-  property int lockCornerShadowSize: 600       // Pixels, how far the shadow spreads from the corner
+  property real lockClockShadow: 0.7           // 0 to 1, darkness at the top right corner (0 = off)
+  property int lockClockShadowWidth: 700       // Pixels
+  property int lockClockShadowHeight: 320      // Pixels
+  property real lockPlayingShadow: 0.7         // 0 to 1, darkness at the top left corner behind Now Playing (0 = off)
+  property int lockPlayingShadowWidth: 700     // Pixels
+  property int lockPlayingShadowHeight: 200    // Pixels
   property string lockClockFormat: "HH:mm"
   property string lockDateFormat: "dddd, MMMM d"
   property string lockUsername: Quickshell.env("USER")
