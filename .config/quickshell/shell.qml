@@ -1511,13 +1511,11 @@ ShellRoot {
               WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
               WlrLayershell.namespace: "app-launcher"
               exclusionMode: ExclusionMode.Ignore
-              // Only `top` is anchored, so the compositor centers the window horizontally.
-              // Top margin centers the full-size (max rows) launcher vertically, so the
-              // search box stays in place while the result list shrinks.
               anchors { top: true }
               margins.top: Math.max(0, Math.round((screenRoot.modelData.height - (56 + config.appLauncherMaxVisible * config.appLauncherItemHeight)) / 2))
               implicitWidth: config.appLauncherWidth
-              implicitHeight: 56 + Math.min(filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
+              implicitHeight: 56 + config.appLauncherMaxVisible * config.appLauncherItemHeight
+              mask: Region { item: launcherCard }
               color: "transparent"
               visible: false
 
@@ -1562,7 +1560,10 @@ ShellRoot {
               }
 
               Rectangle {
-                anchors.fill: parent
+                id: launcherCard
+
+                anchors { left: parent.left; right: parent.right; top: parent.top }
+                height: 56 + Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
                 color: config.barColor
                 radius: config.workspaceRadius
 
@@ -2166,7 +2167,6 @@ ShellRoot {
                       PopupWindow {
                         id: trayPopup
 
-                        // Anchored to the bar window so the gap below the bar matches the power menu popup.
                         anchor.window: bar
                         anchor.rect.x: 0
                         anchor.rect.y: bar.height + config.trayPopupMargin
@@ -2182,7 +2182,6 @@ ShellRoot {
 
                         onVisibleChanged: {
                           if (visible) {
-                            // Center horizontally under the arrow.
                             anchor.rect.x = trayArrow.mapToItem(null, trayArrow.width / 2, 0).x
                             shellRoot.trayPopupScreen = screenRoot.modelData.name
                           } else if (shellRoot.trayPopupScreen === screenRoot.modelData.name) {
