@@ -11,7 +11,6 @@
 
 import QtCore
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Layouts
 import QtQuick.Shapes
 import Qt.labs.folderlistmodel
@@ -740,6 +739,70 @@ ShellRoot {
           }
         }
 
+        // Top-left shadow behind Now Playing
+        Shape {
+          id: playingShadow
+
+          anchors { left: parent.left; top: parent.top }
+          height: config.lockCornerShadowSize
+          visible: media.active && config.lockCornerShadow > 0
+          width: config.lockCornerShadowSize
+
+          ShapePath {
+            startX: 0
+            startY: 0
+            strokeColor: "transparent"
+
+            fillGradient: RadialGradient {
+              centerRadius: playingShadow.width
+              centerX: 0
+              centerY: 0
+              focalX: 0
+              focalY: 0
+
+              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockCornerShadow) }
+              GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
+            }
+
+            PathLine { x: playingShadow.width; y: 0 }
+            PathLine { x: playingShadow.width; y: playingShadow.height }
+            PathLine { x: 0; y: playingShadow.height }
+            PathLine { x: 0; y: 0 }
+          }
+        }
+
+        // Top-right shadow behind the date and clock
+        Shape {
+          id: clockShadow
+
+          anchors { right: parent.right; top: parent.top }
+          height: config.lockCornerShadowSize
+          visible: config.lockCornerShadow > 0
+          width: config.lockCornerShadowSize
+
+          ShapePath {
+            startX: 0
+            startY: 0
+            strokeColor: "transparent"
+
+            fillGradient: RadialGradient {
+              centerRadius: clockShadow.width
+              centerX: clockShadow.width
+              centerY: 0
+              focalX: clockShadow.width
+              focalY: 0
+
+              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockCornerShadow) }
+              GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
+            }
+
+            PathLine { x: clockShadow.width; y: 0 }
+            PathLine { x: clockShadow.width; y: clockShadow.height }
+            PathLine { x: 0; y: clockShadow.height }
+            PathLine { x: 0; y: 0 }
+          }
+        }
+
         // ── Top left: Now Playing (hidden when nothing is playing) ──
         Text {
           anchors { left: parent.left; top: parent.top; margins: config.lockMargin }
@@ -750,32 +813,12 @@ ShellRoot {
           font.weight: config.fontWeight
           text: lockscreen.format(media.label)
           visible: media.active
-
-          layer.enabled: config.lockTextShadow > 0
-          layer.effect: MultiEffect {
-            shadowBlur: config.lockTextShadowBlur
-            shadowColor: config.lockTextShadowColor
-            shadowEnabled: true
-            shadowHorizontalOffset: config.lockTextShadowOffset
-            shadowOpacity: config.lockTextShadow
-            shadowVerticalOffset: config.lockTextShadowOffset
-          }
         }
 
         // ── Top right: date and clock ──
         Column {
           anchors { right: parent.right; top: parent.top; margins: config.lockMargin }
           spacing: 4
-
-          layer.enabled: config.lockTextShadow > 0
-          layer.effect: MultiEffect {
-            shadowBlur: config.lockTextShadowBlur
-            shadowColor: config.lockTextShadowColor
-            shadowEnabled: true
-            shadowHorizontalOffset: config.lockTextShadowOffset
-            shadowOpacity: config.lockTextShadow
-            shadowVerticalOffset: config.lockTextShadowOffset
-          }
 
           Text {
             anchors.right: parent.right
