@@ -106,6 +106,7 @@ noto-fonts-cjk
 noto-fonts-emoji
 noto-fonts-extra
 ttf-jetbrains-mono-nerd
+ttf-iosevkaterm-nerd
 otf-geist-mono-nerd
 ttf-liberation
 wqy-zenhei
