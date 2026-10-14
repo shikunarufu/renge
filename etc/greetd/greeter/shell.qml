@@ -1,3 +1,7 @@
+// shell.qml — greetd login screen.
+//
+// Settings: edit Config.qml (same folder). This file only holds the layout and logic.
+
 import QtQuick
 import QtQuick.Shapes
 import Quickshell
@@ -55,11 +59,12 @@ ShellRoot {
 
   // ── Components ──
 
-  // ── Shadow ──
+  // Quarter-ellipse shadow in the top right corner, shadowWidth x shadowHeight pixels.
+  // The gradient is drawn on a square, then squashed to the requested height.
   component CornerShadow: Shape {
     id: shadow
 
-    property real strength: 0
+    property real strength: 0       // 0 to 1; 0 hides it
     property real shadowWidth: 1920
     property real shadowHeight: 540
 
@@ -103,7 +108,7 @@ ShellRoot {
     }
   }
 
-  // ── Login Power Button ──
+  // Outlined button that fills with the accent color on hover.
   component OutlineButton: Rectangle {
     id: button
 
@@ -144,6 +149,7 @@ ShellRoot {
 
   Config { id: config }
 
+  // Look shared by every button.
   QtObject {
     id: buttonStyle
 
@@ -165,6 +171,7 @@ ShellRoot {
     precision: SystemClock.Minutes
   }
 
+  // Reads regular users: one login name per line.
   Process {
     command: ["bash", Quickshell.shellDir + "/list-users.sh"]
     running: config.detectUsers
@@ -175,6 +182,7 @@ ShellRoot {
       }
     }
 
+    // Start on the default user; add it to the list if it was not detected.
     onExited: {
       var index = greeter.users.indexOf(config.username)
       if (index < 0) {
@@ -185,6 +193,7 @@ ShellRoot {
     }
   }
 
+  // Reads installed sessions: one "name<TAB>command" line each.
   Process {
     command: ["bash", Quickshell.shellDir + "/list-sessions.sh"]
     running: true
@@ -249,6 +258,7 @@ ShellRoot {
       exclusionMode: ExclusionMode.Ignore
       screen: modelData
 
+      // Decoded at screen size instead of the file's full size.
       Image {
         anchors.fill: parent
         asynchronous: true
@@ -263,7 +273,7 @@ ShellRoot {
         opacity: config.dim
       }
 
-      // ── Shadow ──
+      // Bottom shadow so the login and buttons stay readable
       Rectangle {
         anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
         height: parent.height * config.shadowHeight
@@ -274,12 +284,14 @@ ShellRoot {
         }
       }
 
+      // Top-right shadow behind the date and clock
       CornerShadow {
         shadowHeight: config.clockShadowHeight
         shadowWidth: config.clockShadowWidth
         strength: config.clockShadow
       }
 
+      // ── Top right: date and clock ──
       Column {
         anchors { right: parent.right; top: parent.top; margins: config.margin }
         spacing: 4
@@ -304,11 +316,12 @@ ShellRoot {
         }
       }
 
-      // ── Login ──
+      // ── Bottom left: username, password, login ──
       Column {
         anchors { left: parent.left; bottom: parent.bottom; margins: config.margin }
         spacing: config.spacing
 
+        // Click to cycle through users (only when more than one exists).
         Text {
           color: userArea.containsMouse && greeter.users.length > 1 ? config.colorAccent : config.colorText
           font.family: config.fontFamily
@@ -383,11 +396,12 @@ ShellRoot {
         }
       }
 
-      // ── Login Power Button ──
+      // ── Bottom right: session changer and power buttons ──
       Row {
         anchors { right: parent.right; bottom: parent.bottom; margins: config.margin }
         spacing: config.spacing
 
+        // Click to cycle through installed sessions.
         OutlineButton {
           horizontalPadding: config.buttonPadding
           label: greeter.format(greeter.sessionName)
