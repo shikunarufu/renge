@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Greetd
@@ -178,7 +177,8 @@ ShellRoot {
         }
       }
 
-      // Top-right shadow behind the date and clock
+      // Top-right shadow behind the date and clock: 128 stacked rows.
+      // Each row fades sideways, and the rows fade downward, so the edges are soft.
       Item {
         id: clockShadow
 
@@ -187,39 +187,29 @@ ShellRoot {
         visible: config.clockShadow > 0
         width: config.clockShadowWidth
 
-        layer.enabled: true
-        layer.effect: MultiEffect {
-          maskEnabled: true
-          maskSource: clockShadowMask
-        }
+        Repeater {
+          model: 128
 
-        Rectangle {
-          anchors.fill: parent
+          Rectangle {
+            id: shadowRow
 
-          gradient: Gradient {
-            GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.clockShadow) }
-            GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
-          }
-        }
-      }
+            required property int index
+            readonly property real fade: Math.pow(1 - (index + 0.5) / 128, 2)
+            readonly property int rowTop: Math.round(index * clockShadow.height / 128)
 
-      // Fades the shadow sideways so only the corner side stays dark
-      Item {
-        id: clockShadowMask
+            height: Math.round((index + 1) * clockShadow.height / 128) - rowTop
+            width: clockShadow.width
+            y: rowTop
 
-        height: clockShadow.height
-        layer.enabled: true
-        visible: false
-        width: clockShadow.width
+            gradient: Gradient {
+              orientation: Gradient.Horizontal
 
-        Rectangle {
-          anchors.fill: parent
-
-          gradient: Gradient {
-            orientation: Gradient.Horizontal
-
-            GradientStop { position: 0; color: Qt.rgba(0, 0, 0, 0) }
-            GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 1) }
+              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.clockShadow * shadowRow.fade * 0) }
+              GradientStop { position: 0.25; color: Qt.rgba(0, 0, 0, config.clockShadow * shadowRow.fade * 0.0625) }
+              GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, config.clockShadow * shadowRow.fade * 0.25) }
+              GradientStop { position: 0.75; color: Qt.rgba(0, 0, 0, config.clockShadow * shadowRow.fade * 0.5625) }
+              GradientStop { position: 1; color: Qt.rgba(0, 0, 0, config.clockShadow * shadowRow.fade * 1) }
+            }
           }
         }
       }
