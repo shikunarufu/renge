@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Greetd
@@ -181,6 +182,16 @@ ShellRoot {
       Column {
         anchors { right: parent.right; top: parent.top; margins: config.margin }
         spacing: 4
+
+        layer.enabled: config.textShadow > 0
+        layer.effect: MultiEffect {
+          shadowBlur: config.textShadowBlur
+          shadowColor: config.textShadowColor
+          shadowEnabled: true
+          shadowHorizontalOffset: config.textShadowOffset
+          shadowOpacity: config.textShadow
+          shadowVerticalOffset: config.textShadowOffset
+        }
 
         Text {
           anchors.right: parent.right
