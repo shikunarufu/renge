@@ -1,14 +1,3 @@
-// shell.qml — Quickshell bar, launcher, wallpaper and notifications.
-//
-// Settings: edit Config.qml (same folder). This file only holds the layout and logic.
-// Structure (search for the section name):
-//   Config          settings object, `config`
-//   Wallpaper       random wallpaper per start + theme colors from the image
-//   Now Playing Function   media player state and visualizer
-//   Layout State / Network State / Input Method State
-//   Notifications   notification server and popup
-//   Bar             left, center and right bar
-
 import QtCore
 import QtQuick
 import QtQuick.Layouts
@@ -28,14 +17,153 @@ import Quickshell.WindowManager
 ShellRoot {
   id: shellRoot
 
-  // Name of the screen whose tray popup is open ("" when closed). Notifications move below it.
   property string trayPopupScreen: ""
 
-  // Emitted to close every popup (power menu, app launcher, tray) on all screens.
   signal dismissPopups()
+
+  // ── Separator ──
+  component Separator: Text {
+    required property QtObject cfg
+
+    anchors.verticalCenter: parent.verticalCenter
+    bottomPadding: 3
+    color: cfg.colorText
+    font.family: cfg.fontFamily
+    font.pixelSize: cfg.fontSize
+    font.weight: cfg.fontWeight
+    text: "|"
+  }
+
+  // ── Concave ──
+  component Concave: Shape {
+    required property QtObject cfg
+    property bool mirrored: false
+
+    implicitHeight: cfg.barRadius
+    implicitWidth: cfg.barRadius
+    preferredRendererType: Shape.CurveRenderer
+    transform: Scale {
+      origin.x: cfg.barRadius / 2
+      origin.y: 0
+      xScale: mirrored ? -1 : 1
+    }
+
+    ShapePath {
+      fillColor: cfg.barColor
+      startX: cfg.barRadius
+      startY: 0
+      strokeColor: "transparent"
+
+      PathLine { x: 0; y: 0 }
+      PathLine { x: 0; y: cfg.barRadius }
+      PathArc {
+        direction: PathArc.Clockwise
+        radiusX: cfg.barRadius
+        radiusY: cfg.barRadius
+        x: cfg.barRadius
+        y: 0
+      }
+    }
+  }
+
+  // ── Shadow ──
+  component CornerShadow: Shape {
+    id: shadow
+
+    property bool rightSide: false
+    property real strength: 0
+    property real shadowWidth: 1920
+    property real shadowHeight: 540
+
+    anchors.left: rightSide ? undefined : parent.left
+    anchors.right: rightSide ? parent.right : undefined
+    anchors.top: parent.top
+    height: width
+    visible: strength > 0
+    width: Math.max(1, shadowWidth)
+
+    transform: Scale {
+      yScale: shadow.shadowHeight / shadow.width
+    }
+
+    ShapePath {
+      startX: 0
+      startY: 0
+      strokeColor: "transparent"
+
+      fillGradient: RadialGradient {
+        centerRadius: shadow.width
+        centerX: shadow.rightSide ? shadow.width : 0
+        centerY: 0
+        focalX: centerX
+        focalY: 0
+
+        GradientStop { position: 0; color: Qt.rgba(0, 0, 0, shadow.strength) }
+        GradientStop { position: 0.125; color: Qt.rgba(0, 0, 0, shadow.strength * 0.765625) }
+        GradientStop { position: 0.25; color: Qt.rgba(0, 0, 0, shadow.strength * 0.5625) }
+        GradientStop { position: 0.375; color: Qt.rgba(0, 0, 0, shadow.strength * 0.390625) }
+        GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, shadow.strength * 0.25) }
+        GradientStop { position: 0.625; color: Qt.rgba(0, 0, 0, shadow.strength * 0.140625) }
+        GradientStop { position: 0.75; color: Qt.rgba(0, 0, 0, shadow.strength * 0.0625) }
+        GradientStop { position: 0.875; color: Qt.rgba(0, 0, 0, shadow.strength * 0.015625) }
+        GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
+      }
+
+      PathLine { x: shadow.width; y: 0 }
+      PathLine { x: shadow.width; y: shadow.height }
+      PathLine { x: 0; y: shadow.height }
+      PathLine { x: 0; y: 0 }
+    }
+  }
+
+  // ── Lock Screen Button ──
+  component OutlineButton: Rectangle {
+    id: button
+
+    required property QtObject style
+    property string label: ""
+    property int horizontalPadding: 24
+    readonly property bool hovered: area.containsMouse
+
+    signal clicked()
+
+    border.color: style.borderColor
+    border.width: style.borderWidth
+    color: hovered ? style.hoverColor : "transparent"
+    implicitHeight: style.buttonHeight
+    implicitWidth: caption.implicitWidth + horizontalPadding
+
+    Text {
+      id: caption
+
+      anchors.centerIn: parent
+      color: button.hovered ? button.style.hoverTextColor : button.style.textColor
+      font.family: button.style.fontFamily
+      font.letterSpacing: button.style.letterSpacing
+      font.pixelSize: button.style.fontSize
+      font.weight: button.style.fontWeight
+      text: button.label
+    }
+
+    MouseArea {
+      id: area
+
+      anchors.fill: parent
+      hoverEnabled: true
+
+      onClicked: button.clicked()
+    }
+  }
 
   // ── Config ──
   Config { id: config }
+
+  // ── Clock ──
+  SystemClock {
+    id: clock
+
+    precision: SystemClock.Minutes
+  }
 
   // ── Wallpaper ──
   Scope {
@@ -47,31 +175,23 @@ ShellRoot {
       var n = wallpaperFolder.count
       if (n === 0) return
 
-        var i = -1
-        for (var k = 0; k < n; k++) {
-          if (wallpaperFolder.get(k, "filePath") === current) { i = k; break }
-        }
+      var i = -1
+      for (var k = 0; k < n; k++) {
+        if (wallpaperFolder.get(k, "filePath") === current) { i = k; break }
+      }
 
-        var next = i === -1 ? 0 : (i + delta + n) % n
-        wallpaperSettings.current = wallpaperFolder.get(next, "filePath")
+      var next = i === -1 ? 0 : (i + delta + n) % n
+      wallpaperSettings.current = wallpaperFolder.get(next, "filePath")
     }
 
     function applyPixels(data) {
-      if (!config.themeFromWallpaper) {
-        return
-      }
-
       var buckets = {}
       for (var i = 0; i < data.length; i += 4) {
-        if (data[i + 3] < 128) {
-          continue
-        }
+        if (data[i + 3] < 128) continue
 
         var key = ((data[i] >> 4) << 8) | ((data[i + 1] >> 4) << 4) | (data[i + 2] >> 4)
         var bucket = buckets[key]
-        if (!bucket) {
-          bucket = buckets[key] = { n: 0, r: 0, g: 0, b: 0 }
-        }
+        if (!bucket) bucket = buckets[key] = { n: 0, r: 0, g: 0, b: 0 }
 
         bucket.n++
         bucket.r += data[i]
@@ -83,19 +203,15 @@ ShellRoot {
       list.sort((x, y) => y.n - x.n)
 
       var colors = list.slice(0, config.themePaletteSize)
-      .map(c => Qt.rgba(c.r / c.n / 255, c.g / c.n / 255, c.b / c.n / 255, 1))
-      if (colors.length === 0) {
-        return
-      }
+        .map(c => Qt.rgba(c.r / c.n / 255, c.g / c.n / 255, c.b / c.n / 255, 1))
+      if (colors.length === 0) return
 
       var base = colors[0]
       var accent = base
       var best = -1
       for (var j = 0; j < colors.length; j++) {
         var lightness = colors[j].hslLightness
-        if (lightness < 0.2 || lightness > 0.9) {
-          continue
-        }
+        if (lightness < 0.2 || lightness > 0.9) continue
 
         var score = colors[j].hslSaturation * (1 - Math.abs(lightness - 0.5))
         if (score > best) {
@@ -107,8 +223,8 @@ ShellRoot {
       var accentHue = accent.hslHue >= 0 ? accent.hslHue : 0
       var hue = base.hslSaturation > 0.08 && base.hslHue >= 0 ? base.hslHue : accentHue
       var accentSaturation = accent.hslSaturation < 0.1
-      ? accent.hslSaturation
-      : Math.min(Math.max(accent.hslSaturation, config.themeAccentMinSaturation), config.themeAccentMaxSaturation)
+        ? accent.hslSaturation
+        : Math.min(Math.max(accent.hslSaturation, config.themeAccentMinSaturation), config.themeAccentMaxSaturation)
 
       config.barColor = Qt.hsla(hue, Math.min(base.hslSaturation, config.themeBarMaxSaturation), config.themeBarLightness, 1)
       config.colorText = Qt.hsla(hue, config.themeTextSaturation, config.themeTextLightness, 1)
@@ -119,29 +235,26 @@ ShellRoot {
     Settings {
       id: wallpaperSettings
 
-      category: "Wallpaper"
       property string current: ""
+
+      category: "Wallpaper"
     }
 
     FolderListModel {
       id: wallpaperFolder
+
+      property bool picked: false
 
       folder: "file://" + config.wallpaperDir
       nameFilters: config.wallpaperFormats
       showDirs: false
       sortField: FolderListModel.Name
 
-      property bool picked: false
-
       onStatusChanged: {
-        if (status !== FolderListModel.Ready || picked || count === 0) {
-          return
-        }
+        if (status !== FolderListModel.Ready || picked || count === 0) return
 
         picked = true
-        if (!config.wallpaperRandomOnStart && wallpaperSettings.current !== "") {
-          return
-        }
+        if (!config.wallpaperRandomOnStart && wallpaperSettings.current !== "") return
 
         wallpaperSettings.current = get(Math.floor(Math.random() * count), "filePath")
       }
@@ -158,26 +271,37 @@ ShellRoot {
 
       WlrLayershell.layer: WlrLayer.Background
       WlrLayershell.namespace: "wallpaper"
-      exclusionMode: ExclusionMode.Ignore
       anchors { left: true; right: true; top: true; bottom: true }
-      color: config.barColor
+      color: config.wallpaperFallbackColor
+      exclusionMode: ExclusionMode.Ignore
       screen: modelData
 
-      Canvas {
-        id: sampler
+      Image {
+        anchors.fill: parent
+        asynchronous: true
+        fillMode: Image.PreserveAspectCrop
+        source: wallpaper.current !== "" ? "file://" + wallpaper.current : ""
+        sourceSize: Qt.size(wallpaperWindow.modelData.width, wallpaperWindow.modelData.height)
+      }
 
-        property string source: wallpaper.current
-        property string loadedUrl: ""
+      Loader {
+        active: config.themeFromWallpaper && wallpaperWindow.modelData === Quickshell.screens[0]
 
-        x: -width
-        width: config.themeSampleSize
-        height: config.themeSampleSize
+        sourceComponent: Canvas {
+          id: sampler
 
-        onSourceChanged: requestPaint()
-        onImageLoaded: requestPaint()
+          property string source: wallpaper.current
+          property string sampled: ""
 
-        onPaint: {
-          if (wallpaperWindow.modelData !== Quickshell.screens[0] || source === "") return
+          height: config.themeSampleSize
+          width: config.themeSampleSize
+          x: -width
+
+          onImageLoaded: requestPaint()
+          onSourceChanged: requestPaint()
+
+          onPaint: {
+            if (source === "" || source === sampled) return
 
             var url = "file://" + source
             if (!isImageLoaded(url)) { loadImage(url); return }
@@ -186,21 +310,13 @@ ShellRoot {
             ctx.clearRect(0, 0, width, height)
             ctx.drawImage(url, 0, 0, width, height)
             wallpaper.applyPixels(ctx.getImageData(0, 0, width, height).data)
+            sampled = source
 
-            if (loadedUrl !== "" && loadedUrl !== url) unloadImage(loadedUrl)
-              loadedUrl = url
+            Qt.callLater(function () { sampler.unloadImage(url) })
+          }
         }
       }
 
-      Image {
-        anchors.fill: parent
-        asynchronous: true
-        fillMode: Image.PreserveAspectCrop
-        source: wallpaper.current !== "" ? "file://" + wallpaper.current : ""
-        sourceSize: Qt.size(modelData.width, modelData.height)
-      }
-
-      // Click on the desktop closes open popups.
       MouseArea {
         anchors.fill: parent
 
@@ -209,40 +325,38 @@ ShellRoot {
     }
   }
 
-  // ── Now Playing Function ──
+  // ── Now Playing ──
   Scope {
     id: media
 
-    property var player: {
+    property var levels: []
+    readonly property var player: {
       var list = Mpris.players.values
       for (var i = 0; i < list.length; i++) {
         if (list[i].isPlaying) return list[i]
       }
       return null
     }
-    property bool active: player !== null
-    property var levels: []
-
-    property string label: {
+    readonly property bool active: player !== null
+    readonly property string label: {
       if (!player) return ""
 
-        var parts = []
-        if (player.trackTitle) parts.push(player.trackTitle)
-          if (player.trackArtist) parts.push(player.trackArtist)
+      var parts = []
+      if (player.trackTitle) parts.push(player.trackTitle)
+      if (player.trackArtist) parts.push(player.trackArtist)
 
-            var text = parts.join(config.nowPlayingSeparator)
-            return text.length > config.nowPlayingMaxLength
-            ? text.substring(0, config.nowPlayingMaxLength - 1) + "…"
-            : text
+      var text = parts.join(config.nowPlayingSeparator)
+      return text.length > config.nowPlayingMaxLength
+        ? text.substring(0, config.nowPlayingMaxLength - 1) + "…"
+        : text
     }
 
     onActiveChanged: if (!active) levels = []
 
-    // ── Visualizer Function ──
     Process {
       id: cava
 
-      running: media.active
+      running: media.active && config.visualizerEnabled
       command: [
         "sh", "-c",
         'f="${XDG_RUNTIME_DIR:-/tmp}/quickshell-cava.conf"; printf "%s\\n" "$0" > "$f"; exec cava -p "$f"',
@@ -260,8 +374,8 @@ ShellRoot {
 
       stdout: SplitParser {
         onRead: data => {
-          var out = []
           var parts = data.split(";")
+          var out = []
           for (var i = 0; i < parts.length; i++) {
             if (parts[i] !== "") out.push(Number(parts[i]))
           }
@@ -271,7 +385,7 @@ ShellRoot {
     }
   }
 
-  // ── Layout Function ──
+  // ── Layout State ──
   Scope {
     id: layoutState
 
@@ -286,14 +400,12 @@ ShellRoot {
       stdout: SplitParser {
         onRead: data => {
           try {
-            var payload = JSON.parse(data)
-            var monitors = payload.monitors || []
+            var monitors = JSON.parse(data).monitors || []
             if (monitors.length === 0) return
 
-              var next = {}
-              for (var key in layoutState.symbols) next[key] = layoutState.symbols[key]
-                for (var i = 0; i < monitors.length; i++) next[monitors[i].name] = monitors[i].layout_symbol
-                  layoutState.symbols = next
+            var next = Object.assign({}, layoutState.symbols)
+            for (var i = 0; i < monitors.length; i++) next[monitors[i].name] = monitors[i].layout_symbol
+            layoutState.symbols = next
           } catch (e) {
           }
         }
@@ -311,46 +423,49 @@ ShellRoot {
     }
   }
 
-  // ── Network Function ──
+  // ── Network State ──
   Scope {
     id: network
 
     property string kind: "none"
 
+    function parse(text) {
+      var lines = text.split("\n")
+      for (var i = 0; i < lines.length; i++) {
+        var fields = lines[i].split(":")
+        if ((fields[0] === "wifi" || fields[0] === "ethernet") && fields[1] === "connected") return fields[0]
+      }
+      return "none"
+    }
+
     Process {
       id: networkQuery
 
-      command: [
-        "sh", "-c",
-        "nmcli -t -f TYPE,STATE device | awk -F: '($1==\"wifi\"||$1==\"ethernet\")&&$2==\"connected\"{print $1; f=1; exit} END{if(!f)print \"none\"}'"
-      ]
+      command: ["nmcli", "-t", "-f", "TYPE,STATE", "device"]
 
-      stdout: SplitParser {
-        onRead: data => { if (data !== "") network.kind = data.trim() }
+      stdout: StdioCollector {
+        onStreamFinished: network.kind = network.parse(text)
       }
     }
 
     Timer {
       interval: config.networkPollInterval
       repeat: true
-      running: true
+      running: config.networkEnabled
       triggeredOnStart: true
 
       onTriggered: if (!networkQuery.running) networkQuery.running = true
     }
   }
 
-  // ── Input Method Function ──
+  // ── Input Method State ──
   Scope {
     id: inputMethod
 
-    property string current: imLatin
-    property int imPollInterval: 500
-    property string imLatin: "keyboard-us"
-    property string imJapanese: "mozc"
+    property string current: config.inputMethodLatin
 
     function toggle() {
-      current = current === imJapanese ? imLatin : imJapanese
+      current = current === config.inputMethodJapanese ? config.inputMethodLatin : config.inputMethodJapanese
       imHold.restart()
       Quickshell.execDetached(["fcitx5-remote", "-t"])
     }
@@ -372,12 +487,36 @@ ShellRoot {
     }
 
     Timer {
-      interval: imPollInterval
+      interval: config.inputMethodPollInterval
       repeat: true
-      running: true
+      running: config.inputMethodEnabled
       triggeredOnStart: true
 
       onTriggered: if (!imQuery.running) imQuery.running = true
+    }
+  }
+
+  // ── Launcher State ──
+  Scope {
+    id: launcher
+
+    property var recentIds: JSON.parse(launcherSettings.recentIdsSerialized)
+
+    function record(id) {
+      var list = recentIds.filter(entry => entry !== id)
+      list.unshift(id)
+      if (list.length > config.appLauncherRecentMax) list.length = config.appLauncherRecentMax
+
+      recentIds = list
+      launcherSettings.recentIdsSerialized = JSON.stringify(list)
+    }
+
+    Settings {
+      id: launcherSettings
+
+      property string recentIdsSerialized: "[]"
+
+      category: "AppLauncher"
     }
   }
 
@@ -389,25 +528,25 @@ ShellRoot {
       id: server
 
       actionsSupported: true
-      bodySupported: true
       bodyMarkupSupported: true
+      bodySupported: true
       imageSupported: true
 
       onNotification: n => { n.tracked = true }
     }
 
     PanelWindow {
-      // Extra top offset while the tray popup is open on this screen.
       property real trayShift: shellRoot.trayPopupScreen === Quickshell.screens[0].name ? config.trayPopupExtent : 0
 
-      screen: Quickshell.screens[0]
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.namespace: "notifications"
       anchors { top: true; left: true; right: true }
-      margins { top: config.notificationMargin + Math.round(trayShift) }
-      exclusiveZone: 0
       color: "transparent"
+      exclusiveZone: 0
       implicitHeight: Math.max(1, notificationColumn.implicitHeight)
+      margins { top: config.notificationMargin + Math.round(trayShift) }
+      mask: Region { item: notificationColumn }
+      screen: Quickshell.screens[0]
 
       Behavior on trayShift {
         NumberAnimation {
@@ -415,18 +554,15 @@ ShellRoot {
           easing.type: Easing.OutCubic
         }
       }
-      mask: Region { item: notificationColumn }
 
       ColumnLayout {
         id: notificationColumn
 
         anchors { right: parent.right; top: parent.top; rightMargin: config.notificationMargin }
-        width: config.notificationWidth
         spacing: config.notificationSpacing
+        width: config.notificationWidth
 
         Repeater {
-          // Live model (oldest first): cards are added and removed one by one,
-          // so the card on screen is not recreated.
           model: server.trackedNotifications
 
           delegate: Rectangle {
@@ -435,23 +571,24 @@ ShellRoot {
             required property var modelData
             required property int index
 
-            property var notification: modelData
-            property bool critical: notification.urgency === NotificationUrgency.Critical
-            property int timeout: critical ? 0
-            : notification.expireTimeout > 0 ? notification.expireTimeout * 1000
-            : config.notificationTimeout
-            property bool hasActions: {
+            readonly property var notification: modelData
+            readonly property bool critical: notification.urgency === NotificationUrgency.Critical
+            readonly property int timeout: critical ? 0
+              : notification.expireTimeout > 0 ? notification.expireTimeout * 1000
+              : config.notificationTimeout
+            readonly property bool hasActions: {
               var list = notification.actions
               for (var i = 0; i < list.length; i++) {
                 if (list[i].identifier !== "default") return true
               }
               return false
             }
-            property string iconSource: {
+            readonly property string iconSource: {
               if (notification.image !== "") return notification.image
-                var icon = notification.appIcon
-                if (icon === "") return ""
-                  return icon.startsWith("/") ? "file://" + icon : Quickshell.iconPath(icon, true)
+
+              var icon = notification.appIcon
+              if (icon === "") return ""
+              return icon.startsWith("/") ? "file://" + icon : Quickshell.iconPath(icon, true)
             }
 
             property real slideX: config.notificationWidth + config.notificationMargin
@@ -461,22 +598,22 @@ ShellRoot {
 
             function close(expired, action) {
               if (leaving) return
-                leaving = true
-                expireOnClose = expired
-                pendingAction = action || null
-                slideIn.stop()
-                slideOut.start()
+
+              leaving = true
+              expireOnClose = expired
+              pendingAction = action || null
+              slideIn.stop()
+              slideOut.start()
             }
 
             Layout.fillWidth: true
-            visible: index < config.notificationMax
-            color: config.barColor
-            radius: config.notificationRadius
-            border.width: critical ? 2 : 0
             border.color: config.colorAccent
+            border.width: critical ? 2 : 0
+            color: config.barColor
             implicitHeight: cardContent.implicitHeight + config.notificationPadding * 2
-
+            radius: config.notificationRadius
             transform: Translate { x: card.slideX }
+            visible: index < config.notificationMax
 
             Component.onCompleted: if (visible) slideIn.start()
             onVisibleChanged: if (visible && !leaving) slideIn.start()
@@ -484,21 +621,21 @@ ShellRoot {
             NumberAnimation {
               id: slideIn
 
-              target: card
-              property: "slideX"
-              to: 0
               duration: config.notificationSlideDuration
               easing.type: Easing.OutQuint
+              property: "slideX"
+              target: card
+              to: 0
             }
 
             NumberAnimation {
               id: slideOut
 
-              target: card
-              property: "slideX"
-              to: config.notificationWidth + config.notificationMargin
               duration: config.notificationSlideDuration
               easing.type: Easing.InQuint
+              property: "slideX"
+              target: card
+              to: config.notificationWidth + config.notificationMargin
 
               onFinished: {
                 var n = card.notification
@@ -520,12 +657,13 @@ ShellRoot {
             Timer {
               interval: card.timeout
               running: card.timeout > 0 && card.visible && !card.leaving && !cardHover.hovered
+
               onTriggered: card.close(true)
             }
 
             MouseArea {
-              anchors.fill: parent
               acceptedButtons: Qt.LeftButton | Qt.RightButton
+              anchors.fill: parent
 
               onClicked: mouse => {
                 if (mouse.button === Qt.LeftButton) {
@@ -558,10 +696,11 @@ ShellRoot {
 
                 Image {
                   Layout.alignment: Qt.AlignTop
-                  Layout.preferredWidth: config.notificationIconSize
                   Layout.preferredHeight: config.notificationIconSize
+                  Layout.preferredWidth: config.notificationIconSize
+                  asynchronous: true
                   fillMode: Image.PreserveAspectFit
-                  source: card.iconSource
+                  source: card.visible ? card.iconSource : ""
                   sourceSize: Qt.size(config.notificationIconSize * 2, config.notificationIconSize * 2)
                   visible: source != ""
                 }
@@ -573,11 +712,11 @@ ShellRoot {
                   Text {
                     Layout.fillWidth: true
                     color: config.colorText
-                    opacity: 0.6
                     elide: Text.ElideRight
                     font.family: config.fontFamily
                     font.pixelSize: config.fontSize - 2
                     font.weight: config.fontWeight
+                    opacity: 0.6
                     text: card.notification.appName
                     visible: text !== ""
                   }
@@ -599,8 +738,8 @@ ShellRoot {
                     font.family: config.fontFamily
                     font.pixelSize: config.fontSize
                     maximumLineCount: 3
-                    textFormat: Text.StyledText
                     text: card.notification.body
+                    textFormat: Text.StyledText
                     visible: text !== ""
                     wrapMode: Text.Wrap
                   }
@@ -621,11 +760,11 @@ ShellRoot {
                     required property var modelData
 
                     Layout.fillWidth: true
-                    color: actionArea.containsMouse ? config.colorAccent : "transparent"
-                    border.width: 1
                     border.color: config.colorAccent
-                    radius: config.barRadius
-                    implicitHeight: 28
+                    border.width: 1
+                    color: actionArea.containsMouse ? config.colorAccent : "transparent"
+                    implicitHeight: config.notificationButtonHeight
+                    radius: config.notificationRadiusButton
                     visible: modelData.identifier !== "default"
 
                     Text {
@@ -642,6 +781,7 @@ ShellRoot {
 
                       anchors.fill: parent
                       hoverEnabled: true
+
                       onClicked: card.close(false, actionButton.modelData)
                     }
                   }
@@ -660,7 +800,7 @@ ShellRoot {
 
     property string password: ""
     property bool failed: false
-    property string background: config.lockWallpaper !== ""
+    readonly property string background: config.lockWallpaper !== ""
       ? "file://" + config.lockWallpaper
       : (wallpaper.current !== "" ? "file://" + wallpaper.current : "")
 
@@ -676,7 +816,6 @@ ShellRoot {
       pam.start()
     }
 
-    // Call with: qs ipc call lock lock
     IpcHandler {
       target: "lock"
 
@@ -685,18 +824,26 @@ ShellRoot {
       }
     }
 
-    SystemClock {
-      id: lockClock
-      precision: SystemClock.Minutes
+    QtObject {
+      id: lockStyle
+
+      readonly property color borderColor: config.lockColorBorder
+      readonly property int borderWidth: config.lockButtonBorder
+      readonly property int buttonHeight: config.lockButtonHeight
+      readonly property string fontFamily: config.lockFontFamily
+      readonly property int fontSize: config.lockButtonSize
+      readonly property int fontWeight: config.lockFontWeight
+      readonly property color hoverColor: config.lockColorAccent
+      readonly property color hoverTextColor: config.lockColorAccentText
+      readonly property real letterSpacing: config.lockLetterSpacing
+      readonly property color textColor: config.lockColorText
     }
 
     PamContext {
       id: pam
 
-      configDirectory: Quickshell.shellDir + "/pam"
       config: "password.conf"
-
-      onResponseRequiredChanged: if (responseRequired) respond(lockscreen.password)
+      configDirectory: Quickshell.shellDir + "/pam"
 
       onCompleted: result => {
         lockscreen.password = ""
@@ -707,6 +854,7 @@ ShellRoot {
           lockscreen.failed = true
         }
       }
+      onResponseRequiredChanged: if (responseRequired) respond(lockscreen.password)
     }
 
     WlSessionLock {
@@ -719,7 +867,8 @@ ShellRoot {
           anchors.fill: parent
           asynchronous: true
           fillMode: Image.PreserveAspectCrop
-          source: lockscreen.background
+          source: width > 0 ? lockscreen.background : ""
+          sourceSize: Qt.size(width, height)
         }
 
         Rectangle {
@@ -728,7 +877,7 @@ ShellRoot {
           opacity: config.lockDim
         }
 
-        // Bottom shadow so the login and buttons stay readable
+        // ── Shadow ──
         Rectangle {
           anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
           height: parent.height * config.lockShadowHeight
@@ -739,107 +888,30 @@ ShellRoot {
           }
         }
 
-        // Top-left shadow behind Now Playing: a quarter ellipse, config.lockPlayingShadowWidth x config.lockPlayingShadowHeight.
-        // The gradient is drawn on a square, then squashed to the requested height.
-        Shape {
-          id: playingShadow
-
-          anchors { left: parent.left; top: parent.top }
-          height: width
-          visible: media.active && config.lockPlayingShadow > 0
-          width: Math.max(1, config.lockPlayingShadowWidth)
-
-          transform: Scale {
-            yScale: config.lockPlayingShadowHeight / playingShadow.width
-          }
-
-          ShapePath {
-            startX: 0
-            startY: 0
-            strokeColor: "transparent"
-
-            fillGradient: RadialGradient {
-              centerRadius: playingShadow.width
-              centerX: 0
-              centerY: 0
-              focalX: 0
-              focalY: 0
-
-              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 1) }
-              GradientStop { position: 0.125; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.765625) }
-              GradientStop { position: 0.25; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.5625) }
-              GradientStop { position: 0.375; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.390625) }
-              GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.25) }
-              GradientStop { position: 0.625; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.140625) }
-              GradientStop { position: 0.75; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.0625) }
-              GradientStop { position: 0.875; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.015625) }
-              GradientStop { position: 1; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0) }
-            }
-
-            PathLine { x: playingShadow.width; y: 0 }
-            PathLine { x: playingShadow.width; y: playingShadow.height }
-            PathLine { x: 0; y: playingShadow.height }
-            PathLine { x: 0; y: 0 }
-          }
+        CornerShadow {
+          shadowHeight: config.lockPlayingShadowHeight
+          shadowWidth: config.lockPlayingShadowWidth
+          strength: media.active ? config.lockPlayingShadow : 0
         }
 
-        // Top-right shadow behind the date and clock: a quarter ellipse, config.lockClockShadowWidth x config.lockClockShadowHeight.
-        // The gradient is drawn on a square, then squashed to the requested height.
-        Shape {
-          id: clockShadow
-
-          anchors { right: parent.right; top: parent.top }
-          height: width
-          visible: config.lockClockShadow > 0
-          width: Math.max(1, config.lockClockShadowWidth)
-
-          transform: Scale {
-            yScale: config.lockClockShadowHeight / clockShadow.width
-          }
-
-          ShapePath {
-            startX: 0
-            startY: 0
-            strokeColor: "transparent"
-
-            fillGradient: RadialGradient {
-              centerRadius: clockShadow.width
-              centerX: clockShadow.width
-              centerY: 0
-              focalX: clockShadow.width
-              focalY: 0
-
-              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 1) }
-              GradientStop { position: 0.125; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.765625) }
-              GradientStop { position: 0.25; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.5625) }
-              GradientStop { position: 0.375; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.390625) }
-              GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.25) }
-              GradientStop { position: 0.625; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.140625) }
-              GradientStop { position: 0.75; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.0625) }
-              GradientStop { position: 0.875; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.015625) }
-              GradientStop { position: 1; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0) }
-            }
-
-            PathLine { x: clockShadow.width; y: 0 }
-            PathLine { x: clockShadow.width; y: clockShadow.height }
-            PathLine { x: 0; y: clockShadow.height }
-            PathLine { x: 0; y: 0 }
-          }
+        CornerShadow {
+          rightSide: true
+          shadowHeight: config.lockClockShadowHeight
+          shadowWidth: config.lockClockShadowWidth
+          strength: config.lockClockShadow
         }
 
-        // ── Top left: Now Playing (hidden when nothing is playing) ──
         Text {
           anchors { left: parent.left; top: parent.top; margins: config.lockMargin }
           color: config.lockColorText
           font.family: config.lockFontFamily
           font.letterSpacing: config.lockLetterSpacing
           font.pixelSize: config.lockLabelSize
-          font.weight: config.fontWeight
+          font.weight: config.lockFontWeight
           text: lockscreen.format(media.label)
           visible: media.active
         }
 
-        // ── Top right: date and clock ──
         Column {
           anchors { right: parent.right; top: parent.top; margins: config.lockMargin }
           spacing: 4
@@ -850,8 +922,8 @@ ShellRoot {
             font.family: config.lockFontFamily
             font.letterSpacing: config.lockLetterSpacing
             font.pixelSize: config.lockDateSize
-            font.weight: config.fontWeight
-            text: lockscreen.format(Qt.formatDateTime(lockClock.date, config.lockDateFormat))
+            font.weight: config.lockFontWeight
+            text: lockscreen.format(Qt.formatDateTime(clock.date, config.lockDateFormat))
           }
 
           Text {
@@ -859,28 +931,28 @@ ShellRoot {
             color: config.lockColorText
             font.family: config.lockFontFamily
             font.pixelSize: config.lockClockSize
-            font.weight: config.fontWeight
-            text: Qt.formatTime(lockClock.date, config.lockClockFormat)
+            font.weight: config.lockFontWeight
+            text: Qt.formatTime(clock.date, config.lockClockFormat)
           }
         }
 
-        // ── Bottom left: username, password, login ──
+        // ── Login ──
         Column {
           anchors { left: parent.left; bottom: parent.bottom; margins: config.lockMargin }
-          spacing: 12
+          spacing: config.lockSpacing
 
           Text {
             color: config.lockColorText
             font.family: config.lockFontFamily
             font.letterSpacing: config.lockLetterSpacing
             font.pixelSize: config.lockLabelSize
-            font.weight: config.fontWeight
+            font.weight: config.lockFontWeight
             text: lockscreen.format(config.lockUsername)
           }
 
           Item {
-            width: config.lockInputWidth
             height: config.lockInputHeight
+            width: config.lockInputWidth
 
             TextInput {
               id: lockInput
@@ -893,8 +965,8 @@ ShellRoot {
               font.pixelSize: config.lockLabelSize
               readOnly: pam.active
 
-              onTextChanged: lockscreen.failed = false
               onAccepted: lockscreen.submit(lockInput)
+              onTextChanged: lockscreen.failed = false
             }
 
             Rectangle {
@@ -909,35 +981,14 @@ ShellRoot {
           Row {
             spacing: 16
 
-            Rectangle {
+            OutlineButton {
               id: loginButton
 
-              border.color: config.lockColorBorder
-              border.width: 2
-              color: loginArea.containsMouse ? config.lockColorAccent : "transparent"
-              height: config.lockButtonHeight
-              width: loginText.implicitWidth + 32
+              horizontalPadding: config.lockLoginPadding
+              label: lockscreen.format(config.lockLoginLabel)
+              style: lockStyle
 
-              Text {
-                id: loginText
-
-                anchors.centerIn: parent
-                color: loginArea.containsMouse ? config.colorAccentText : config.lockColorText
-                font.family: config.lockFontFamily
-                font.letterSpacing: config.lockLetterSpacing
-                font.pixelSize: config.lockButtonSize
-                font.weight: config.fontWeight
-                text: lockscreen.format(config.lockLoginLabel)
-              }
-
-              MouseArea {
-                id: loginArea
-
-                anchors.fill: parent
-                hoverEnabled: true
-
-                onClicked: lockscreen.submit(lockInput)
-              }
+              onClicked: lockscreen.submit(lockInput)
             }
 
             Text {
@@ -946,52 +997,29 @@ ShellRoot {
               font.family: config.lockFontFamily
               font.letterSpacing: config.lockLetterSpacing
               font.pixelSize: config.lockButtonSize
-              font.weight: config.fontWeight
+              font.weight: config.lockFontWeight
               text: lockscreen.format(config.lockErrorLabel)
               visible: lockscreen.failed
             }
           }
         }
 
-        // ── Bottom right: power buttons ──
+        // ── Login Power Button ──
         Row {
           anchors { right: parent.right; bottom: parent.bottom; margins: config.lockMargin }
-          spacing: 12
+          spacing: config.lockSpacing
 
           Repeater {
             model: config.lockActions
 
-            Rectangle {
-              id: actionButton
-
+            delegate: OutlineButton {
               required property var modelData
 
-              border.color: config.lockColorBorder
-              border.width: 2
-              color: actionArea.containsMouse ? config.lockColorAccent : "transparent"
-              height: config.lockButtonHeight
-              width: actionText.implicitWidth + 24
+              horizontalPadding: config.lockButtonPadding
+              label: lockscreen.format(modelData.label)
+              style: lockStyle
 
-              Text {
-                id: actionText
-
-                anchors.centerIn: parent
-                color: actionArea.containsMouse ? config.colorAccentText : config.lockColorText
-                font.family: config.lockFontFamily
-                font.letterSpacing: config.lockLetterSpacing
-                font.pixelSize: config.lockButtonSize
-                font.weight: config.fontWeight
-                text: lockscreen.format(actionButton.modelData.label)
-              }
-
-              MouseArea {
-                id: actionArea
-
-                anchors.fill: parent
-                hoverEnabled: true
-
-                onClicked: Quickshell.execDetached(["sh", "-c", actionButton.modelData.command])
-              }
+              onClicked: Quickshell.execDetached(["sh", "-c", modelData.command])
             }
           }
         }
@@ -1011,17 +1039,12 @@ ShellRoot {
 
         required property ShellScreen modelData
 
-        property var cornerHiddenLayouts: ["S"]
-        property bool cornersHidden: cornerHiddenLayouts.indexOf(layoutState.symbols[modelData.name]) !== -1
+        readonly property bool cornersHidden: config.cornerHiddenLayouts.indexOf(layoutState.symbols[modelData.name]) !== -1
 
-        // Only one popup is open at a time. Two popups with a focus grab open together
-        // get placed relative to each other instead of the bar.
         function togglePopup(popup) {
           var wasOpen = popup.visible
           shellRoot.dismissPopups()
-          if (!wasOpen) {
-            Qt.callLater(() => { popup.visible = true })
-          }
+          if (!wasOpen) Qt.callLater(() => { popup.visible = true })
         }
 
         Connections {
@@ -1037,19 +1060,18 @@ ShellRoot {
         PanelWindow {
           id: bar
 
-          property var projection: WindowManager.screenProjection(screenRoot.modelData)
+          readonly property var projection: WindowManager.screenProjection(screenRoot.modelData)
 
-          exclusiveZone: config.barHeight
           WlrLayershell.layer: WlrLayer.Bottom
           anchors { left: true; right: true; top: true }
           color: "transparent"
-          screen: screenRoot.modelData
+          exclusiveZone: config.barHeight
           implicitHeight: config.barHeight
+          screen: screenRoot.modelData
 
           Item {
             anchors.fill: parent
 
-            // Click on empty bar space closes open popups.
             MouseArea {
               anchors.fill: parent
 
@@ -1063,17 +1085,17 @@ ShellRoot {
               property int slideDuration: config.barSlideDuration
               property bool ready: false
 
-              clip: true
-              bottomRightRadius: config.barRadius
-              color: config.barColor
               anchors { left: parent.left; top: parent.top }
+              bottomRightRadius: config.barRadius
+              clip: true
+              color: config.barColor
               height: config.barHeight
-
               width: Math.round(leftRow.x + focusSlot.x + focusSlot.width + config.barPadding / 2)
 
               Timer {
                 interval: 1000
                 running: true
+
                 onTriggered: leftBar.ready = true
               }
 
@@ -1089,16 +1111,14 @@ ShellRoot {
 
                 move: Transition {
                   NumberAnimation {
-                    properties: "x"
                     duration: leftBar.slideDuration
                     easing.type: Easing.InOutQuint
+                    properties: "x"
                   }
                 }
 
                 // ── Power Menu ──
                 Text {
-                  id: powerMenuGlyph
-
                   anchors.verticalCenter: parent.verticalCenter
                   color: config.colorText
                   font.family: config.iconFontFamily
@@ -1112,24 +1132,14 @@ ShellRoot {
                   }
                 }
 
-                // Separator 1
-                Text {
-                  anchors.verticalCenter: parent.verticalCenter
-                  bottomPadding: 3
-                  color: config.colorText
-                  font.family: config.fontFamily
-                  font.pixelSize: config.fontSize
-                  font.weight: config.fontWeight
-                  text: "|"
-                }
+                Separator { cfg: config }
 
                 // ── Layout ──
                 Text {
                   id: layoutGlyph
 
-                  property var layoutList: config.layoutCycle
-                  property string currentLayout: layoutState.symbols[screenRoot.modelData.name] || layoutList[0]
                   property int nextIndex: 0
+                  readonly property string currentLayout: layoutState.symbols[screenRoot.modelData.name] || config.layoutCycle[0]
 
                   anchors.verticalCenter: parent.verticalCenter
                   color: config.colorText
@@ -1142,22 +1152,13 @@ ShellRoot {
                     anchors.fill: parent
 
                     onClicked: {
-                      layoutGlyph.nextIndex = (layoutGlyph.nextIndex + 1) % layoutGlyph.layoutList.length
-                      Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + layoutGlyph.layoutList[layoutGlyph.nextIndex]])
+                      layoutGlyph.nextIndex = (layoutGlyph.nextIndex + 1) % config.layoutCycle.length
+                      Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + config.layoutCycle[layoutGlyph.nextIndex]])
                     }
                   }
                 }
 
-                // Separator 2
-                Text {
-                  anchors.verticalCenter: parent.verticalCenter
-                  bottomPadding: 3
-                  color: config.colorText
-                  font.family: config.fontFamily
-                  font.pixelSize: config.fontSize
-                  font.weight: config.fontWeight
-                  text: "|"
-                }
+                Separator { cfg: config }
 
                 // ── Workspace ──
                 Row {
@@ -1168,9 +1169,9 @@ ShellRoot {
 
                   move: Transition {
                     NumberAnimation {
-                      properties: "x"
                       duration: leftBar.slideDuration
                       easing.type: Easing.InOutQuint
+                      properties: "x"
                     }
                   }
 
@@ -1180,41 +1181,11 @@ ShellRoot {
                     delegate: Rectangle {
                       id: workspaceDelegate
 
-                      anchors.verticalCenter: parent.verticalCenter
-                      property color workspaceActiveColor: config.colorAccent
-                      property color workspaceActiveTextColor: config.colorAccentText
-                      property color workspaceInactiveColor: "transparent"
-                      property color workspaceInactiveTextColor: config.colorText
-                      property color workspaceUrgentColor: config.colorAccent
-                      property var ws: modelData
-                      property bool shouldShow: ws.shouldDisplay
+                      required property var modelData
 
-                      color: ws.urgent ? workspaceUrgentColor : (ws.active ? workspaceActiveColor : workspaceInactiveColor)
-                      radius: config.workspaceRadius
-                      implicitHeight: config.workspaceHeight
-                      implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
-
-                      visible: shouldShow || opacity > 0
-
+                      readonly property var ws: modelData
+                      readonly property bool shouldShow: ws.shouldDisplay
                       property bool revealed: false
-
-                      opacity: revealed ? 1 : 0
-
-                      Behavior on opacity {
-                        enabled: leftBar.ready
-
-                        NumberAnimation {
-                          duration: config.animationDuration
-                          easing.type: Easing.OutQuint
-                        }
-                      }
-
-                      Timer {
-                        id: revealTimer
-
-                        interval: leftBar.slideDuration
-                        onTriggered: workspaceDelegate.revealed = true
-                      }
 
                       function reveal() {
                         revealTimer.stop()
@@ -1223,6 +1194,23 @@ ShellRoot {
                           revealTimer.restart()
                         } else {
                           revealed = true
+                        }
+                      }
+
+                      anchors.verticalCenter: parent.verticalCenter
+                      color: ws.urgent || ws.active ? config.colorAccent : "transparent"
+                      implicitHeight: config.workspaceHeight
+                      implicitWidth: Math.max(config.workspaceWidth, workspaceLabel.implicitWidth + config.workspacePadding)
+                      opacity: revealed ? 1 : 0
+                      radius: config.workspaceRadius
+                      visible: shouldShow || opacity > 0
+
+                      Behavior on opacity {
+                        enabled: leftBar.ready
+
+                        NumberAnimation {
+                          duration: config.animationDuration
+                          easing.type: Easing.OutQuint
                         }
                       }
 
@@ -1237,43 +1225,40 @@ ShellRoot {
                         }
                       }
 
+                      Timer {
+                        id: revealTimer
+
+                        interval: leftBar.slideDuration
+
+                        onTriggered: workspaceDelegate.revealed = true
+                      }
+
                       Text {
                         id: workspaceLabel
 
-                        color: ws.active ? workspaceActiveTextColor : workspaceInactiveTextColor
+                        anchors.centerIn: parent
+                        color: workspaceDelegate.ws.active ? config.colorAccentText : config.colorText
                         font.family: config.fontFamily
                         font.pixelSize: config.fontSize
                         font.weight: config.fontWeight
                         rightPadding: 1
-                        text: ws.name.length ? ws.name : (ws.coordinates[0] + 1)
-                        anchors.centerIn: parent
+                        text: workspaceDelegate.ws.name.length ? workspaceDelegate.ws.name : (workspaceDelegate.ws.coordinates[0] + 1)
                       }
 
                       MouseArea {
-                        enabled: workspaceDelegate.shouldShow
-                        onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
-
                         anchors.fill: parent
+                        enabled: workspaceDelegate.shouldShow
+
+                        onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
                       }
                     }
                   }
                 }
 
-                // Separator 3
-                Text {
-                  anchors.verticalCenter: parent.verticalCenter
-                  bottomPadding: 3
-                  color: config.colorText
-                  font.family: config.fontFamily
-                  font.pixelSize: config.fontSize
-                  font.weight: config.fontWeight
-                  text: "|"
-                }
+                Separator { cfg: config }
 
                 // ── App Launcher ──
                 Text {
-                  id: appLauncherGlyph
-
                   anchors.verticalCenter: parent.verticalCenter
                   color: config.colorText
                   font.family: config.iconFontFamily
@@ -1293,8 +1278,8 @@ ShellRoot {
 
                   anchors.verticalCenter: parent.verticalCenter
                   clip: true
-                  width: focusWindow.implicitWidth
                   height: focusWindow.implicitHeight
+                  width: focusWindow.implicitWidth
 
                   Behavior on width {
                     enabled: leftBar.ready
@@ -1308,16 +1293,14 @@ ShellRoot {
                   RowLayout {
                     id: focusWindow
 
-                    property string targetIcon: {
-                      var t = ToplevelManager.activeToplevel
-                      if (!t) return config.focusWindowGlyph
-                        return config.focusWindowIcons[t.appId.toLowerCase()] || config.focusWindowGlyph
-                    }
-                    property string targetLabel: {
-                      var t = ToplevelManager.activeToplevel
-                      if (!t) return config.focusWindowPlaceholder
-                        return config.focusWindowNames[t.appId.toLowerCase()] || t.appId
-                    }
+                    readonly property var toplevel: ToplevelManager.activeToplevel
+                    readonly property string appKey: toplevel ? toplevel.appId.toLowerCase() : ""
+                    readonly property string targetIcon: toplevel
+                      ? (config.focusWindowIcons[appKey] || config.focusWindowGlyph)
+                      : config.focusWindowGlyph
+                    readonly property string targetLabel: toplevel
+                      ? (config.focusWindowNames[appKey] || toplevel.appId)
+                      : config.focusWindowPlaceholder
                     property string shownIcon: targetIcon
                     property string shownLabel: targetLabel
 
@@ -1328,40 +1311,38 @@ ShellRoot {
 
                     function update() {
                       if (leftBar.ready) swap.restart()
-                        else apply()
+                      else apply()
                     }
-
-                    onTargetIconChanged: update()
-                    onTargetLabelChanged: update()
 
                     anchors { left: parent.left; verticalCenter: parent.verticalCenter }
                     spacing: 8
+
+                    onTargetIconChanged: update()
+                    onTargetLabelChanged: update()
 
                     SequentialAnimation {
                       id: swap
 
                       NumberAnimation {
-                        target: focusWindow
-                        property: "opacity"
-                        to: 0
                         duration: config.animationDuration
                         easing.type: Easing.OutQuint
+                        property: "opacity"
+                        target: focusWindow
+                        to: 0
                       }
 
                       ScriptAction { script: focusWindow.apply() }
 
                       NumberAnimation {
-                        target: focusWindow
-                        property: "opacity"
-                        to: 1
                         duration: config.animationDuration
                         easing.type: Easing.OutQuint
+                        property: "opacity"
+                        target: focusWindow
+                        to: 1
                       }
                     }
 
                     Text {
-                      id: focusWindowIcon
-
                       color: config.colorText
                       font.family: config.iconFontFamily
                       font.pixelSize: config.iconSize
@@ -1369,10 +1350,8 @@ ShellRoot {
                     }
 
                     Text {
-                      id: focusWindowLabel
-
-                      elide: Text.ElideRight
                       color: config.colorText
+                      elide: Text.ElideRight
                       font.family: config.fontFamily
                       font.pixelSize: config.fontSize
                       font.weight: config.fontWeight
@@ -1387,17 +1366,16 @@ ShellRoot {
             PopupWindow {
               id: powerMenuPopup
 
-              // Anchored to the bar window: left screen edge, just below the bar.
-              anchor.window: bar
-              anchor.rect.x: config.powerMenuMargin
-              anchor.rect.y: bar.height + config.powerMenuMargin
               anchor.edges: Edges.Top | Edges.Left
               anchor.gravity: Edges.Bottom | Edges.Right
-              implicitWidth: config.powerMenuWidth
-              implicitHeight: powerMenuColumn.implicitHeight + (powerMenuColumn.anchors.margins * 2)
+              anchor.rect.x: config.powerMenuMargin
+              anchor.rect.y: bar.height + config.powerMenuMargin
+              anchor.window: bar
               color: "transparent"
-              visible: false
               grabFocus: true
+              implicitHeight: powerMenuColumn.implicitHeight + config.powerMenuPadding * 2
+              implicitWidth: config.powerMenuWidth
+              visible: false
 
               Rectangle {
                 anchors.fill: parent
@@ -1408,8 +1386,8 @@ ShellRoot {
                   id: powerMenuColumn
 
                   anchors.fill: parent
-                  anchors.margins: 8
-                  spacing: 2
+                  anchors.margins: config.powerMenuPadding
+                  spacing: config.powerMenuSpacing
 
                   Repeater {
                     model: config.powerMenuActions
@@ -1417,21 +1395,21 @@ ShellRoot {
                     delegate: Rectangle {
                       id: powerMenuOption
 
-                      property var entry: modelData
+                      required property var modelData
 
                       Layout.fillWidth: true
                       color: powerMenuOptionArea.containsMouse ? config.colorAccent : "transparent"
+                      implicitHeight: config.powerMenuItemHeight
                       radius: config.powerMenuRadius
-                      implicitHeight: 28
 
                       Text {
+                        anchors.verticalCenter: parent.verticalCenter
                         color: powerMenuOptionArea.containsMouse ? config.colorAccentText : config.colorText
                         font.family: config.fontFamily
                         font.pixelSize: config.fontSize
                         font.weight: config.fontWeight
                         leftPadding: 8
-                        text: powerMenuOption.entry.label
-                        anchors.verticalCenter: parent.verticalCenter
+                        text: powerMenuOption.modelData.label
                       }
 
                       MouseArea {
@@ -1441,7 +1419,7 @@ ShellRoot {
                         hoverEnabled: true
 
                         onClicked: {
-                          Quickshell.execDetached(["sh", "-c", powerMenuOption.entry.command])
+                          Quickshell.execDetached(["sh", "-c", powerMenuOption.modelData.command])
                           powerMenuPopup.visible = false
                         }
                       }
@@ -1452,21 +1430,19 @@ ShellRoot {
             }
 
             // ── App Launcher Click Catcher ──
-            // Full-screen transparent window below the launcher. A click anywhere
-            // outside the launcher closes it; mouse movement does nothing.
             PanelWindow {
-              WlrLayershell.layer: WlrLayer.Top
               WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+              WlrLayershell.layer: WlrLayer.Top
               WlrLayershell.namespace: "app-launcher-catcher"
-              exclusionMode: ExclusionMode.Ignore
               anchors { left: true; right: true; top: true; bottom: true }
               color: "transparent"
+              exclusionMode: ExclusionMode.Ignore
               screen: screenRoot.modelData
               visible: appLauncherPopup.visible
 
               MouseArea {
-                anchors.fill: parent
                 acceptedButtons: Qt.AllButtons
+                anchors.fill: parent
 
                 onClicked: appLauncherPopup.visible = false
               }
@@ -1478,45 +1454,65 @@ ShellRoot {
 
               property string searchQuery: ""
               property int selectedIndex: 0
-              property var recentIds: JSON.parse(recentAppsSettings.recentIdsSerialized)
+              readonly property int chromeHeight: config.appLauncherSearchHeight + config.appLauncherPadding * 3
+              readonly property int fullHeight: chromeHeight + config.appLauncherMaxVisible * config.appLauncherItemHeight
 
-              property var filteredApps: {
+              readonly property var appsByName: visible
+                ? DesktopEntries.applications.values.slice().sort((a, b) => a.name.localeCompare(b.name))
+                : []
+              readonly property var filteredApps: {
+                var apps = appsByName
                 var q = searchQuery.trim().toLowerCase()
-                var vals = DesktopEntries.applications.values
+                if (q !== "") return apps.filter(entry => matches(entry, q))
 
-                if (q !== "") {
-                  return vals.filter(function (e) {
-                    if (e.name.toLowerCase().indexOf(q) !== -1) return true
-                      if (e.genericName && e.genericName.toLowerCase().indexOf(q) !== -1) return true
-                        for (var i = 0; i < e.keywords.length; i++) {
-                          if (e.keywords[i].toLowerCase().indexOf(q) !== -1) return true
-                        }
-                        return false
-                  }).sort(function (a, b) { return a.name.localeCompare(b.name) })
+                var rank = new Map()
+                var recent = launcher.recentIds
+                for (var i = 0; i < recent.length; i++) rank.set(recent[i], i)
+
+                var head = []
+                var tail = []
+                for (var j = 0; j < apps.length; j++) {
+                  if (rank.has(apps[j].id)) head.push(apps[j])
+                  else tail.push(apps[j])
                 }
-
-                var recent = appLauncherPopup.recentIds
-                return vals.slice().sort(function (a, b) {
-                  var ai = recent.indexOf(a.id)
-                  var bi = recent.indexOf(b.id)
-                  if (ai !== -1 && bi !== -1) return ai - bi
-                    if (ai !== -1) return -1
-                      if (bi !== -1) return 1
-                        return a.name.localeCompare(b.name)
-                })
+                head.sort((a, b) => rank.get(a.id) - rank.get(b.id))
+                return head.concat(tail)
               }
 
-              screen: screenRoot.modelData
-              WlrLayershell.layer: WlrLayer.Overlay
+              function matches(entry, q) {
+                if (entry.name.toLowerCase().indexOf(q) !== -1) return true
+                if (entry.genericName && entry.genericName.toLowerCase().indexOf(q) !== -1) return true
+
+                for (var i = 0; i < entry.keywords.length; i++) {
+                  if (entry.keywords[i].toLowerCase().indexOf(q) !== -1) return true
+                }
+                return false
+              }
+
+              function navigate(delta) {
+                if (filteredApps.length === 0) return
+
+                selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
+                appList.positionViewAtIndex(selectedIndex, ListView.Contain)
+              }
+
+              function launchEntry(entry) {
+                launcher.record(entry.id)
+                entry.execute()
+                visible = false
+              }
+
               WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+              WlrLayershell.layer: WlrLayer.Overlay
               WlrLayershell.namespace: "app-launcher"
-              exclusionMode: ExclusionMode.Ignore
               anchors { top: true }
-              margins.top: Math.max(0, Math.round((screenRoot.modelData.height - (56 + config.appLauncherMaxVisible * config.appLauncherItemHeight)) / 2))
-              implicitWidth: config.appLauncherWidth
-              implicitHeight: 56 + config.appLauncherMaxVisible * config.appLauncherItemHeight
-              mask: Region { item: launcherCard }
               color: "transparent"
+              exclusionMode: ExclusionMode.Ignore
+              implicitHeight: fullHeight
+              implicitWidth: config.appLauncherWidth
+              margins.top: Math.max(0, Math.round((screenRoot.modelData.height - fullHeight) / 2))
+              mask: Region { item: launcherCard }
+              screen: screenRoot.modelData
               visible: false
 
               onFilteredAppsChanged: selectedIndex = 0
@@ -1530,53 +1526,25 @@ ShellRoot {
                 }
               }
 
-              function recordLaunch(id) {
-                var list = appLauncherPopup.recentIds.slice()
-                var idx = list.indexOf(id)
-                if (idx !== -1) list.splice(idx, 1)
-                  list.unshift(id)
-                  if (list.length > 12) list = list.slice(0, 12)
-                    appLauncherPopup.recentIds = list
-                    recentAppsSettings.recentIdsSerialized = JSON.stringify(list)
-              }
-
-              function navigate(delta) {
-                if (filteredApps.length === 0) return
-                  selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
-                  appList.positionViewAtIndex(selectedIndex, ListView.Contain)
-              }
-
-              function launchEntry(entry) {
-                recordLaunch(entry.id)
-                entry.execute()
-                appLauncherPopup.visible = false
-              }
-
-              Settings {
-                id: recentAppsSettings
-
-                category: "AppLauncher"
-                property string recentIdsSerialized: "[]"
-              }
-
               Rectangle {
                 id: launcherCard
 
                 anchors { left: parent.left; right: parent.right; top: parent.top }
-                height: 56 + Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
                 color: config.barColor
+                height: appLauncherPopup.chromeHeight
+                  + Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
                 radius: config.workspaceRadius
 
                 ColumnLayout {
                   anchors.fill: parent
-                  anchors.margins: 8
-                  spacing: 8
+                  anchors.margins: config.appLauncherPadding
+                  spacing: config.appLauncherPadding
 
                   Rectangle {
                     Layout.fillWidth: true
-                    implicitHeight: 32
-                    radius: config.workspaceRadius
                     color: config.colorInput
+                    implicitHeight: config.appLauncherSearchHeight
+                    radius: config.workspaceRadius
 
                     TextInput {
                       id: searchField
@@ -1584,11 +1552,11 @@ ShellRoot {
                       anchors.fill: parent
                       anchors.leftMargin: 8
                       anchors.rightMargin: 8
+                      clip: true
                       color: config.colorText
                       font.family: config.fontFamily
                       font.pixelSize: config.fontSize
                       verticalAlignment: TextInput.AlignVCenter
-                      clip: true
 
                       onTextChanged: appLauncherPopup.searchQuery = text
 
@@ -1602,7 +1570,7 @@ ShellRoot {
                         } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                           if (appLauncherPopup.filteredApps.length > 0)
                             appLauncherPopup.launchEntry(appLauncherPopup.filteredApps[appLauncherPopup.selectedIndex])
-                            event.accepted = true
+                          event.accepted = true
                         } else if (event.key === Qt.Key_Escape) {
                           appLauncherPopup.visible = false
                           event.accepted = true
@@ -1615,7 +1583,7 @@ ShellRoot {
                         font.family: config.fontFamily
                         font.pixelSize: config.fontSize
                         opacity: 0.35
-                        text: "Search apps…"
+                        text: config.appLauncherPlaceholder
                         verticalAlignment: Text.AlignVCenter
                         visible: searchField.text === ""
                       }
@@ -1627,10 +1595,11 @@ ShellRoot {
 
                     Layout.fillWidth: true
                     Layout.preferredHeight: Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
-                    model: appLauncherPopup.filteredApps
                     boundsBehavior: Flickable.StopAtBounds
+                    cacheBuffer: 0
                     clip: true
-                    interactive: true
+                    model: appLauncherPopup.filteredApps
+                    reuseItems: true
 
                     Text {
                       anchors.centerIn: parent
@@ -1638,17 +1607,20 @@ ShellRoot {
                       font.family: config.fontFamily
                       font.pixelSize: config.fontSize
                       opacity: 0.35
-                      text: "No apps found"
+                      text: config.appLauncherEmpty
                       visible: appLauncherPopup.filteredApps.length === 0
                     }
 
                     delegate: Rectangle {
                       id: appRow
 
-                      width: appList.width
-                      height: config.appLauncherItemHeight
+                      required property var modelData
+                      required property int index
+
                       color: appLauncherPopup.selectedIndex === index ? config.colorAccent : "transparent"
+                      height: config.appLauncherItemHeight
                       radius: config.workspaceRadius
+                      width: appList.width
 
                       Row {
                         anchors.fill: parent
@@ -1657,23 +1629,23 @@ ShellRoot {
                         spacing: 10
 
                         Image {
-                          width: 24
-                          height: 24
                           anchors.verticalCenter: parent.verticalCenter
-                          mipmap: true
-                          smooth: true
-                          source: modelData.icon !== "" ? "image://icon/" + modelData.icon : ""
+                          asynchronous: true
+                          height: config.appLauncherIconSize
+                          source: appRow.modelData.icon !== "" ? "image://icon/" + appRow.modelData.icon : ""
+                          sourceSize: Qt.size(config.appLauncherIconSize * 2, config.appLauncherIconSize * 2)
+                          width: config.appLauncherIconSize
                         }
 
                         Text {
                           anchors.verticalCenter: parent.verticalCenter
-                          width: parent.width - 34
-                          color: appLauncherPopup.selectedIndex === index ? config.colorAccentText : config.colorText
+                          color: appLauncherPopup.selectedIndex === appRow.index ? config.colorAccentText : config.colorText
                           elide: Text.ElideRight
                           font.family: config.fontFamily
                           font.pixelSize: config.fontSize
                           font.weight: config.fontWeight
-                          text: modelData.name
+                          text: appRow.modelData.name
+                          width: parent.width - config.appLauncherIconSize - 10
                         }
                       }
 
@@ -1681,8 +1653,8 @@ ShellRoot {
                         anchors.fill: parent
                         hoverEnabled: true
 
-                        onEntered: appLauncherPopup.selectedIndex = index
-                        onClicked: appLauncherPopup.launchEntry(modelData)
+                        onClicked: appLauncherPopup.launchEntry(appRow.modelData)
+                        onEntered: appLauncherPopup.selectedIndex = appRow.index
                       }
                     }
                   }
@@ -1691,106 +1663,34 @@ ShellRoot {
             }
 
             // ── Left Concave 2 ──
-            Shape {
-              id: leftConcave2
-
-              preferredRendererType: Shape.CurveRenderer
+            Concave {
               anchors { left: leftBar.right; top: parent.top }
-              implicitHeight: config.barRadius
-              implicitWidth: config.barRadius
-              transform: Scale {
-                xScale: 1
-                origin { x: config.barRadius / 2; y: 0 }
-              }
-
-              ShapePath {
-                fillColor: config.barColor
-                strokeColor: "transparent"
-                startX: config.barRadius
-                startY: 0
-
-                PathLine {
-                  x: 0
-                  y: 0
-                }
-
-                PathLine {
-                  x: 0
-                  y: config.barRadius
-                }
-
-                PathArc {
-                  direction: PathArc.Clockwise
-                  radiusX: config.barRadius
-                  radiusY: config.barRadius
-                  x: config.barRadius
-                  y: 0
-                }
-              }
+              cfg: config
             }
 
             // ── Center Concave 1 ──
-            Shape {
-              id: centerConcave1
-
-              preferredRendererType: Shape.CurveRenderer
+            Concave {
               anchors { right: centerBar.left; top: parent.top }
-              implicitHeight: config.barRadius
-              implicitWidth: config.barRadius
-              transform: Scale {
-                xScale: -1
-                origin { x: config.barRadius / 2; y: 0 }
-              }
-
-              ShapePath {
-                fillColor: config.barColor
-                strokeColor: "transparent"
-                startX: config.barRadius
-                startY: 0
-
-                PathLine {
-                  x: 0
-                  y: 0
-                }
-
-                PathLine {
-                  x: 0
-                  y: config.barRadius
-                }
-
-                PathArc {
-                  direction: PathArc.Clockwise
-                  radiusX: config.barRadius
-                  radiusY: config.barRadius
-                  x: config.barRadius
-                  y: 0
-                }
-              }
+              cfg: config
+              mirrored: true
             }
 
             // ── Center Bar ──
             Rectangle {
               id: centerBar
 
-              property real contentEdge: mediaSlot.width > 0
-              ? mediaSlot.x + mediaSlot.width
-              : clockLabel.x + clockLabel.width
-              property real rawWidth: centerRow.x + contentEdge + config.barPadding / 2
-              property int roundedWidth: Math.round(rawWidth)
+              readonly property real contentEdge: mediaSlot.width > 0
+                ? mediaSlot.x + mediaSlot.width
+                : clockLabel.x + clockLabel.width
+              readonly property int roundedWidth: Math.round(centerRow.x + contentEdge + config.barPadding / 2)
 
-              clip: true
+              anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
               bottomLeftRadius: config.barRadius
               bottomRightRadius: config.barRadius
+              clip: true
               color: config.barColor
-              anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
               height: config.barHeight
               width: ((parent.width - roundedWidth) % 2 !== 0) ? roundedWidth + 1 : roundedWidth
-
-              SystemClock {
-                id: clock
-
-                precision: SystemClock.Minutes
-              }
 
               Row {
                 id: centerRow
@@ -1804,9 +1704,9 @@ ShellRoot {
 
                 move: Transition {
                   NumberAnimation {
-                    properties: "x"
                     duration: leftBar.slideDuration
                     easing.type: Easing.InOutQuint
+                    properties: "x"
                   }
                 }
 
@@ -1819,16 +1719,16 @@ ShellRoot {
                   font.family: config.fontFamily
                   font.pixelSize: config.fontSize
                   font.weight: config.fontWeight
-                  text: Qt.formatDateTime(clock.date, "ddd, d MMM   HH:mm")
+                  text: Qt.formatDateTime(clock.date, config.barClockFormat)
                 }
 
                 // ── Media ──
                 Item {
                   id: mediaSlot
 
-                  property bool wanted: media.active
                   property bool expanded: false
                   property bool contentShown: false
+                  readonly property bool wanted: media.active
 
                   function show() {
                     hideTimer.stop()
@@ -1846,11 +1746,8 @@ ShellRoot {
                     labelSwap.stop()
                     contentShown = false
                     if (leftBar.ready) hideTimer.restart()
-                      else expanded = false
+                    else expanded = false
                   }
-
-                  Component.onCompleted: if (wanted) show()
-                  onWantedChanged: wanted ? show() : hide()
 
                   anchors.verticalCenter: parent.verticalCenter
                   clip: true
@@ -1866,10 +1763,14 @@ ShellRoot {
                     }
                   }
 
+                  Component.onCompleted: if (wanted) show()
+                  onWantedChanged: wanted ? show() : hide()
+
                   Timer {
                     id: showTimer
 
                     interval: leftBar.slideDuration
+
                     onTriggered: mediaSlot.contentShown = true
                   }
 
@@ -1877,22 +1778,22 @@ ShellRoot {
                     id: hideTimer
 
                     interval: config.animationDuration
+
                     onTriggered: mediaSlot.expanded = false
                   }
 
                   RowLayout {
                     id: mediaRow
 
-                    property string targetLabel: media.label
+                    readonly property string targetLabel: media.label
                     property string shownLabel: targetLabel
 
                     function update() {
                       if (media.player === null) return
-                        if (leftBar.ready && mediaSlot.contentShown) labelSwap.restart()
-                          else shownLabel = targetLabel
-                    }
 
-                    onTargetLabelChanged: update()
+                      if (leftBar.ready && mediaSlot.contentShown) labelSwap.restart()
+                      else shownLabel = targetLabel
+                    }
 
                     anchors {
                       left: parent.left
@@ -1911,35 +1812,36 @@ ShellRoot {
                       }
                     }
 
+                    onTargetLabelChanged: update()
+
                     SequentialAnimation {
                       id: labelSwap
 
                       NumberAnimation {
-                        target: mediaRow
-                        property: "opacity"
-                        to: 0
                         duration: config.animationDuration
                         easing.type: Easing.OutQuint
+                        property: "opacity"
+                        target: mediaRow
+                        to: 0
                       }
 
                       ScriptAction { script: mediaRow.shownLabel = mediaRow.targetLabel }
 
                       NumberAnimation {
-                        target: mediaRow
-                        property: "opacity"
-                        to: 1
                         duration: config.animationDuration
                         easing.type: Easing.OutQuint
+                        property: "opacity"
+                        target: mediaRow
+                        to: 1
                       }
                     }
 
                     // ── Visualizer ──
                     Row {
-                      id: visualizer
-
                       Layout.alignment: Qt.AlignVCenter
                       Layout.preferredHeight: config.visualizerHeight
                       spacing: config.visualizerBarGap
+                      visible: config.visualizerEnabled
 
                       Repeater {
                         model: config.visualizerBars
@@ -1959,8 +1861,6 @@ ShellRoot {
 
                     // ── Now Playing ──
                     Text {
-                      id: nowPlayingLabel
-
                       color: config.colorText
                       font.family: config.fontFamily
                       font.pixelSize: config.fontSize
@@ -1968,17 +1868,17 @@ ShellRoot {
                       text: mediaRow.shownLabel
 
                       MouseArea {
-                        anchors.fill: parent
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
+                        anchors.fill: parent
 
                         onClicked: mouse => {
                           if (!media.player) return
 
-                            if (mouse.button === Qt.RightButton) {
-                              if (media.player.canGoNext) media.player.next()
-                            } else if (media.player.canTogglePlaying) {
-                              media.player.togglePlaying()
-                            }
+                          if (mouse.button === Qt.RightButton) {
+                            if (media.player.canGoNext) media.player.next()
+                          } else if (media.player.canTogglePlaying) {
+                            media.player.togglePlaying()
+                          }
                         }
                       }
                     }
@@ -1988,91 +1888,26 @@ ShellRoot {
             }
 
             // ── Center Concave 2 ──
-            Shape {
-              id: centerConcave2
-
-              preferredRendererType: Shape.CurveRenderer
+            Concave {
               anchors { left: centerBar.right; top: parent.top }
-              implicitHeight: config.barRadius
-              implicitWidth: config.barRadius
-              transform: Scale {
-                xScale: 1
-                origin { x: config.barRadius / 2; y: 0 }
-              }
-
-              ShapePath {
-                fillColor: config.barColor
-                strokeColor: "transparent"
-                startX: config.barRadius
-                startY: 0
-
-                PathLine {
-                  x: 0
-                  y: 0
-                }
-
-                PathLine {
-                  x: 0
-                  y: config.barRadius
-                }
-
-                PathArc {
-                  direction: PathArc.Clockwise
-                  radiusX: config.barRadius
-                  radiusY: config.barRadius
-                  x: config.barRadius
-                  y: 0
-                }
-              }
+              cfg: config
             }
 
             // ── Right Concave 1 ──
-            Shape {
-              id: rightConcave1
-
-              preferredRendererType: Shape.CurveRenderer
+            Concave {
               anchors { right: rightBar.left; top: parent.top }
-              implicitHeight: config.barRadius
-              implicitWidth: config.barRadius
-              transform: Scale {
-                xScale: -1
-                origin { x: config.barRadius / 2; y: 0 }
-              }
-
-              ShapePath {
-                fillColor: config.barColor
-                strokeColor: "transparent"
-                startX: config.barRadius
-                startY: 0
-
-                PathLine {
-                  x: 0
-                  y: 0
-                }
-
-                PathLine {
-                  x: 0
-                  y: config.barRadius
-                }
-
-                PathArc {
-                  direction: PathArc.Clockwise
-                  radiusX: config.barRadius
-                  radiusY: config.barRadius
-                  x: config.barRadius
-                  y: 0
-                }
-              }
+              cfg: config
+              mirrored: true
             }
 
             // ── Right Bar ──
             Rectangle {
               id: rightBar
 
-              clip: true
-              bottomLeftRadius: config.barRadius
-              color: config.barColor
               anchors { right: parent.right; top: parent.top }
+              bottomLeftRadius: config.barRadius
+              clip: true
+              color: config.barColor
               height: config.barHeight
               width: Math.round(rightRow.x + imSlot.x + imSlot.width + config.barPadding / 2)
 
@@ -2088,9 +1923,9 @@ ShellRoot {
 
                 move: Transition {
                   NumberAnimation {
-                    properties: "x"
                     duration: leftBar.slideDuration
                     easing.type: Easing.InOutQuint
+                    properties: "x"
                   }
                 }
 
@@ -2098,7 +1933,7 @@ ShellRoot {
                 Item {
                   id: traySlot
 
-                  property bool shouldShow: SystemTray.items.values.length > 0
+                  readonly property bool shouldShow: SystemTray.items.values.length > 0
                   property bool revealed: false
 
                   function reveal() {
@@ -2108,17 +1943,6 @@ ShellRoot {
                       trayTimer.restart()
                     } else {
                       revealed = true
-                    }
-                  }
-
-                  Component.onCompleted: if (shouldShow) reveal()
-
-                  onShouldShowChanged: {
-                    if (shouldShow) {
-                      reveal()
-                    } else {
-                      trayTimer.stop()
-                      revealed = false
                     }
                   }
 
@@ -2137,10 +1961,22 @@ ShellRoot {
                     }
                   }
 
+                  Component.onCompleted: if (shouldShow) reveal()
+
+                  onShouldShowChanged: {
+                    if (shouldShow) {
+                      reveal()
+                    } else {
+                      trayTimer.stop()
+                      revealed = false
+                    }
+                  }
+
                   Timer {
                     id: trayTimer
 
                     interval: leftBar.slideDuration
+
                     onTriggered: traySlot.revealed = true
                   }
 
@@ -2167,18 +2003,18 @@ ShellRoot {
                       PopupWindow {
                         id: trayPopup
 
-                        anchor.window: bar
-                        anchor.rect.x: 0
-                        anchor.rect.y: bar.height + config.trayPopupMargin
-                        anchor.rect.width: 1
-                        anchor.rect.height: 1
                         anchor.edges: Edges.Bottom
                         anchor.gravity: Edges.Bottom
+                        anchor.rect.height: 1
+                        anchor.rect.width: 1
+                        anchor.rect.x: 0
+                        anchor.rect.y: bar.height + config.trayPopupMargin
+                        anchor.window: bar
                         color: "transparent"
+                        grabFocus: true
                         implicitHeight: config.trayIconSize + config.trayPopupPadding * 2
                         implicitWidth: trayIcons.implicitWidth + config.trayPopupPadding * 2
                         visible: false
-                        grabFocus: true
 
                         onVisibleChanged: {
                           if (visible) {
@@ -2213,12 +2049,13 @@ ShellRoot {
 
                                 IconImage {
                                   anchors.fill: parent
+                                  asynchronous: true
                                   source: trayDelegate.modelData.icon
                                 }
 
                                 MouseArea {
-                                  anchors.fill: parent
                                   acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
+                                  anchors.fill: parent
 
                                   onClicked: mouse => {
                                     var item = trayDelegate.modelData
@@ -2241,23 +2078,12 @@ ShellRoot {
                       }
                     }
 
-                    // Separator 4
-                    Text {
-                      anchors.verticalCenter: parent.verticalCenter
-                      bottomPadding: 3
-                      color: config.colorText
-                      font.family: config.fontFamily
-                      font.pixelSize: config.fontSize
-                      font.weight: config.fontWeight
-                      text: "|"
-                    }
+                    Separator { cfg: config }
                   }
                 }
 
                 // ── Wallpaper ──
                 Text {
-                  id: wallpaperGlyph
-
                   anchors.verticalCenter: parent.verticalCenter
                   color: config.colorText
                   font.family: config.iconFontFamily
@@ -2265,33 +2091,24 @@ ShellRoot {
                   text: config.wallpaperIcon
 
                   MouseArea {
-                    anchors.fill: parent
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
+                    anchors.fill: parent
 
                     onClicked: mouse => wallpaper.step(mouse.button === Qt.RightButton ? -1 : 1)
                   }
                 }
 
-                // Separator 5
-                Text {
-                  anchors.verticalCenter: parent.verticalCenter
-                  bottomPadding: 3
-                  color: config.colorText
-                  font.family: config.fontFamily
-                  font.pixelSize: config.fontSize
-                  font.weight: config.fontWeight
-                  text: "|"
-                }
+                Separator { cfg: config }
 
                 // ── Volume ──
                 Item {
                   id: volumeItem
 
-                  anchors.verticalCenter: parent.verticalCenter
-                  property var sink: Pipewire.defaultAudioSink
-                  property real volume: sink && sink.audio ? sink.audio.volume : 0
-                  property bool muted: sink && sink.audio ? sink.audio.muted : false
+                  readonly property var sink: Pipewire.defaultAudioSink
+                  readonly property real volume: sink && sink.audio ? sink.audio.volume : 0
+                  readonly property bool muted: sink && sink.audio ? sink.audio.muted : false
 
+                  anchors.verticalCenter: parent.verticalCenter
                   implicitHeight: volumeRow.implicitHeight
                   implicitWidth: volumeRow.implicitWidth
 
@@ -2308,8 +2125,8 @@ ShellRoot {
                       font.family: config.iconFontFamily
                       font.pixelSize: config.iconSize
                       text: volumeItem.muted ? config.volumeIconMuted
-                      : volumeItem.volume < 0.5 ? config.volumeIconLow
-                      : config.volumeIconHigh
+                        : volumeItem.volume < 0.5 ? config.volumeIconLow
+                        : config.volumeIconHigh
                     }
 
                     Text {
@@ -2323,8 +2140,8 @@ ShellRoot {
                   }
 
                   MouseArea {
-                    anchors.fill: parent
                     acceptedButtons: Qt.LeftButton
+                    anchors.fill: parent
 
                     onClicked: {
                       if (volumeItem.sink && volumeItem.sink.audio)
@@ -2334,43 +2151,28 @@ ShellRoot {
                     onWheel: wheel => {
                       if (!volumeItem.sink || !volumeItem.sink.audio) return
 
-                        var delta = wheel.angleDelta.y > 0 ? config.volumeStep : -config.volumeStep
-                        volumeItem.sink.audio.muted = false
-                        volumeItem.sink.audio.volume = Math.max(0, Math.min(1, volumeItem.volume + delta))
+                      var delta = wheel.angleDelta.y > 0 ? config.volumeStep : -config.volumeStep
+                      volumeItem.sink.audio.muted = false
+                      volumeItem.sink.audio.volume = Math.max(0, Math.min(1, volumeItem.volume + delta))
                     }
                   }
                 }
 
-                // Separator 6
-                Text {
-                  anchors.verticalCenter: parent.verticalCenter
-                  bottomPadding: 3
-                  color: config.colorText
-                  font.family: config.fontFamily
-                  font.pixelSize: config.fontSize
-                  font.weight: config.fontWeight
-                  text: "|"
-                }
+                Separator { cfg: config }
 
                 // ── Networks ──
                 Text {
-                  id: networkGlyph
-
                   anchors.verticalCenter: parent.verticalCenter
-                  property string kind: network.kind
-
                   color: config.colorText
                   font.family: config.iconFontFamily
                   font.pixelSize: config.iconSize
-                  opacity: kind === "none" ? config.networkDisconnectedOpacity : 1
-                  text: kind === "ethernet" ? config.networkIconEthernet : config.networkIconWifi
+                  opacity: network.kind === "none" ? config.networkDisconnectedOpacity : 1
+                  text: network.kind === "ethernet" ? config.networkIconEthernet : config.networkIconWifi
 
                   MouseArea {
                     anchors.fill: parent
 
-                    property var networkCommand: ["foot", "-e", "nmtui"]
-
-                    onClicked: Quickshell.execDetached(networkCommand)
+                    onClicked: Quickshell.execDetached(config.networkCommand)
                   }
                 }
 
@@ -2380,8 +2182,8 @@ ShellRoot {
 
                   anchors.verticalCenter: parent.verticalCenter
                   clip: true
-                  width: imText.implicitWidth
                   height: imText.implicitHeight
+                  width: imText.implicitWidth
 
                   Behavior on width {
                     enabled: leftBar.ready
@@ -2395,16 +2197,10 @@ ShellRoot {
                   Text {
                     id: imText
 
-                    property string imJapanese: "mozc"
-                    property string imLabelLatin: "en"
-                    property string imLabelJapanese: "jp"
-                    property string targetText: inputMethod.current === imJapanese ? imLabelJapanese : imLabelLatin
+                    readonly property string targetText: inputMethod.current === config.inputMethodJapanese
+                      ? config.inputMethodLabelJapanese
+                      : config.inputMethodLabelLatin
                     property string shownText: targetText
-
-                    onTargetTextChanged: {
-                      if (leftBar.ready) imSwap.restart()
-                        else shownText = targetText
-                    }
 
                     anchors { left: parent.left; verticalCenter: parent.verticalCenter }
                     color: config.colorText
@@ -2413,25 +2209,30 @@ ShellRoot {
                     font.weight: config.fontWeight
                     text: shownText
 
+                    onTargetTextChanged: {
+                      if (leftBar.ready) imSwap.restart()
+                      else shownText = targetText
+                    }
+
                     SequentialAnimation {
                       id: imSwap
 
                       NumberAnimation {
-                        target: imText
-                        property: "opacity"
-                        to: 0
                         duration: config.animationDuration
                         easing.type: Easing.OutQuint
+                        property: "opacity"
+                        target: imText
+                        to: 0
                       }
 
                       ScriptAction { script: imText.shownText = imText.targetText }
 
                       NumberAnimation {
-                        target: imText
-                        property: "opacity"
-                        to: 1
                         duration: config.animationDuration
                         easing.type: Easing.OutQuint
+                        property: "opacity"
+                        target: imText
+                        to: 1
                       }
                     }
 
@@ -2450,55 +2251,23 @@ ShellRoot {
               anchors { left: true; top: true }
               color: "transparent"
               exclusionMode: ExclusionMode.Ignore
-              mask: Region {}
-              screen: screenRoot.modelData
-              margins.top: config.barHeight
-              visible: !screenRoot.cornersHidden || leftConcave1.x > -config.barRadius
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
+              margins.top: config.barHeight
+              mask: Region {}
+              screen: screenRoot.modelData
+              visible: !screenRoot.cornersHidden || leftConcave1.x > -config.barRadius
 
-              Shape {
+              Concave {
                 id: leftConcave1
 
+                cfg: config
                 x: screenRoot.cornersHidden ? -config.barRadius : 0
 
                 Behavior on x {
                   NumberAnimation {
                     duration: leftBar.slideDuration
                     easing.type: Easing.InOutQuint
-                  }
-                }
-
-                preferredRendererType: Shape.CurveRenderer
-                implicitHeight: config.barRadius
-                implicitWidth: config.barRadius
-                transform: Scale {
-                  xScale: 1
-                  origin { x: config.barRadius / 2; y: 0 }
-                }
-
-                ShapePath {
-                  fillColor: config.barColor
-                  strokeColor: "transparent"
-                  startX: config.barRadius
-                  startY: 0
-
-                  PathLine {
-                    x: 0
-                    y: 0
-                  }
-
-                  PathLine {
-                    x: 0
-                    y: config.barRadius
-                  }
-
-                  PathArc {
-                    direction: PathArc.Clockwise
-                    radiusX: config.barRadius
-                    radiusY: config.barRadius
-                    x: config.barRadius
-                    y: 0
                   }
                 }
               }
@@ -2509,48 +2278,16 @@ ShellRoot {
               anchors { right: true; top: true }
               color: "transparent"
               exclusionMode: ExclusionMode.Ignore
-              mask: Region {}
-              screen: screenRoot.modelData
-              margins.top: config.barHeight
-              visible: !screenRoot.cornersHidden
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
+              margins.top: config.barHeight
+              mask: Region {}
+              screen: screenRoot.modelData
+              visible: !screenRoot.cornersHidden
 
-              Shape {
-                id: rightConcave2
-
-                preferredRendererType: Shape.CurveRenderer
-                implicitHeight: config.barRadius
-                implicitWidth: config.barRadius
-                transform: Scale {
-                  xScale: -1
-                  origin { x: config.barRadius / 2; y: 0 }
-                }
-
-                ShapePath {
-                  fillColor: config.barColor
-                  strokeColor: "transparent"
-                  startX: config.barRadius
-                  startY: 0
-
-                  PathLine {
-                    x: 0
-                    y: 0
-                  }
-
-                  PathLine {
-                    x: 0
-                    y: config.barRadius
-                  }
-
-                  PathArc {
-                    direction: PathArc.Clockwise
-                    radiusX: config.barRadius
-                    radiusY: config.barRadius
-                    x: config.barRadius
-                    y: 0
-                  }
-                }
+              Concave {
+                cfg: config
+                mirrored: true
               }
             }
           }
