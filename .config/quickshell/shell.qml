@@ -739,77 +739,91 @@ ShellRoot {
           }
         }
 
-        // Top-left shadow behind Now Playing: 128 stacked rows.
-        // Each row fades sideways, and the rows fade downward, so the edges are soft.
-        Item {
+        // Top-left shadow behind Now Playing: a quarter ellipse, config.lockPlayingShadowWidth x config.lockPlayingShadowHeight.
+        // The gradient is drawn on a square, then squashed to the requested height.
+        Shape {
           id: playingShadow
 
           anchors { left: parent.left; top: parent.top }
-          height: config.lockPlayingShadowHeight
+          height: width
           visible: media.active && config.lockPlayingShadow > 0
-          width: config.lockPlayingShadowWidth
+          width: Math.max(1, config.lockPlayingShadowWidth)
 
-          Repeater {
-            model: 128
+          transform: Scale {
+            yScale: config.lockPlayingShadowHeight / playingShadow.width
+          }
 
-            Rectangle {
-              id: shadowRow
+          ShapePath {
+            startX: 0
+            startY: 0
+            strokeColor: "transparent"
 
-              required property int index
-              readonly property real fade: Math.pow(1 - (index + 0.5) / 128, 2)
-              readonly property int rowTop: Math.round(index * playingShadow.height / 128)
+            fillGradient: RadialGradient {
+              centerRadius: playingShadow.width
+              centerX: 0
+              centerY: 0
+              focalX: 0
+              focalY: 0
 
-              height: Math.round((index + 1) * playingShadow.height / 128) - rowTop
-              width: playingShadow.width
-              y: rowTop
-
-              gradient: Gradient {
-                orientation: Gradient.Horizontal
-
-                GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * shadowRow.fade * 1) }
-                GradientStop { position: 0.25; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * shadowRow.fade * 0.5625) }
-                GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * shadowRow.fade * 0.25) }
-                GradientStop { position: 0.75; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * shadowRow.fade * 0.0625) }
-                GradientStop { position: 1; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * shadowRow.fade * 0) }
-              }
+              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 1) }
+              GradientStop { position: 0.125; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.765625) }
+              GradientStop { position: 0.25; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.5625) }
+              GradientStop { position: 0.375; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.390625) }
+              GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.25) }
+              GradientStop { position: 0.625; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.140625) }
+              GradientStop { position: 0.75; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.0625) }
+              GradientStop { position: 0.875; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0.015625) }
+              GradientStop { position: 1; color: Qt.rgba(0, 0, 0, config.lockPlayingShadow * 0) }
             }
+
+            PathLine { x: playingShadow.width; y: 0 }
+            PathLine { x: playingShadow.width; y: playingShadow.height }
+            PathLine { x: 0; y: playingShadow.height }
+            PathLine { x: 0; y: 0 }
           }
         }
 
-        // Top-right shadow behind the date and clock: 128 stacked rows.
-        // Each row fades sideways, and the rows fade downward, so the edges are soft.
-        Item {
+        // Top-right shadow behind the date and clock: a quarter ellipse, config.lockClockShadowWidth x config.lockClockShadowHeight.
+        // The gradient is drawn on a square, then squashed to the requested height.
+        Shape {
           id: clockShadow
 
           anchors { right: parent.right; top: parent.top }
-          height: config.lockClockShadowHeight
+          height: width
           visible: config.lockClockShadow > 0
-          width: config.lockClockShadowWidth
+          width: Math.max(1, config.lockClockShadowWidth)
 
-          Repeater {
-            model: 128
+          transform: Scale {
+            yScale: config.lockClockShadowHeight / clockShadow.width
+          }
 
-            Rectangle {
-              id: shadowRow
+          ShapePath {
+            startX: 0
+            startY: 0
+            strokeColor: "transparent"
 
-              required property int index
-              readonly property real fade: Math.pow(1 - (index + 0.5) / 128, 2)
-              readonly property int rowTop: Math.round(index * clockShadow.height / 128)
+            fillGradient: RadialGradient {
+              centerRadius: clockShadow.width
+              centerX: clockShadow.width
+              centerY: 0
+              focalX: clockShadow.width
+              focalY: 0
 
-              height: Math.round((index + 1) * clockShadow.height / 128) - rowTop
-              width: clockShadow.width
-              y: rowTop
-
-              gradient: Gradient {
-                orientation: Gradient.Horizontal
-
-                GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockClockShadow * shadowRow.fade * 0) }
-                GradientStop { position: 0.25; color: Qt.rgba(0, 0, 0, config.lockClockShadow * shadowRow.fade * 0.0625) }
-                GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, config.lockClockShadow * shadowRow.fade * 0.25) }
-                GradientStop { position: 0.75; color: Qt.rgba(0, 0, 0, config.lockClockShadow * shadowRow.fade * 0.5625) }
-                GradientStop { position: 1; color: Qt.rgba(0, 0, 0, config.lockClockShadow * shadowRow.fade * 1) }
-              }
+              GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 1) }
+              GradientStop { position: 0.125; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.765625) }
+              GradientStop { position: 0.25; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.5625) }
+              GradientStop { position: 0.375; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.390625) }
+              GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.25) }
+              GradientStop { position: 0.625; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.140625) }
+              GradientStop { position: 0.75; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.0625) }
+              GradientStop { position: 0.875; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0.015625) }
+              GradientStop { position: 1; color: Qt.rgba(0, 0, 0, config.lockClockShadow * 0) }
             }
+
+            PathLine { x: clockShadow.width; y: 0 }
+            PathLine { x: clockShadow.width; y: clockShadow.height }
+            PathLine { x: 0; y: clockShadow.height }
+            PathLine { x: 0; y: 0 }
           }
         }
 
