@@ -16,8 +16,9 @@ QtObject {
   property real dim: 0                                     // 0 to 1, black overlay on the wallpaper
   property real shadow: 0.75                                // 0 to 1, darkness at the bottom edge (0 = off)
   property real shadowHeight: 0.5                         // Fraction of the screen height the shadow covers
-  property real cornerShadow: 0.7                          // 0 to 1, darkness at the top right corner (0 = off)
-  property int cornerShadowSize: 600                       // Pixels, how far the shadow spreads from the corner
+  property real clockShadow: 0.7                           // 0 to 1, darkness at the top right corner (0 = off)
+  property int clockShadowWidth: 700                       // Pixels
+  property int clockShadowHeight: 320                      // Pixels
   property color backgroundColor: "#18181b"                // Shown if the wallpaper is missing
 
   // ── Font ──
