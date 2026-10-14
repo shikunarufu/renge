@@ -110,6 +110,14 @@ otf-geist-mono-nerd
 ttf-liberation
 wqy-zenhei
 
+# Command shell
+fish
+groff
+pkgfile
+python
+wl-clipboard
+xsel
+
 # Terminal emulator
 foot
 foot-terminfo
