@@ -1,5 +1,5 @@
 import QtQuick
-import QtQuick.Shapes
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Greetd
@@ -179,34 +179,48 @@ ShellRoot {
       }
 
       // Top-right shadow behind the date and clock
-      Shape {
+      Item {
         id: clockShadow
 
         anchors { right: parent.right; top: parent.top }
-        height: config.cornerShadowSize
-        visible: config.cornerShadow > 0
-        width: config.cornerShadowSize
+        height: config.clockShadowHeight
+        visible: config.clockShadow > 0
+        width: config.clockShadowWidth
 
-        ShapePath {
-          startX: 0
-          startY: 0
-          strokeColor: "transparent"
+        layer.enabled: true
+        layer.effect: MultiEffect {
+          maskEnabled: true
+          maskSource: clockShadowMask
+        }
 
-          fillGradient: RadialGradient {
-            centerRadius: clockShadow.width
-            centerX: clockShadow.width
-            centerY: 0
-            focalX: clockShadow.width
-            focalY: 0
+        Rectangle {
+          anchors.fill: parent
 
-            GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.cornerShadow) }
+          gradient: Gradient {
+            GradientStop { position: 0; color: Qt.rgba(0, 0, 0, config.clockShadow) }
             GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
           }
+        }
+      }
 
-          PathLine { x: clockShadow.width; y: 0 }
-          PathLine { x: clockShadow.width; y: clockShadow.height }
-          PathLine { x: 0; y: clockShadow.height }
-          PathLine { x: 0; y: 0 }
+      // Fades the shadow sideways so only the corner side stays dark
+      Item {
+        id: clockShadowMask
+
+        height: clockShadow.height
+        layer.enabled: true
+        visible: false
+        width: clockShadow.width
+
+        Rectangle {
+          anchors.fill: parent
+
+          gradient: Gradient {
+            orientation: Gradient.Horizontal
+
+            GradientStop { position: 0; color: Qt.rgba(0, 0, 0, 0) }
+            GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 1) }
+          }
         }
       }
 
