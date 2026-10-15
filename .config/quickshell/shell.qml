@@ -1,8 +1,8 @@
+import Qt.labs.folderlistmodel
 import QtCore
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Shapes
-import Qt.labs.folderlistmodel
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Mpris
@@ -10,234 +10,106 @@ import Quickshell.Services.Notifications
 import Quickshell.Services.Pam
 import Quickshell.Services.Pipewire
 import Quickshell.Services.SystemTray
-import Quickshell.Widgets
 import Quickshell.Wayland
+import Quickshell.Widgets
 import Quickshell.WindowManager
 
 ShellRoot {
   id: shellRoot
 
-  // Name of the screen whose tray popup is open ("" when closed). Notifications move below it.
   property string trayPopupScreen: ""
 
-  // Emitted to close every popup (power menu, app launcher, tray) on all screens.
   signal dismissPopups()
 
-  // ── Components ──
-  // Inline components cannot see `config` by id, so each one receives what it needs.
-
-  // Vertical bar between bar items.
-  component Separator: Text {
-    required property QtObject cfg
-
-    anchors.verticalCenter: parent.verticalCenter
-    bottomPadding: 3
-    color: cfg.colorText
-    font.family: cfg.fontFamily
-    font.pixelSize: cfg.fontSize
-    font.weight: cfg.fontWeight
-    text: "|"
+  // ── Configuration File ──
+  Config {
+    id: config
   }
 
-  // Concave corner under the bar. `mirrored` flips it horizontally.
-  component Concave: Shape {
-    required property QtObject cfg
-    property bool mirrored: false
-
-    implicitHeight: cfg.barRadius
-    implicitWidth: cfg.barRadius
-    preferredRendererType: Shape.CurveRenderer
-    transform: Scale {
-      origin.x: cfg.barRadius / 2
-      origin.y: 0
-      xScale: mirrored ? -1 : 1
-    }
-
-    ShapePath {
-      fillColor: cfg.barColor
-      startX: cfg.barRadius
-      startY: 0
-      strokeColor: "transparent"
-
-      PathLine { x: 0; y: 0 }
-      PathLine { x: 0; y: cfg.barRadius }
-      PathArc {
-        direction: PathArc.Clockwise
-        radiusX: cfg.barRadius
-        radiusY: cfg.barRadius
-        x: cfg.barRadius
-        y: 0
-      }
-    }
-  }
-
-  // Quarter-ellipse shadow in a top corner, shadowWidth x shadowHeight pixels.
-  // The gradient is drawn on a square, then squashed to the requested height.
-  component CornerShadow: Shape {
-    id: shadow
-
-    property bool rightSide: false
-    property real strength: 0       // 0 to 1; 0 hides it
-    property real shadowWidth: 1920
-    property real shadowHeight: 540
-
-    anchors.left: rightSide ? undefined : parent.left
-    anchors.right: rightSide ? parent.right : undefined
-    anchors.top: parent.top
-    height: width
-    visible: strength > 0
-    width: Math.max(1, shadowWidth)
-
-    transform: Scale {
-      yScale: shadow.shadowHeight / shadow.width
-    }
-
-    ShapePath {
-      startX: 0
-      startY: 0
-      strokeColor: "transparent"
-
-      fillGradient: RadialGradient {
-        centerRadius: shadow.width
-        centerX: shadow.rightSide ? shadow.width : 0
-        centerY: 0
-        focalX: centerX
-        focalY: 0
-
-        GradientStop { position: 0; color: Qt.rgba(0, 0, 0, shadow.strength) }
-        GradientStop { position: 0.125; color: Qt.rgba(0, 0, 0, shadow.strength * 0.765625) }
-        GradientStop { position: 0.25; color: Qt.rgba(0, 0, 0, shadow.strength * 0.5625) }
-        GradientStop { position: 0.375; color: Qt.rgba(0, 0, 0, shadow.strength * 0.390625) }
-        GradientStop { position: 0.5; color: Qt.rgba(0, 0, 0, shadow.strength * 0.25) }
-        GradientStop { position: 0.625; color: Qt.rgba(0, 0, 0, shadow.strength * 0.140625) }
-        GradientStop { position: 0.75; color: Qt.rgba(0, 0, 0, shadow.strength * 0.0625) }
-        GradientStop { position: 0.875; color: Qt.rgba(0, 0, 0, shadow.strength * 0.015625) }
-        GradientStop { position: 1; color: Qt.rgba(0, 0, 0, 0) }
-      }
-
-      PathLine { x: shadow.width; y: 0 }
-      PathLine { x: shadow.width; y: shadow.height }
-      PathLine { x: 0; y: shadow.height }
-      PathLine { x: 0; y: 0 }
-    }
-  }
-
-  // Outlined button that fills with the accent color on hover.
-  // `style` needs: borderColor, borderWidth, hoverColor, textColor, hoverTextColor,
-  // fontFamily, fontWeight, letterSpacing, fontSize, buttonHeight.
-  component OutlineButton: Rectangle {
-    id: button
-
-    required property QtObject style
-    property string label: ""
-    property int horizontalPadding: 24
-    readonly property bool hovered: area.containsMouse
-
-    signal clicked()
-
-    border.color: style.borderColor
-    border.width: style.borderWidth
-    color: hovered ? style.hoverColor : "transparent"
-    implicitHeight: style.buttonHeight
-    implicitWidth: caption.implicitWidth + horizontalPadding
-
-    Text {
-      id: caption
-
-      anchors.centerIn: parent
-      color: button.hovered ? button.style.hoverTextColor : button.style.textColor
-      font.family: button.style.fontFamily
-      font.letterSpacing: button.style.letterSpacing
-      font.pixelSize: button.style.fontSize
-      font.weight: button.style.fontWeight
-      text: button.label
-    }
-
-    MouseArea {
-      id: area
-
-      anchors.fill: parent
-      hoverEnabled: true
-
-      onClicked: button.clicked()
-    }
-  }
-
-  // ── Config ──
-  Config { id: config }
-
-  // One clock for the bar and the lockscreen.
+  // ── Clock ──
   SystemClock {
     id: clock
 
     precision: SystemClock.Minutes
   }
 
-  // ── Wallpaper ──
+  // ── Wallpaper Function ──
   Scope {
     id: wallpaper
 
     property string current: wallpaperSettings.current
 
     function step(delta) {
-      var n = wallpaperFolder.count
-      if (n === 0) return
+      var n = wallpaperFolder.count;
+      if (n === 0)
+        return ;
 
-      var i = -1
+      var i = -1;
       for (var k = 0; k < n; k++) {
-        if (wallpaperFolder.get(k, "filePath") === current) { i = k; break }
+        if (wallpaperFolder.get(k, "filePath") === current) {
+          i = k;
+          break;
+        }
       }
-
-      var next = i === -1 ? 0 : (i + delta + n) % n
-      wallpaperSettings.current = wallpaperFolder.get(next, "filePath")
+      var next = i === -1 ? 0 : (i + delta + n) % n;
+      wallpaperSettings.current = wallpaperFolder.get(next, "filePath");
     }
 
     function applyPixels(data) {
-      var buckets = {}
+      var buckets = {
+      };
       for (var i = 0; i < data.length; i += 4) {
-        if (data[i + 3] < 128) continue
+        if (data[i + 3] < 128)
+          continue;
 
-        var key = ((data[i] >> 4) << 8) | ((data[i + 1] >> 4) << 4) | (data[i + 2] >> 4)
-        var bucket = buckets[key]
-        if (!bucket) bucket = buckets[key] = { n: 0, r: 0, g: 0, b: 0 }
+        var key = ((data[i] >> 4) << 8) | ((data[i + 1] >> 4) << 4) | (data[i + 2] >> 4);
+        var bucket = buckets[key];
+        if (!bucket)
+          bucket = buckets[key] = {
+            "n": 0,
+            "r": 0,
+            "g": 0,
+            "b": 0
+          };
 
-        bucket.n++
-        bucket.r += data[i]
-        bucket.g += data[i + 1]
-        bucket.b += data[i + 2]
+        bucket.n++;
+        bucket.r += data[i];
+        bucket.g += data[i + 1];
+        bucket.b += data[i + 2];
       }
+      var list = Object.keys(buckets).map((k) => {
+        return buckets[k];
+      });
+      list.sort((x, y) => {
+        return y.n - x.n;
+      });
+      var colors = list.slice(0, config.themePaletteSize).map((c) => {
+        return Qt.rgba(c.r / c.n / 255, c.g / c.n / 255, c.b / c.n / 255, 1);
+      });
+      if (colors.length === 0)
+        return ;
 
-      var list = Object.keys(buckets).map(k => buckets[k])
-      list.sort((x, y) => y.n - x.n)
-
-      var colors = list.slice(0, config.themePaletteSize)
-        .map(c => Qt.rgba(c.r / c.n / 255, c.g / c.n / 255, c.b / c.n / 255, 1))
-      if (colors.length === 0) return
-
-      var base = colors[0]
-      var accent = base
-      var best = -1
+      var base = colors[0];
+      var accent = base;
+      var best = -1;
       for (var j = 0; j < colors.length; j++) {
-        var lightness = colors[j].hslLightness
-        if (lightness < 0.2 || lightness > 0.9) continue
+        var lightness = colors[j].hslLightness;
+        if (lightness < 0.2 || lightness > 0.9)
+          continue;
 
-        var score = colors[j].hslSaturation * (1 - Math.abs(lightness - 0.5))
+        var score = colors[j].hslSaturation * (1 - Math.abs(lightness - 0.5));
         if (score > best) {
-          best = score
-          accent = colors[j]
+          best = score;
+          accent = colors[j];
         }
       }
-
-      var accentHue = accent.hslHue >= 0 ? accent.hslHue : 0
-      var hue = base.hslSaturation > 0.08 && base.hslHue >= 0 ? base.hslHue : accentHue
-      var accentSaturation = accent.hslSaturation < 0.1
-        ? accent.hslSaturation
-        : Math.min(Math.max(accent.hslSaturation, config.themeAccentMinSaturation), config.themeAccentMaxSaturation)
-
-      config.barColor = Qt.hsla(hue, Math.min(base.hslSaturation, config.themeBarMaxSaturation), config.themeBarLightness, 1)
-      config.colorText = Qt.hsla(hue, config.themeTextSaturation, config.themeTextLightness, 1)
-      config.colorAccent = Qt.hsla(accentHue, accentSaturation, config.themeAccentLightness, 1)
-      config.colorAccentText = config.barColor
+      var accentHue = accent.hslHue >= 0 ? accent.hslHue : 0;
+      var hue = base.hslSaturation > 0.08 && base.hslHue >= 0 ? base.hslHue : accentHue;
+      var accentSaturation = accent.hslSaturation < 0.1 ? accent.hslSaturation : Math.min(Math.max(accent.hslSaturation, config.themeAccentMinSaturation), config.themeAccentMaxSaturation);
+      config.barColor = Qt.hsla(hue, Math.min(base.hslSaturation, config.themeBarMaxSaturation), config.themeBarLightness, 1);
+      config.colorText = Qt.hsla(hue, config.themeTextSaturation, config.themeTextLightness, 1);
+      config.colorAccent = Qt.hsla(accentHue, accentSaturation, config.themeAccentLightness, 1);
+      config.colorAccentText = config.barColor;
     }
 
     Settings {
@@ -257,14 +129,15 @@ ShellRoot {
       nameFilters: config.wallpaperFormats
       showDirs: false
       sortField: FolderListModel.Name
-
       onStatusChanged: {
-        if (status !== FolderListModel.Ready || picked || count === 0) return
+        if (status !== FolderListModel.Ready || picked || count === 0)
+          return ;
 
-        picked = true
-        if (!config.wallpaperRandomOnStart && wallpaperSettings.current !== "") return
+        picked = true;
+        if (!config.wallpaperRandomOnStart && wallpaperSettings.current !== "")
+          return ;
 
-        wallpaperSettings.current = get(Math.floor(Math.random() * count), "filePath")
+        wallpaperSettings.current = get(Math.floor(Math.random() * count), "filePath");
       }
     }
   }
@@ -279,11 +152,16 @@ ShellRoot {
 
       WlrLayershell.layer: WlrLayer.Background
       WlrLayershell.namespace: "wallpaper"
-      anchors { left: true; right: true; top: true; bottom: true }
-      // Constant: a color that follows the theme would repaint the whole screen on every transition frame.
       color: config.wallpaperFallbackColor
       exclusionMode: ExclusionMode.Ignore
       screen: modelData
+
+      anchors {
+        left: true
+        right: true
+        top: true
+        bottom: true
+      }
 
       Image {
         anchors.fill: parent
@@ -293,7 +171,6 @@ ShellRoot {
         sourceSize: Qt.size(wallpaperWindow.modelData.width, wallpaperWindow.modelData.height)
       }
 
-      // Only the first screen samples colors, and only when the theme is on.
       Loader {
         active: config.themeFromWallpaper && wallpaperWindow.modelData === Quickshell.screens[0]
 
@@ -306,93 +183,88 @@ ShellRoot {
           height: config.themeSampleSize
           width: config.themeSampleSize
           x: -width
-
           onImageLoaded: requestPaint()
           onSourceChanged: requestPaint()
-
           onPaint: {
-            if (source === "" || source === sampled) return
+            if (source === "" || source === sampled)
+              return ;
 
-            var url = "file://" + source
-            if (!isImageLoaded(url)) { loadImage(url); return }
-
-            var ctx = getContext("2d")
-            ctx.clearRect(0, 0, width, height)
-            ctx.drawImage(url, 0, 0, width, height)
-            wallpaper.applyPixels(ctx.getImageData(0, 0, width, height).data)
-            sampled = source
-
-            // The full-size decoded image is not needed after sampling. Free it after this paint.
-            Qt.callLater(function () { sampler.unloadImage(url) })
+            var url = "file://" + source;
+            if (!isImageLoaded(url)) {
+              loadImage(url);
+              return ;
+            }
+            var ctx = getContext("2d");
+            ctx.clearRect(0, 0, width, height);
+            ctx.drawImage(url, 0, 0, width, height);
+            wallpaper.applyPixels(ctx.getImageData(0, 0, width, height).data);
+            sampled = source;
+            Qt.callLater(function() {
+              sampler.unloadImage(url);
+            });
           }
         }
       }
 
-      // Click on the desktop closes open popups.
       MouseArea {
         anchors.fill: parent
-
         onClicked: shellRoot.dismissPopups()
       }
     }
   }
 
-  // ── Now Playing ──
+  // ── Now Playing Function ──
   Scope {
     id: media
 
     property var levels: []
     readonly property var player: {
-      var list = Mpris.players.values
+      var list = Mpris.players.values;
       for (var i = 0; i < list.length; i++) {
-        if (list[i].isPlaying) return list[i]
+        if (list[i].isPlaying)
+          return list[i];
+
       }
-      return null
+      return null;
     }
     readonly property bool active: player !== null
     readonly property string label: {
-      if (!player) return ""
+      if (!player)
+        return "";
 
-      var parts = []
-      if (player.trackTitle) parts.push(player.trackTitle)
-      if (player.trackArtist) parts.push(player.trackArtist)
+      var parts = [];
+      if (player.trackTitle)
+        parts.push(player.trackTitle);
 
-      var text = parts.join(config.nowPlayingSeparator)
-      return text.length > config.nowPlayingMaxLength
-        ? text.substring(0, config.nowPlayingMaxLength - 1) + "…"
-        : text
+      if (player.trackArtist)
+        parts.push(player.trackArtist);
+
+      var text = parts.join(config.nowPlayingSeparator);
+      return text.length > config.nowPlayingMaxLength ? text.substring(0, config.nowPlayingMaxLength - 1) + "…" : text;
     }
 
-    onActiveChanged: if (!active) levels = []
+    onActiveChanged: {
+      if (!active) {
+        levels = [];
+      }
+    }
 
-    // Runs only while something plays.
     Process {
       id: cava
 
       running: media.active && config.visualizerEnabled
-      command: [
-        "sh", "-c",
-        'f="${XDG_RUNTIME_DIR:-/tmp}/quickshell-cava.conf"; printf "%s\\n" "$0" > "$f"; exec cava -p "$f"',
-        "[general]\n"
-        + "bars = " + config.visualizerBars + "\n"
-        + "framerate = " + config.visualizerFramerate + "\n"
-        + "lower_cutoff_freq = " + config.visualizerMinFreq + "\n"
-        + "higher_cutoff_freq = " + config.visualizerMaxFreq + "\n"
-        + "[input]\nmethod = pipewire\nsource = auto\n"
-        + "[output]\nmethod = raw\nraw_target = /dev/stdout\n"
-        + "data_format = ascii\nascii_max_range = 100\n"
-        + "bar_delimiter = 59\nframe_delimiter = 10\n"
-        + "[smoothing]\nnoise_reduction = 77\n"
-      ]
+      command: ["sh", "-c", 'f="${XDG_RUNTIME_DIR:-/tmp}/quickshell-cava.conf"; printf "%s\\n" "$0" > "$f"; exec cava -p "$f"', "[general]\n" + "bars = " + config.visualizerBars + "\n" + "framerate = " + config.visualizerFramerate + "\n" + "lower_cutoff_freq = " + config.visualizerMinFreq + "\n" + "higher_cutoff_freq = " + config.visualizerMaxFreq + "\n" + "[input]\nmethod = pipewire\nsource = auto\n" + "[output]\nmethod = raw\nraw_target = /dev/stdout\n" + "data_format = ascii\nascii_max_range = 100\n" + "bar_delimiter = 59\nframe_delimiter = 10\n" + "[smoothing]\nnoise_reduction = 77\n"]
 
       stdout: SplitParser {
-        onRead: data => {
-          var parts = data.split(";")
-          var out = []
+        onRead: (data) => {
+          var parts = data.split(";");
+          var out = [];
           for (var i = 0; i < parts.length; i++) {
-            if (parts[i] !== "") out.push(Number(parts[i]))
+            if (parts[i] !== "")
+              out.push(Number(parts[i]));
+
           }
-          media.levels = out
+          media.levels = out;
         }
       }
     }
@@ -402,37 +274,41 @@ ShellRoot {
   Scope {
     id: layoutState
 
-    property var symbols: ({})
+    property var symbols: ({
+    })
 
     Process {
       id: layoutWatcher
 
       command: ["mmsg", "watch", "all-monitors"]
       running: true
-
-      stdout: SplitParser {
-        onRead: data => {
-          try {
-            var monitors = JSON.parse(data).monitors || []
-            if (monitors.length === 0) return
-
-            var next = Object.assign({}, layoutState.symbols)
-            for (var i = 0; i < monitors.length; i++) next[monitors[i].name] = monitors[i].layout_symbol
-            layoutState.symbols = next
-          } catch (e) {
-            // Ignore partial or non-JSON lines.
-          }
+      onRunningChanged: {
+        if (!running) {
+          layoutRestart.start();
         }
       }
 
-      onRunningChanged: if (!running) layoutRestart.start()
+      stdout: SplitParser {
+        onRead: (data) => {
+          try {
+            var monitors = JSON.parse(data).monitors || [];
+            if (monitors.length === 0)
+              return ;
+
+            var next = Object.assign({
+            }, layoutState.symbols);
+            for (var i = 0; i < monitors.length; i++) next[monitors[i].name] = monitors[i].layout_symbol
+              layoutState.symbols = next;
+          } catch (e) {
+          }
+        }
+      }
     }
 
     Timer {
       id: layoutRestart
 
       interval: 1000
-
       onTriggered: layoutWatcher.running = true
     }
   }
@@ -443,14 +319,15 @@ ShellRoot {
 
     property string kind: "none"
 
-    // First connected wifi or ethernet device, else "none".
     function parse(text) {
-      var lines = text.split("\n")
+      var lines = text.split("\n");
       for (var i = 0; i < lines.length; i++) {
-        var fields = lines[i].split(":")
-        if ((fields[0] === "wifi" || fields[0] === "ethernet") && fields[1] === "connected") return fields[0]
+        var fields = lines[i].split(":");
+        if ((fields[0] === "wifi" || fields[0] === "ethernet") && fields[1] === "connected")
+          return fields[0];
+
       }
-      return "none"
+      return "none";
     }
 
     Process {
@@ -468,8 +345,11 @@ ShellRoot {
       repeat: true
       running: config.networkEnabled
       triggeredOnStart: true
-
-      onTriggered: if (!networkQuery.running) networkQuery.running = true
+      onTriggered: {
+        if (!networkQuery.running) {
+          networkQuery.running = true;
+        }
+      }
     }
   }
 
@@ -480,9 +360,9 @@ ShellRoot {
     property string current: config.inputMethodLatin
 
     function toggle() {
-      current = current === config.inputMethodJapanese ? config.inputMethodLatin : config.inputMethodJapanese
-      imHold.restart()
-      Quickshell.execDetached(["fcitx5-remote", "-t"])
+      current = current === config.inputMethodJapanese ? config.inputMethodLatin : config.inputMethodJapanese;
+      imHold.restart();
+      Quickshell.execDetached(["fcitx5-remote", "-t"]);
     }
 
     Process {
@@ -491,11 +371,14 @@ ShellRoot {
       command: ["fcitx5-remote", "-n"]
 
       stdout: SplitParser {
-        onRead: data => { if (data !== "" && !imHold.running) inputMethod.current = data.trim() }
+        onRead: (data) => {
+          if (data !== "" && !imHold.running)
+            inputMethod.current = data.trim();
+
+        }
       }
     }
 
-    // Ignores polled values right after a toggle so the label does not flip back.
     Timer {
       id: imHold
 
@@ -507,25 +390,30 @@ ShellRoot {
       repeat: true
       running: config.inputMethodEnabled
       triggeredOnStart: true
-
-      onTriggered: if (!imQuery.running) imQuery.running = true
+      onTriggered: {
+        if (!imQuery.running) {
+          imQuery.running = true;
+        }
+      }
     }
   }
 
-  // ── Launcher State ──
-  // Shared by every screen so recent apps stay in sync.
+  // ── App Launcher Function ──
   Scope {
     id: launcher
 
     property var recentIds: JSON.parse(launcherSettings.recentIdsSerialized)
 
     function record(id) {
-      var list = recentIds.filter(entry => entry !== id)
-      list.unshift(id)
-      if (list.length > config.appLauncherRecentMax) list.length = config.appLauncherRecentMax
+      var list = recentIds.filter((entry) => {
+        return entry !== id;
+      });
+      list.unshift(id);
+      if (list.length > config.appLauncherRecentMax)
+        list.length = config.appLauncherRecentMax;
 
-      recentIds = list
-      launcherSettings.recentIdsSerialized = JSON.stringify(list)
+      recentIds = list;
+      launcherSettings.recentIdsSerialized = JSON.stringify(list);
     }
 
     Settings {
@@ -537,7 +425,7 @@ ShellRoot {
     }
   }
 
-  // ── Notifications ──
+  // ── Notification Function ──
   Scope {
     id: notifications
 
@@ -548,41 +436,44 @@ ShellRoot {
       bodyMarkupSupported: true
       bodySupported: true
       imageSupported: true
-
-      onNotification: n => { n.tracked = true }
+      onNotification: (n) => {
+        n.tracked = true;
+      }
     }
 
     PanelWindow {
-      // Extra top offset while the tray popup is open on this screen.
       property real trayShift: shellRoot.trayPopupScreen === Quickshell.screens[0].name ? config.trayPopupExtent : 0
 
       WlrLayershell.layer: WlrLayer.Overlay
       WlrLayershell.namespace: "notifications"
-      anchors { top: true; left: true; right: true }
       color: "transparent"
       exclusiveZone: 0
       implicitHeight: Math.max(1, notificationColumn.implicitHeight)
-      margins { top: config.notificationMargin + Math.round(trayShift) }
-      mask: Region { item: notificationColumn }
       screen: Quickshell.screens[0]
 
-      Behavior on trayShift {
-        NumberAnimation {
-          duration: config.animationDuration
-          easing.type: Easing.OutCubic
-        }
+      anchors {
+        top: true
+        left: true
+        right: true
+      }
+
+      margins {
+        top: config.notificationMargin + Math.round(trayShift)
       }
 
       ColumnLayout {
         id: notificationColumn
 
-        anchors { right: parent.right; top: parent.top; rightMargin: config.notificationMargin }
         spacing: config.notificationSpacing
         width: config.notificationWidth
 
+        anchors {
+          right: parent.right
+          top: parent.top
+          rightMargin: config.notificationMargin
+        }
+
         Repeater {
-          // Live model (oldest first): cards are added and removed one by one,
-          // so the card on screen is not recreated.
           model: server.trackedNotifications
 
           delegate: Rectangle {
@@ -590,40 +481,42 @@ ShellRoot {
 
             required property var modelData
             required property int index
-
             readonly property var notification: modelData
             readonly property bool critical: notification.urgency === NotificationUrgency.Critical
-            readonly property int timeout: critical ? 0
-              : notification.expireTimeout > 0 ? notification.expireTimeout * 1000
-              : config.notificationTimeout
+            readonly property int timeout: critical ? 0 : notification.expireTimeout > 0 ? notification.expireTimeout * 1000 : config.notificationTimeout
             readonly property bool hasActions: {
-              var list = notification.actions
+              var list = notification.actions;
               for (var i = 0; i < list.length; i++) {
-                if (list[i].identifier !== "default") return true
+                if (list[i].identifier !== "default")
+                  return true;
+
               }
-              return false
+              return false;
             }
             readonly property string iconSource: {
-              if (notification.image !== "") return notification.image
+              if (notification.image !== "")
+                return notification.image;
 
-              var icon = notification.appIcon
-              if (icon === "") return ""
-              return icon.startsWith("/") ? "file://" + icon : Quickshell.iconPath(icon, true)
+              var icon = notification.appIcon;
+              if (icon === "")
+                return "";
+
+              return icon.startsWith("/") ? "file://" + icon : Quickshell.iconPath(icon, true);
             }
-
             property real slideX: config.notificationWidth + config.notificationMargin
             property bool leaving: false
             property bool expireOnClose: false
             property var pendingAction: null
 
             function close(expired, action) {
-              if (leaving) return
+              if (leaving)
+                return ;
 
-              leaving = true
-              expireOnClose = expired
-              pendingAction = action || null
-              slideIn.stop()
-              slideOut.start()
+              leaving = true;
+              expireOnClose = expired;
+              pendingAction = action || null;
+              slideIn.stop();
+              slideOut.start();
             }
 
             Layout.fillWidth: true
@@ -632,11 +525,17 @@ ShellRoot {
             color: config.barColor
             implicitHeight: cardContent.implicitHeight + config.notificationPadding * 2
             radius: config.notificationRadius
-            transform: Translate { x: card.slideX }
             visible: index < config.notificationMax
-
-            Component.onCompleted: if (visible) slideIn.start()
-            onVisibleChanged: if (visible && !leaving) slideIn.start()
+            Component.onCompleted: {
+              if (visible) {
+                slideIn.start();
+              }
+            }
+            onVisibleChanged: {
+              if (visible && !leaving) {
+                slideIn.start();
+              }
+            }
 
             NumberAnimation {
               id: slideIn
@@ -656,51 +555,54 @@ ShellRoot {
               property: "slideX"
               target: card
               to: config.notificationWidth + config.notificationMargin
-
               onFinished: {
-                var n = card.notification
-                var action = card.pendingAction
+                var n = card.notification;
+                var action = card.pendingAction;
                 if (action) {
-                  var keep = n.resident
-                  action.invoke()
-                  if (keep) n.dismiss()
+                  var keep = n.resident;
+                  action.invoke();
+                  if (keep)
+                    n.dismiss();
+
                 } else if (card.expireOnClose) {
-                  n.expire()
+                  n.expire();
                 } else {
-                  n.dismiss()
+                  n.dismiss();
                 }
               }
             }
 
-            HoverHandler { id: cardHover }
+            HoverHandler {
+              id: cardHover
+            }
 
             Timer {
               interval: card.timeout
               running: card.timeout > 0 && card.visible && !card.leaving && !cardHover.hovered
-
               onTriggered: card.close(true)
             }
 
             MouseArea {
               acceptedButtons: Qt.LeftButton | Qt.RightButton
               anchors.fill: parent
-
-              onClicked: mouse => {
+              onClicked: (mouse) => {
                 if (mouse.button === Qt.LeftButton) {
-                  var list = card.notification.actions
+                  var list = card.notification.actions;
                   for (var i = 0; i < list.length; i++) {
                     if (list[i].identifier === "default") {
-                      card.close(false, list[i])
-                      return
+                      card.close(false, list[i]);
+                      return ;
                     }
                   }
                 }
-                card.close(false)
+                card.close(false);
               }
             }
 
             ColumnLayout {
               id: cardContent
+
+              spacing: 8
 
               anchors {
                 left: parent.left
@@ -708,7 +610,6 @@ ShellRoot {
                 top: parent.top
                 margins: config.notificationPadding
               }
-              spacing: 8
 
               RowLayout {
                 Layout.fillWidth: true
@@ -720,7 +621,6 @@ ShellRoot {
                   Layout.preferredWidth: config.notificationIconSize
                   asynchronous: true
                   fillMode: Image.PreserveAspectFit
-                  // Cards waiting behind the visible one do not load their icon.
                   source: card.visible ? card.iconSource : ""
                   sourceSize: Qt.size(config.notificationIconSize * 2, config.notificationIconSize * 2)
                   visible: source != ""
@@ -802,14 +702,28 @@ ShellRoot {
 
                       anchors.fill: parent
                       hoverEnabled: true
-
                       onClicked: card.close(false, actionButton.modelData)
                     }
                   }
                 }
               }
             }
+
+            transform: Translate {
+              x: card.slideX
+            }
           }
+        }
+      }
+
+      mask: Region {
+        item: notificationColumn
+      }
+
+      Behavior on trayShift {
+        NumberAnimation {
+          duration: config.animationDuration
+          easing.type: Easing.OutCubic
         }
       }
     }
@@ -821,32 +735,28 @@ ShellRoot {
 
     property string password: ""
     property bool failed: false
-    readonly property string background: config.lockWallpaper !== ""
-      ? "file://" + config.lockWallpaper
-      : (wallpaper.current !== "" ? "file://" + wallpaper.current : "")
+    readonly property string background: config.lockWallpaper !== "" ? "file://" + config.lockWallpaper : (wallpaper.current !== "" ? "file://" + wallpaper.current : "")
 
     function format(text) {
-      return config.lockUppercase ? text.toUpperCase() : text
+      return config.lockUppercase ? text.toUpperCase() : text;
     }
 
     function submit(input) {
-      if (pam.active || input.text === "") return
+      if (pam.active || input.text === "")
+        return ;
 
-      lockscreen.password = input.text
-      input.text = ""
-      pam.start()
+      lockscreen.password = input.text;
+      input.text = "";
+      pam.start();
     }
 
-    // Call with: qs ipc call lock lock
     IpcHandler {
       target: "lock"
-
       function lock(): void {
         if (!sessionLock.locked) sessionLock.locked = true
       }
     }
 
-    // Look shared by the lockscreen buttons.
     QtObject {
       id: lockStyle
 
@@ -867,20 +777,22 @@ ShellRoot {
 
       config: "password.conf"
       configDirectory: Quickshell.shellDir + "/pam"
-
-      onCompleted: result => {
-        lockscreen.password = ""
+      onCompleted: (result) => {
+        lockscreen.password = "";
         if (result === PamResult.Success) {
-          lockscreen.failed = false
-          sessionLock.locked = false
+          lockscreen.failed = false;
+          sessionLock.locked = false;
         } else {
-          lockscreen.failed = true
+          lockscreen.failed = true;
         }
       }
-      onResponseRequiredChanged: if (responseRequired) respond(lockscreen.password)
+      onResponseRequiredChanged: {
+        if (responseRequired) {
+          respond(lockscreen.password);
+        }
+      }
     }
 
-    // Surfaces exist only while locked, so none of this is kept in memory otherwise.
     WlSessionLock {
       id: sessionLock
 
@@ -891,7 +803,6 @@ ShellRoot {
           anchors.fill: parent
           asynchronous: true
           fillMode: Image.PreserveAspectCrop
-          // Wait for the real size so the wallpaper is decoded once, at screen size.
           source: width > 0 ? lockscreen.background : ""
           sourceSize: Qt.size(width, height)
         }
@@ -902,25 +813,36 @@ ShellRoot {
           opacity: config.lockDim
         }
 
-        // Bottom shadow so the login and buttons stay readable
         Rectangle {
-          anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
           height: parent.height * config.lockShadowHeight
 
+          anchors {
+            left: parent.left
+            right: parent.right
+            bottom: parent.bottom
+          }
+
           gradient: Gradient {
-            GradientStop { position: 0; color: Qt.rgba(0, 0, 0, 0) }
-            GradientStop { position: 1; color: Qt.rgba(0, 0, 0, config.lockShadow) }
+            GradientStop {
+              position: 0
+              color: Qt.rgba(0, 0, 0, 0)
+            }
+
+            GradientStop {
+              position: 1
+              color: Qt.rgba(0, 0, 0, config.lockShadow)
+            }
           }
         }
 
-        // Top-left shadow behind Now Playing
+        // ── Now Playing Shadow ──
         CornerShadow {
           shadowHeight: config.lockPlayingShadowHeight
           shadowWidth: config.lockPlayingShadowWidth
           strength: media.active ? config.lockPlayingShadow : 0
         }
 
-        // Top-right shadow behind the date and clock
+        // ── Clock Shadow ──
         CornerShadow {
           rightSide: true
           shadowHeight: config.lockClockShadowHeight
@@ -928,9 +850,8 @@ ShellRoot {
           strength: config.lockClockShadow
         }
 
-        // ── Top left: Now Playing (hidden when nothing is playing) ──
+        // ── Lock Screen Now Playing ──
         Text {
-          anchors { left: parent.left; top: parent.top; margins: config.lockMargin }
           color: config.lockColorText
           font.family: config.lockFontFamily
           font.letterSpacing: config.lockLetterSpacing
@@ -938,12 +859,23 @@ ShellRoot {
           font.weight: config.lockFontWeight
           text: lockscreen.format(media.label)
           visible: media.active
+
+          anchors {
+            left: parent.left
+            top: parent.top
+            margins: config.lockMargin
+          }
         }
 
-        // ── Top right: date and clock ──
+        // ── Lock Screen Clock ──
         Column {
-          anchors { right: parent.right; top: parent.top; margins: config.lockMargin }
           spacing: 4
+
+          anchors {
+            right: parent.right
+            top: parent.top
+            margins: config.lockMargin
+          }
 
           Text {
             anchors.right: parent.right
@@ -965,10 +897,15 @@ ShellRoot {
           }
         }
 
-        // ── Bottom left: username, password, login ──
+        // ── Login ──
         Column {
-          anchors { left: parent.left; bottom: parent.bottom; margins: config.lockMargin }
           spacing: config.lockSpacing
+
+          anchors {
+            left: parent.left
+            bottom: parent.bottom
+            margins: config.lockMargin
+          }
 
           Text {
             color: config.lockColorText
@@ -986,24 +923,34 @@ ShellRoot {
             TextInput {
               id: lockInput
 
-              anchors { left: parent.left; right: parent.right; bottom: lockLine.top; bottomMargin: 4 }
               color: config.lockColorText
               echoMode: TextInput.Password
               focus: true
               font.family: config.lockFontFamily
               font.pixelSize: config.lockLabelSize
               readOnly: pam.active
-
               onAccepted: lockscreen.submit(lockInput)
               onTextChanged: lockscreen.failed = false
+
+              anchors {
+                left: parent.left
+                right: parent.right
+                bottom: lockLine.top
+                bottomMargin: 4
+              }
             }
 
             Rectangle {
               id: lockLine
 
-              anchors { left: parent.left; right: parent.right; bottom: parent.bottom }
               color: lockscreen.failed ? config.lockColorError : config.lockColorAccent
               height: 2
+
+              anchors {
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+              }
             }
           }
 
@@ -1016,7 +963,6 @@ ShellRoot {
               horizontalPadding: config.lockLoginPadding
               label: lockscreen.format(config.lockLoginLabel)
               style: lockStyle
-
               onClicked: lockscreen.submit(lockInput)
             }
 
@@ -1033,10 +979,15 @@ ShellRoot {
           }
         }
 
-        // ── Bottom right: power buttons ──
+        // ── Lock Screen Power Button ──
         Row {
-          anchors { right: parent.right; bottom: parent.bottom; margins: config.lockMargin }
           spacing: config.lockSpacing
+
+          anchors {
+            right: parent.right
+            bottom: parent.bottom
+            margins: config.lockMargin
+          }
 
           Repeater {
             model: config.lockActions
@@ -1047,7 +998,6 @@ ShellRoot {
               horizontalPadding: config.lockButtonPadding
               label: lockscreen.format(modelData.label)
               style: lockStyle
-
               onClicked: Quickshell.execDetached(["sh", "-c", modelData.command])
             }
           }
@@ -1067,30 +1017,32 @@ ShellRoot {
         id: screenRoot
 
         required property ShellScreen modelData
-
         readonly property bool cornersHidden: config.cornerHiddenLayouts.indexOf(layoutState.symbols[modelData.name]) !== -1
+        property string openPopup: ""
 
-        // Only one popup is open at a time. Two popups with a focus grab open together
-        // get placed relative to each other instead of the bar.
-        property string openPopup: ""  // "", "power", "launcher" or "tray"
-
-        // Closing is deferred so a popup is never destroyed from inside its own event handler.
         function closePopup(name) {
-          Qt.callLater(() => { if (openPopup === name) openPopup = "" })
+          Qt.callLater(() => {
+            if (openPopup === name)
+              openPopup = "";
+
+          });
         }
 
         function togglePopup(name) {
-          var wasOpen = openPopup === name
-          shellRoot.dismissPopups()
-          if (!wasOpen) Qt.callLater(() => { openPopup = name })
+          var wasOpen = openPopup === name;
+          shellRoot.dismissPopups();
+          if (!wasOpen)
+            Qt.callLater(() => {
+              openPopup = name;
+            });
         }
 
         Connections {
-          target: shellRoot
-
           function onDismissPopups() {
-            screenRoot.openPopup = ""
+            screenRoot.openPopup = "";
           }
+
+          target: shellRoot
         }
 
         PanelWindow {
@@ -1099,19 +1051,22 @@ ShellRoot {
           readonly property var projection: WindowManager.screenProjection(screenRoot.modelData)
 
           WlrLayershell.layer: WlrLayer.Bottom
-          anchors { left: true; right: true; top: true }
           color: "transparent"
           exclusiveZone: config.barHeight
           implicitHeight: config.barHeight
           screen: screenRoot.modelData
 
+          anchors {
+            left: true
+            right: true
+            top: true
+          }
+
           Item {
             anchors.fill: parent
 
-            // Click on empty bar space closes open popups.
             MouseArea {
               anchors.fill: parent
-
               onClicked: shellRoot.dismissPopups()
             }
 
@@ -1122,37 +1077,32 @@ ShellRoot {
               property int slideDuration: config.barSlideDuration
               property bool ready: false
 
-              anchors { left: parent.left; top: parent.top }
               bottomRightRadius: config.barRadius
               clip: true
               color: config.barColor
               height: config.barHeight
               width: Math.round(leftRow.x + focusSlot.x + focusSlot.width + config.barPadding / 2)
 
-              // Animations stay off for the first second so startup does not slide everything in.
+              anchors {
+                left: parent.left
+                top: parent.top
+              }
+
               Timer {
                 interval: 1000
                 running: true
-
                 onTriggered: leftBar.ready = true
               }
 
               Row {
                 id: leftRow
 
+                spacing: config.barItemSpacing
+
                 anchors {
                   left: parent.left
                   leftMargin: config.barPadding / 2
                   verticalCenter: parent.verticalCenter
-                }
-                spacing: config.barItemSpacing
-
-                move: Transition {
-                  NumberAnimation {
-                    duration: leftBar.slideDuration
-                    easing.type: Easing.InOutQuint
-                    properties: "x"
-                  }
                 }
 
                 // ── Power Menu ──
@@ -1165,12 +1115,13 @@ ShellRoot {
 
                   MouseArea {
                     anchors.fill: parent
-
                     onClicked: screenRoot.togglePopup("power")
                   }
                 }
 
-                Separator { cfg: config }
+                Separator {
+                  cfg: config
+                }
 
                 // ── Layout ──
                 Text {
@@ -1188,15 +1139,16 @@ ShellRoot {
 
                   MouseArea {
                     anchors.fill: parent
-
                     onClicked: {
-                      layoutGlyph.nextIndex = (layoutGlyph.nextIndex + 1) % config.layoutCycle.length
-                      Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + config.layoutCycle[layoutGlyph.nextIndex]])
+                      layoutGlyph.nextIndex = (layoutGlyph.nextIndex + 1) % config.layoutCycle.length;
+                      Quickshell.execDetached(["mmsg", "dispatch", "setlayout," + config.layoutCycle[layoutGlyph.nextIndex]]);
                     }
                   }
                 }
 
-                Separator { cfg: config }
+                Separator {
+                  cfg: config
+                }
 
                 // ── Workspace ──
                 Row {
@@ -1205,14 +1157,6 @@ ShellRoot {
                   anchors.verticalCenter: parent.verticalCenter
                   spacing: config.workspaceSpacing
 
-                  move: Transition {
-                    NumberAnimation {
-                      duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuint
-                      properties: "x"
-                    }
-                  }
-
                   Repeater {
                     model: bar.projection ? bar.projection.windowsets : []
 
@@ -1220,18 +1164,17 @@ ShellRoot {
                       id: workspaceDelegate
 
                       required property var modelData
-
                       readonly property var ws: modelData
                       readonly property bool shouldShow: ws.shouldDisplay
                       property bool revealed: false
 
                       function reveal() {
-                        revealTimer.stop()
+                        revealTimer.stop();
                         if (leftBar.ready) {
-                          revealed = false
-                          revealTimer.restart()
+                          revealed = false;
+                          revealTimer.restart();
                         } else {
-                          revealed = true
+                          revealed = true;
                         }
                       }
 
@@ -1242,24 +1185,17 @@ ShellRoot {
                       opacity: revealed ? 1 : 0
                       radius: config.workspaceRadius
                       visible: shouldShow || opacity > 0
-
-                      Behavior on opacity {
-                        enabled: leftBar.ready
-
-                        NumberAnimation {
-                          duration: config.animationDuration
-                          easing.type: Easing.OutQuint
+                      Component.onCompleted: {
+                        if (shouldShow) {
+                          reveal();
                         }
                       }
-
-                      Component.onCompleted: if (shouldShow) reveal()
-
                       onShouldShowChanged: {
                         if (shouldShow) {
-                          reveal()
+                          reveal();
                         } else {
-                          revealTimer.stop()
-                          revealed = false
+                          revealTimer.stop();
+                          revealed = false;
                         }
                       }
 
@@ -1267,7 +1203,6 @@ ShellRoot {
                         id: revealTimer
 
                         interval: leftBar.slideDuration
-
                         onTriggered: workspaceDelegate.revealed = true
                       }
 
@@ -1286,14 +1221,36 @@ ShellRoot {
                       MouseArea {
                         anchors.fill: parent
                         enabled: workspaceDelegate.shouldShow
-
-                        onClicked: if (workspaceDelegate.ws.canActivate) workspaceDelegate.ws.activate()
+                        onClicked: {
+                          if (workspaceDelegate.ws.canActivate) {
+                            workspaceDelegate.ws.activate();
+                          }
+                        }
                       }
+
+                      Behavior on opacity {
+                        enabled: leftBar.ready
+
+                        NumberAnimation {
+                          duration: config.animationDuration
+                          easing.type: Easing.OutQuint
+                        }
+                      }
+                    }
+                  }
+
+                  move: Transition {
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuint
+                      properties: "x"
                     }
                   }
                 }
 
-                Separator { cfg: config }
+                Separator {
+                  cfg: config
+                }
 
                 // ── App Launcher ──
                 Text {
@@ -1305,7 +1262,6 @@ ShellRoot {
 
                   MouseArea {
                     anchors.fill: parent
-
                     onClicked: screenRoot.togglePopup("launcher")
                   }
                 }
@@ -1319,44 +1275,36 @@ ShellRoot {
                   height: focusWindow.implicitHeight
                   width: focusWindow.implicitWidth
 
-                  Behavior on width {
-                    enabled: leftBar.ready
-
-                    NumberAnimation {
-                      duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuint
-                    }
-                  }
-
                   RowLayout {
                     id: focusWindow
 
                     readonly property var toplevel: ToplevelManager.activeToplevel
                     readonly property string appKey: toplevel ? toplevel.appId.toLowerCase() : ""
-                    readonly property string targetIcon: toplevel
-                      ? (config.focusWindowIcons[appKey] || config.focusWindowGlyph)
-                      : config.focusWindowGlyph
-                    readonly property string targetLabel: toplevel
-                      ? (config.focusWindowNames[appKey] || toplevel.appId)
-                      : config.focusWindowPlaceholder
+                    readonly property string targetIcon: toplevel ? (config.focusWindowIcons[appKey] || config.focusWindowGlyph) : config.focusWindowGlyph
+                    readonly property string targetLabel: toplevel ? (config.focusWindowNames[appKey] || toplevel.appId) : config.focusWindowPlaceholder
                     property string shownIcon: targetIcon
                     property string shownLabel: targetLabel
 
                     function apply() {
-                      shownIcon = targetIcon
-                      shownLabel = targetLabel
+                      shownIcon = targetIcon;
+                      shownLabel = targetLabel;
                     }
 
                     function update() {
-                      if (leftBar.ready) swap.restart()
-                      else apply()
+                      if (leftBar.ready)
+                        swap.restart();
+                      else
+                        apply();
                     }
 
-                    anchors { left: parent.left; verticalCenter: parent.verticalCenter }
                     spacing: 8
-
                     onTargetIconChanged: update()
                     onTargetLabelChanged: update()
+
+                    anchors {
+                      left: parent.left
+                      verticalCenter: parent.verticalCenter
+                    }
 
                     SequentialAnimation {
                       id: swap
@@ -1369,7 +1317,9 @@ ShellRoot {
                         to: 0
                       }
 
-                      ScriptAction { script: focusWindow.apply() }
+                      ScriptAction {
+                        script: focusWindow.apply()
+                      }
 
                       NumberAnimation {
                         duration: config.animationDuration
@@ -1396,6 +1346,23 @@ ShellRoot {
                       text: focusWindow.shownLabel
                     }
                   }
+
+                  Behavior on width {
+                    enabled: leftBar.ready
+
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuint
+                    }
+                  }
+                }
+
+                move: Transition {
+                  NumberAnimation {
+                    duration: leftBar.slideDuration
+                    easing.type: Easing.InOutQuint
+                    properties: "x"
+                  }
                 }
               }
             }
@@ -1407,7 +1374,6 @@ ShellRoot {
               active: screenRoot.openPopup === "power"
 
               PopupWindow {
-                // Anchored to the bar window: left screen edge, just below the bar.
                 anchor.edges: Edges.Top | Edges.Left
                 anchor.gravity: Edges.Bottom | Edges.Right
                 anchor.rect.x: config.powerMenuMargin
@@ -1418,8 +1384,11 @@ ShellRoot {
                 implicitHeight: powerMenuColumn.implicitHeight + config.powerMenuPadding * 2
                 implicitWidth: config.powerMenuWidth
                 visible: true
-
-                onVisibleChanged: if (!visible) screenRoot.closePopup("power")
+                onVisibleChanged: {
+                  if (!visible) {
+                    screenRoot.closePopup("power");
+                  }
+                }
 
                 Rectangle {
                   anchors.fill: parent
@@ -1461,10 +1430,9 @@ ShellRoot {
 
                           anchors.fill: parent
                           hoverEnabled: true
-
                           onClicked: {
-                            Quickshell.execDetached(["sh", "-c", powerMenuOption.modelData.command])
-                            screenRoot.closePopup("power")
+                            Quickshell.execDetached(["sh", "-c", powerMenuOption.modelData.command]);
+                            screenRoot.closePopup("power");
                           }
                         }
                       }
@@ -1473,9 +1441,8 @@ ShellRoot {
                 }
               }
             }
+
             // ── App Launcher Click Catcher ──
-            // Full-screen transparent window below the launcher. A click anywhere
-            // outside the launcher closes it; mouse movement does nothing.
             LazyLoader {
               id: launcherCatcherLoader
 
@@ -1485,16 +1452,21 @@ ShellRoot {
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
                 WlrLayershell.layer: WlrLayer.Top
                 WlrLayershell.namespace: "app-launcher-catcher"
-                anchors { left: true; right: true; top: true; bottom: true }
                 color: "transparent"
                 exclusionMode: ExclusionMode.Ignore
                 screen: screenRoot.modelData
                 visible: true
 
+                anchors {
+                  left: true
+                  right: true
+                  top: true
+                  bottom: true
+                }
+
                 MouseArea {
                   acceptedButtons: Qt.AllButtons
                   anchors.fill: parent
-
                   onClicked: screenRoot.closePopup("launcher")
                 }
               }
@@ -1511,80 +1483,98 @@ ShellRoot {
 
                 property string searchQuery: ""
                 property int selectedIndex: 0
+                property var recentSnapshot: []
                 readonly property int chromeHeight: config.appLauncherSearchHeight + config.appLauncherPadding * 3
                 readonly property int fullHeight: chromeHeight + config.appLauncherMaxVisible * config.appLauncherItemHeight
-
-                // This window exists only while the launcher is open (see the LazyLoader),
-                // so the app list is sorted once per opening and freed on close.
-                readonly property var appsByName: DesktopEntries.applications.values.slice().sort((a, b) => a.name.localeCompare(b.name))
+                readonly property var appsByName: DesktopEntries.applications.values.slice().sort((a, b) => {
+                  return a.name.localeCompare(b.name);
+                })
                 readonly property var filteredApps: {
-                  var apps = appsByName
-                  var q = searchQuery.trim().toLowerCase()
-                  if (q !== "") return apps.filter(entry => matches(entry, q))
+                  var apps = appsByName;
+                  var q = searchQuery.trim().toLowerCase();
+                  if (q !== "")
+                    return apps.filter((entry) => {
+                      return matches(entry, q);
+                    });
 
-                  // No search: recently launched apps first, the rest by name.
-                  var rank = new Map()
-                  var recent = launcher.recentIds
+                  var rank = new Map();
+                  var recent = recentSnapshot;
                   for (var i = 0; i < recent.length; i++) rank.set(recent[i], i)
-
-                  var head = []
-                  var tail = []
+                    var head = [];
+                  var tail = [];
                   for (var j = 0; j < apps.length; j++) {
-                    if (rank.has(apps[j].id)) head.push(apps[j])
-                    else tail.push(apps[j])
+                    if (rank.has(apps[j].id))
+                      head.push(apps[j]);
+                    else
+                      tail.push(apps[j]);
                   }
-                  head.sort((a, b) => rank.get(a.id) - rank.get(b.id))
-                  return head.concat(tail)
+                  head.sort((a, b) => {
+                    return rank.get(a.id) - rank.get(b.id);
+                  });
+                  return head.concat(tail);
                 }
 
                 function matches(entry, q) {
-                  if (entry.name.toLowerCase().indexOf(q) !== -1) return true
-                  if (entry.genericName && entry.genericName.toLowerCase().indexOf(q) !== -1) return true
+                  if (entry.name.toLowerCase().indexOf(q) !== -1)
+                    return true;
+
+                  if (entry.genericName && entry.genericName.toLowerCase().indexOf(q) !== -1)
+                    return true;
 
                   for (var i = 0; i < entry.keywords.length; i++) {
-                    if (entry.keywords[i].toLowerCase().indexOf(q) !== -1) return true
+                    if (entry.keywords[i].toLowerCase().indexOf(q) !== -1)
+                      return true;
+
                   }
-                  return false
+                  return false;
                 }
 
                 function navigate(delta) {
-                  if (filteredApps.length === 0) return
+                  if (filteredApps.length === 0)
+                    return ;
 
-                  selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length
-                  appList.positionViewAtIndex(selectedIndex, ListView.Contain)
+                  selectedIndex = (selectedIndex + delta + filteredApps.length) % filteredApps.length;
+                  appList.positionViewAtIndex(selectedIndex, ListView.Contain);
                 }
 
                 function launchEntry(entry) {
-                  launcher.record(entry.id)
-                  entry.execute()
-                  screenRoot.closePopup("launcher")
+                  launcher.record(entry.id);
+                  entry.execute();
+                  screenRoot.closePopup("launcher");
                 }
 
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
                 WlrLayershell.layer: WlrLayer.Overlay
                 WlrLayershell.namespace: "app-launcher"
-                anchors { top: true }
                 color: "transparent"
                 exclusionMode: ExclusionMode.Ignore
                 implicitHeight: fullHeight
                 implicitWidth: config.appLauncherWidth
                 margins.top: Math.max(0, Math.round((screenRoot.modelData.height - fullHeight) / 2))
-                mask: Region { item: launcherCard }
                 screen: screenRoot.modelData
                 visible: true
-
                 onFilteredAppsChanged: selectedIndex = 0
+                Component.onCompleted: {
+                  recentSnapshot = launcher.recentIds;
+                  searchField.forceActiveFocus();
+                }
 
-                Component.onCompleted: searchField.forceActiveFocus()
+                anchors {
+                  top: true
+                }
 
                 Rectangle {
                   id: launcherCard
 
-                  anchors { left: parent.left; right: parent.right; top: parent.top }
                   color: config.barColor
-                  height: appLauncherPopup.chromeHeight
-                    + Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
+                  height: appLauncherPopup.chromeHeight + Math.min(appLauncherPopup.filteredApps.length, config.appLauncherMaxVisible) * config.appLauncherItemHeight
                   radius: config.workspaceRadius
+
+                  anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                  }
 
                   ColumnLayout {
                     anchors.fill: parent
@@ -1608,23 +1598,22 @@ ShellRoot {
                         font.family: config.fontFamily
                         font.pixelSize: config.fontSize
                         verticalAlignment: TextInput.AlignVCenter
-
                         onTextChanged: appLauncherPopup.searchQuery = text
-
-                        Keys.onPressed: function (event) {
+                        Keys.onPressed: function(event) {
                           if (event.key === Qt.Key_Up) {
-                            appLauncherPopup.navigate(-1)
-                            event.accepted = true
+                            appLauncherPopup.navigate(-1);
+                            event.accepted = true;
                           } else if (event.key === Qt.Key_Down) {
-                            appLauncherPopup.navigate(1)
-                            event.accepted = true
+                            appLauncherPopup.navigate(1);
+                            event.accepted = true;
                           } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
                             if (appLauncherPopup.filteredApps.length > 0)
-                              appLauncherPopup.launchEntry(appLauncherPopup.filteredApps[appLauncherPopup.selectedIndex])
-                            event.accepted = true
+                              appLauncherPopup.launchEntry(appLauncherPopup.filteredApps[appLauncherPopup.selectedIndex]);
+
+                            event.accepted = true;
                           } else if (event.key === Qt.Key_Escape) {
-                            screenRoot.closePopup("launcher")
-                            event.accepted = true
+                            screenRoot.closePopup("launcher");
+                            event.accepted = true;
                           }
                         }
 
@@ -1683,7 +1672,6 @@ ShellRoot {
                             anchors.verticalCenter: parent.verticalCenter
                             asynchronous: true
                             height: config.appLauncherIconSize
-                            // Icons are decoded at display size instead of their file size.
                             source: appRow.modelData.icon !== "" ? "image://icon/" + appRow.modelData.icon : ""
                             sourceSize: Qt.size(config.appLauncherIconSize * 2, config.appLauncherIconSize * 2)
                             width: config.appLauncherIconSize
@@ -1704,7 +1692,6 @@ ShellRoot {
                         MouseArea {
                           anchors.fill: parent
                           hoverEnabled: true
-
                           onClicked: appLauncherPopup.launchEntry(appRow.modelData)
                           onEntered: appLauncherPopup.selectedIndex = appRow.index
                         }
@@ -1712,55 +1699,62 @@ ShellRoot {
                     }
                   }
                 }
+
+                mask: Region {
+                  item: launcherCard
+                }
               }
             }
+
             // ── Left Concave 2 ──
             Concave {
-              anchors { left: leftBar.right; top: parent.top }
               cfg: config
+
+              anchors {
+                left: leftBar.right
+                top: parent.top
+              }
             }
 
             // ── Center Concave 1 ──
             Concave {
-              anchors { right: centerBar.left; top: parent.top }
               cfg: config
               mirrored: true
+
+              anchors {
+                right: centerBar.left
+                top: parent.top
+              }
             }
 
             // ── Center Bar ──
             Rectangle {
               id: centerBar
 
-              readonly property real contentEdge: mediaSlot.width > 0
-                ? mediaSlot.x + mediaSlot.width
-                : clockLabel.x + clockLabel.width
+              readonly property real contentEdge: mediaSlot.width > 0 ? mediaSlot.x + mediaSlot.width : clockLabel.x + clockLabel.width
               readonly property int roundedWidth: Math.round(centerRow.x + contentEdge + config.barPadding / 2)
 
-              anchors { horizontalCenter: parent.horizontalCenter; top: parent.top }
               bottomLeftRadius: config.barRadius
               bottomRightRadius: config.barRadius
               clip: true
               color: config.barColor
               height: config.barHeight
-              // Keeps the left and right margins equal so the bar stays centered on whole pixels.
               width: ((parent.width - roundedWidth) % 2 !== 0) ? roundedWidth + 1 : roundedWidth
+
+              anchors {
+                horizontalCenter: parent.horizontalCenter
+                top: parent.top
+              }
 
               Row {
                 id: centerRow
+
+                spacing: 0
 
                 anchors {
                   left: parent.left
                   leftMargin: config.barPadding / 2
                   verticalCenter: parent.verticalCenter
-                }
-                spacing: 0
-
-                move: Transition {
-                  NumberAnimation {
-                    duration: leftBar.slideDuration
-                    easing.type: Easing.InOutQuint
-                    properties: "x"
-                  }
                 }
 
                 // ── Clock ──
@@ -1784,46 +1778,41 @@ ShellRoot {
                   readonly property bool wanted: media.active
 
                   function show() {
-                    hideTimer.stop()
-                    expanded = true
+                    hideTimer.stop();
+                    expanded = true;
                     if (leftBar.ready) {
-                      contentShown = false
-                      showTimer.restart()
+                      contentShown = false;
+                      showTimer.restart();
                     } else {
-                      contentShown = true
+                      contentShown = true;
                     }
                   }
 
                   function hide() {
-                    showTimer.stop()
-                    labelSwap.stop()
-                    contentShown = false
-                    if (leftBar.ready) hideTimer.restart()
-                    else expanded = false
+                    showTimer.stop();
+                    labelSwap.stop();
+                    contentShown = false;
+                    if (leftBar.ready)
+                      hideTimer.restart();
+                    else
+                      expanded = false;
                   }
 
                   anchors.verticalCenter: parent.verticalCenter
                   clip: true
                   height: mediaRow.implicitHeight
                   width: expanded ? config.barItemSpacing + mediaRow.implicitWidth : 0
-
-                  Behavior on width {
-                    enabled: leftBar.ready
-
-                    NumberAnimation {
-                      duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuint
+                  Component.onCompleted: {
+                    if (wanted) {
+                      show();
                     }
                   }
-
-                  Component.onCompleted: if (wanted) show()
                   onWantedChanged: wanted ? show() : hide()
 
                   Timer {
                     id: showTimer
 
                     interval: leftBar.slideDuration
-
                     onTriggered: mediaSlot.contentShown = true
                   }
 
@@ -1831,7 +1820,6 @@ ShellRoot {
                     id: hideTimer
 
                     interval: config.animationDuration
-
                     onTriggered: mediaSlot.expanded = false
                   }
 
@@ -1842,30 +1830,24 @@ ShellRoot {
                     property string shownLabel: targetLabel
 
                     function update() {
-                      if (media.player === null) return
+                      if (media.player === null)
+                        return ;
 
-                      if (leftBar.ready && mediaSlot.contentShown) labelSwap.restart()
-                      else shownLabel = targetLabel
+                      if (leftBar.ready && mediaSlot.contentShown)
+                        labelSwap.restart();
+                      else
+                        shownLabel = targetLabel;
                     }
+
+                    opacity: mediaSlot.contentShown ? 1 : 0
+                    spacing: config.barItemSpacing
+                    onTargetLabelChanged: update()
 
                     anchors {
                       left: parent.left
                       leftMargin: config.barItemSpacing
                       verticalCenter: parent.verticalCenter
                     }
-                    opacity: mediaSlot.contentShown ? 1 : 0
-                    spacing: config.barItemSpacing
-
-                    Behavior on opacity {
-                      enabled: leftBar.ready && !labelSwap.running
-
-                      NumberAnimation {
-                        duration: config.animationDuration
-                        easing.type: Easing.OutQuint
-                      }
-                    }
-
-                    onTargetLabelChanged: update()
 
                     SequentialAnimation {
                       id: labelSwap
@@ -1878,7 +1860,9 @@ ShellRoot {
                         to: 0
                       }
 
-                      ScriptAction { script: mediaRow.shownLabel = mediaRow.targetLabel }
+                      ScriptAction {
+                        script: mediaRow.shownLabel = mediaRow.targetLabel
+                      }
 
                       NumberAnimation {
                         duration: config.animationDuration
@@ -1907,7 +1891,11 @@ ShellRoot {
                           height: Math.max(config.visualizerBarWidth, ((media.levels[index] || 0) / 100) * config.visualizerHeight)
                           width: config.visualizerBarWidth
 
-                          Behavior on height { NumberAnimation { duration: config.animationDuration } }
+                          Behavior on height {
+                            NumberAnimation {
+                              duration: config.animationDuration
+                            }
+                          }
                         }
                       }
                     }
@@ -1923,56 +1911,40 @@ ShellRoot {
                       MouseArea {
                         acceptedButtons: Qt.LeftButton | Qt.RightButton
                         anchors.fill: parent
-
-                        onClicked: mouse => {
-                          if (!media.player) return
+                        onClicked: (mouse) => {
+                          if (!media.player)
+                            return ;
 
                           if (mouse.button === Qt.RightButton) {
-                            if (media.player.canGoNext) media.player.next()
+                            if (media.player.canGoNext)
+                              media.player.next();
+
                           } else if (media.player.canTogglePlaying) {
-                            media.player.togglePlaying()
+                            media.player.togglePlaying();
                           }
                         }
                       }
                     }
+
+                    Behavior on opacity {
+                      enabled: leftBar.ready && !labelSwap.running
+
+                      NumberAnimation {
+                        duration: config.animationDuration
+                        easing.type: Easing.OutQuint
+                      }
+                    }
+                  }
+
+                  Behavior on width {
+                    enabled: leftBar.ready
+
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuint
+                    }
                   }
                 }
-              }
-            }
-
-            // ── Center Concave 2 ──
-            Concave {
-              anchors { left: centerBar.right; top: parent.top }
-              cfg: config
-            }
-
-            // ── Right Concave 1 ──
-            Concave {
-              anchors { right: rightBar.left; top: parent.top }
-              cfg: config
-              mirrored: true
-            }
-
-            // ── Right Bar ──
-            Rectangle {
-              id: rightBar
-
-              anchors { right: parent.right; top: parent.top }
-              bottomLeftRadius: config.barRadius
-              clip: true
-              color: config.barColor
-              height: config.barHeight
-              width: Math.round(rightRow.x + imSlot.x + imSlot.width + config.barPadding / 2)
-
-              Row {
-                id: rightRow
-
-                anchors {
-                  left: parent.left
-                  leftMargin: config.barPadding / 2
-                  verticalCenter: parent.verticalCenter
-                }
-                spacing: config.barItemSpacing
 
                 move: Transition {
                   NumberAnimation {
@@ -1980,6 +1952,55 @@ ShellRoot {
                     easing.type: Easing.InOutQuint
                     properties: "x"
                   }
+                }
+              }
+            }
+
+            // ── Center Concave 2 ──
+            Concave {
+              cfg: config
+
+              anchors {
+                left: centerBar.right
+                top: parent.top
+              }
+            }
+
+            // ── Right Concave 1 ──
+            Concave {
+              cfg: config
+              mirrored: true
+
+              anchors {
+                right: rightBar.left
+                top: parent.top
+              }
+            }
+
+            // ── Right Bar ──
+            Rectangle {
+              id: rightBar
+
+              bottomLeftRadius: config.barRadius
+              clip: true
+              color: config.barColor
+              height: config.barHeight
+              width: Math.round(rightRow.x + imSlot.x + imSlot.width + config.barPadding / 2)
+
+              anchors {
+                right: parent.right
+                top: parent.top
+              }
+
+              Row {
+                id: rightRow
+
+                spacing: config.barItemSpacing
+
+                anchors {
+                  left: parent.left
+                  leftMargin: config.barPadding / 2
+                  verticalCenter: parent.verticalCenter
                 }
 
                 // ── System Tray ──
@@ -1990,12 +2011,12 @@ ShellRoot {
                   property bool revealed: false
 
                   function reveal() {
-                    trayTimer.stop()
+                    trayTimer.stop();
                     if (leftBar.ready) {
-                      revealed = false
-                      trayTimer.restart()
+                      revealed = false;
+                      trayTimer.restart();
                     } else {
-                      revealed = true
+                      revealed = true;
                     }
                   }
 
@@ -2004,24 +2025,17 @@ ShellRoot {
                   implicitWidth: trayContent.implicitWidth
                   opacity: revealed ? 1 : 0
                   visible: shouldShow || opacity > 0
-
-                  Behavior on opacity {
-                    enabled: leftBar.ready
-
-                    NumberAnimation {
-                      duration: config.animationDuration
-                      easing.type: Easing.OutQuint
+                  Component.onCompleted: {
+                    if (shouldShow) {
+                      reveal();
                     }
                   }
-
-                  Component.onCompleted: if (shouldShow) reveal()
-
                   onShouldShowChanged: {
                     if (shouldShow) {
-                      reveal()
+                      reveal();
                     } else {
-                      trayTimer.stop()
-                      revealed = false
+                      trayTimer.stop();
+                      revealed = false;
                     }
                   }
 
@@ -2029,7 +2043,6 @@ ShellRoot {
                     id: trayTimer
 
                     interval: leftBar.slideDuration
-
                     onTriggered: traySlot.revealed = true
                   }
 
@@ -2049,7 +2062,6 @@ ShellRoot {
 
                       MouseArea {
                         anchors.fill: parent
-
                         onClicked: screenRoot.togglePopup("tray")
                       }
 
@@ -2071,19 +2083,20 @@ ShellRoot {
                           implicitHeight: config.trayIconSize + config.trayPopupPadding * 2
                           implicitWidth: trayIcons.implicitWidth + config.trayPopupPadding * 2
                           visible: false
-
                           Component.onCompleted: {
-                            // Position under the arrow, then show.
-                            anchor.rect.x = trayArrow.mapToItem(null, trayArrow.width / 2, 0).x
-                            shellRoot.trayPopupScreen = screenRoot.modelData.name
-                            visible = true
+                            anchor.rect.x = trayArrow.mapToItem(null, trayArrow.width / 2, 0).x;
+                            shellRoot.trayPopupScreen = screenRoot.modelData.name;
+                            visible = true;
                           }
-
                           Component.onDestruction: {
-                            if (shellRoot.trayPopupScreen === screenRoot.modelData.name) shellRoot.trayPopupScreen = ""
+                            if (shellRoot.trayPopupScreen === screenRoot.modelData.name)
+                              shellRoot.trayPopupScreen = "";
                           }
-
-                          onVisibleChanged: if (!visible) screenRoot.closePopup("tray")
+                          onVisibleChanged: {
+                            if (!visible) {
+                              screenRoot.closePopup("tray");
+                            }
+                          }
 
                           Rectangle {
                             anchors.fill: parent
@@ -2116,18 +2129,17 @@ ShellRoot {
                                   MouseArea {
                                     acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.RightButton
                                     anchors.fill: parent
-
-                                    onClicked: mouse => {
-                                      var item = trayDelegate.modelData
+                                    onClicked: (mouse) => {
+                                      var item = trayDelegate.modelData;
                                       if (mouse.button === Qt.LeftButton && !item.onlyMenu) {
-                                        item.activate()
-                                        screenRoot.closePopup("tray")
+                                        item.activate();
+                                        screenRoot.closePopup("tray");
                                       } else if (mouse.button === Qt.MiddleButton) {
-                                        item.secondaryActivate()
-                                        screenRoot.closePopup("tray")
+                                        item.secondaryActivate();
+                                        screenRoot.closePopup("tray");
                                       } else if (item.hasMenu) {
-                                        var pos = trayDelegate.mapToItem(null, 0, trayDelegate.height)
-                                        item.display(trayDelegate.QsWindow.window, pos.x, pos.y)
+                                        var pos = trayDelegate.mapToItem(null, 0, trayDelegate.height);
+                                        item.display(trayDelegate.QsWindow.window, pos.x, pos.y);
                                       }
                                     }
                                   }
@@ -2139,7 +2151,18 @@ ShellRoot {
                       }
                     }
 
-                    Separator { cfg: config }
+                    Separator {
+                      cfg: config
+                    }
+                  }
+
+                  Behavior on opacity {
+                    enabled: leftBar.ready
+
+                    NumberAnimation {
+                      duration: config.animationDuration
+                      easing.type: Easing.OutQuint
+                    }
                   }
                 }
 
@@ -2154,12 +2177,15 @@ ShellRoot {
                   MouseArea {
                     acceptedButtons: Qt.LeftButton | Qt.RightButton
                     anchors.fill: parent
-
-                    onClicked: mouse => wallpaper.step(mouse.button === Qt.RightButton ? -1 : 1)
+                    onClicked: (mouse) => {
+                      return wallpaper.step(mouse.button === Qt.RightButton ? -1 : 1);
+                    }
                   }
                 }
 
-                Separator { cfg: config }
+                Separator {
+                  cfg: config
+                }
 
                 // ── Volume ──
                 Item {
@@ -2173,7 +2199,9 @@ ShellRoot {
                   implicitHeight: volumeRow.implicitHeight
                   implicitWidth: volumeRow.implicitWidth
 
-                  PwObjectTracker { objects: [volumeItem.sink] }
+                  PwObjectTracker {
+                    objects: [volumeItem.sink]
+                  }
 
                   RowLayout {
                     id: volumeRow
@@ -2185,9 +2213,7 @@ ShellRoot {
                       color: config.colorText
                       font.family: config.iconFontFamily
                       font.pixelSize: config.iconSize
-                      text: volumeItem.muted ? config.volumeIconMuted
-                        : volumeItem.volume < 0.5 ? config.volumeIconLow
-                        : config.volumeIconHigh
+                      text: volumeItem.muted ? config.volumeIconMuted : volumeItem.volume < 0.5 ? config.volumeIconLow : config.volumeIconHigh
                     }
 
                     Text {
@@ -2203,25 +2229,26 @@ ShellRoot {
                   MouseArea {
                     acceptedButtons: Qt.LeftButton
                     anchors.fill: parent
-
                     onClicked: {
                       if (volumeItem.sink && volumeItem.sink.audio)
-                        volumeItem.sink.audio.muted = !volumeItem.sink.audio.muted
+                        volumeItem.sink.audio.muted = !volumeItem.sink.audio.muted;
                     }
+                    onWheel: (wheel) => {
+                      if (!volumeItem.sink || !volumeItem.sink.audio)
+                        return ;
 
-                    onWheel: wheel => {
-                      if (!volumeItem.sink || !volumeItem.sink.audio) return
-
-                      var delta = wheel.angleDelta.y > 0 ? config.volumeStep : -config.volumeStep
-                      volumeItem.sink.audio.muted = false
-                      volumeItem.sink.audio.volume = Math.max(0, Math.min(1, volumeItem.volume + delta))
+                      var delta = wheel.angleDelta.y > 0 ? config.volumeStep : -config.volumeStep;
+                      volumeItem.sink.audio.muted = false;
+                      volumeItem.sink.audio.volume = Math.max(0, Math.min(1, volumeItem.volume + delta));
                     }
                   }
                 }
 
-                Separator { cfg: config }
+                Separator {
+                  cfg: config
+                }
 
-                // ── Networks ──
+                // ── Network ──
                 Text {
                   anchors.verticalCenter: parent.verticalCenter
                   color: config.colorText
@@ -2232,7 +2259,6 @@ ShellRoot {
 
                   MouseArea {
                     anchors.fill: parent
-
                     onClicked: Quickshell.execDetached(config.networkCommand)
                   }
                 }
@@ -2246,33 +2272,27 @@ ShellRoot {
                   height: imText.implicitHeight
                   width: imText.implicitWidth
 
-                  Behavior on width {
-                    enabled: leftBar.ready
-
-                    NumberAnimation {
-                      duration: leftBar.slideDuration
-                      easing.type: Easing.InOutQuint
-                    }
-                  }
-
                   Text {
                     id: imText
 
-                    readonly property string targetText: inputMethod.current === config.inputMethodJapanese
-                      ? config.inputMethodLabelJapanese
-                      : config.inputMethodLabelLatin
+                    readonly property string targetText: inputMethod.current === config.inputMethodJapanese ? config.inputMethodLabelJapanese : config.inputMethodLabelLatin
                     property string shownText: targetText
 
-                    anchors { left: parent.left; verticalCenter: parent.verticalCenter }
                     color: config.colorText
                     font.family: config.fontFamily
                     font.pixelSize: config.fontSize
                     font.weight: config.fontWeight
                     text: shownText
-
                     onTargetTextChanged: {
-                      if (leftBar.ready) imSwap.restart()
-                      else shownText = targetText
+                      if (leftBar.ready)
+                        imSwap.restart();
+                      else
+                        shownText = targetText;
+                    }
+
+                    anchors {
+                      left: parent.left
+                      verticalCenter: parent.verticalCenter
                     }
 
                     SequentialAnimation {
@@ -2286,7 +2306,9 @@ ShellRoot {
                         to: 0
                       }
 
-                      ScriptAction { script: imText.shownText = imText.targetText }
+                      ScriptAction {
+                        script: imText.shownText = imText.targetText
+                      }
 
                       NumberAnimation {
                         duration: config.animationDuration
@@ -2299,26 +2321,44 @@ ShellRoot {
 
                     MouseArea {
                       anchors.fill: parent
-
                       onClicked: inputMethod.toggle()
                     }
+                  }
+
+                  Behavior on width {
+                    enabled: leftBar.ready
+
+                    NumberAnimation {
+                      duration: leftBar.slideDuration
+                      easing.type: Easing.InOutQuint
+                    }
+                  }
+                }
+
+                move: Transition {
+                  NumberAnimation {
+                    duration: leftBar.slideDuration
+                    easing.type: Easing.InOutQuint
+                    properties: "x"
                   }
                 }
               }
             }
 
             // ── Left Concave 1 ──
-            // Separate small windows below the bar. A single wide window would need a much larger buffer.
             PanelWindow {
-              anchors { left: true; top: true }
               color: "transparent"
               exclusionMode: ExclusionMode.Ignore
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
               margins.top: config.barHeight
-              mask: Region {}
               screen: screenRoot.modelData
               visible: !screenRoot.cornersHidden || leftConcave1.x > -config.barRadius
+
+              anchors {
+                left: true
+                top: true
+              }
 
               Concave {
                 id: leftConcave1
@@ -2333,28 +2373,229 @@ ShellRoot {
                   }
                 }
               }
+
+              mask: Region {
+              }
             }
 
             // ── Right Concave 2 ──
             PanelWindow {
-              anchors { right: true; top: true }
               color: "transparent"
               exclusionMode: ExclusionMode.Ignore
               implicitHeight: config.barRadius
               implicitWidth: config.barRadius
               margins.top: config.barHeight
-              mask: Region {}
               screen: screenRoot.modelData
               visible: !screenRoot.cornersHidden
+
+              anchors {
+                right: true
+                top: true
+              }
 
               Concave {
                 cfg: config
                 mirrored: true
               }
+
+              mask: Region {
+              }
             }
           }
         }
       }
+    }
+  }
+
+  // ── Separator ──
+  component Separator: Text {
+    required property QtObject cfg
+
+    anchors.verticalCenter: parent.verticalCenter
+    bottomPadding: 3
+    color: cfg.colorText
+    font.family: cfg.fontFamily
+    font.pixelSize: cfg.fontSize
+    font.weight: cfg.fontWeight
+    text: "|"
+  }
+
+  // ── Concave Shape ──
+  component Concave: Shape {
+    required property QtObject cfg
+    property bool mirrored: false
+
+    implicitHeight: cfg.barRadius
+    implicitWidth: cfg.barRadius
+    preferredRendererType: Shape.CurveRenderer
+
+    ShapePath {
+      fillColor: cfg.barColor
+      startX: cfg.barRadius
+      startY: 0
+      strokeColor: "transparent"
+
+      PathLine {
+        x: 0
+        y: 0
+      }
+
+      PathLine {
+        x: 0
+        y: cfg.barRadius
+      }
+
+      PathArc {
+        direction: PathArc.Clockwise
+        radiusX: cfg.barRadius
+        radiusY: cfg.barRadius
+        x: cfg.barRadius
+        y: 0
+      }
+    }
+
+    transform: Scale {
+      origin.x: cfg.barRadius / 2
+      origin.y: 0
+      xScale: mirrored ? -1 : 1
+    }
+  }
+
+  // ── Shadow ──
+  component CornerShadow: Shape {
+    id: shadow
+
+    property bool rightSide: false
+    property real strength: 0
+    property real shadowWidth: 1920
+    property real shadowHeight: 540
+
+    anchors.left: rightSide ? undefined : parent.left
+    anchors.right: rightSide ? parent.right : undefined
+    anchors.top: parent.top
+    height: width
+    visible: strength > 0
+    width: Math.max(1, shadowWidth)
+
+    ShapePath {
+      startX: 0
+      startY: 0
+      strokeColor: "transparent"
+
+      PathLine {
+        x: shadow.width
+        y: 0
+      }
+
+      PathLine {
+        x: shadow.width
+        y: shadow.height
+      }
+
+      PathLine {
+        x: 0
+        y: shadow.height
+      }
+
+      PathLine {
+        x: 0
+        y: 0
+      }
+
+      fillGradient: RadialGradient {
+        centerRadius: shadow.width
+        centerX: shadow.rightSide ? shadow.width : 0
+        centerY: 0
+        focalX: centerX
+        focalY: 0
+
+        GradientStop {
+          position: 0
+          color: Qt.rgba(0, 0, 0, shadow.strength)
+        }
+
+        GradientStop {
+          position: 0.125
+          color: Qt.rgba(0, 0, 0, shadow.strength * 0.765625)
+        }
+
+        GradientStop {
+          position: 0.25
+          color: Qt.rgba(0, 0, 0, shadow.strength * 0.5625)
+        }
+
+        GradientStop {
+          position: 0.375
+          color: Qt.rgba(0, 0, 0, shadow.strength * 0.390625)
+        }
+
+        GradientStop {
+          position: 0.5
+          color: Qt.rgba(0, 0, 0, shadow.strength * 0.25)
+        }
+
+        GradientStop {
+          position: 0.625
+          color: Qt.rgba(0, 0, 0, shadow.strength * 0.140625)
+        }
+
+        GradientStop {
+          position: 0.75
+          color: Qt.rgba(0, 0, 0, shadow.strength * 0.0625)
+        }
+
+        GradientStop {
+          position: 0.875
+          color: Qt.rgba(0, 0, 0, shadow.strength * 0.015625)
+        }
+
+        GradientStop {
+          position: 1
+          color: Qt.rgba(0, 0, 0, 0)
+        }
+      }
+    }
+
+    transform: Scale {
+      yScale: shadow.shadowHeight / shadow.width
+    }
+  }
+
+  // ── Login Button ──
+  component OutlineButton: Rectangle {
+    id: button
+
+    required property QtObject style
+    property string label: ""
+    property int horizontalPadding: 24
+    readonly property bool hovered: area.containsMouse
+
+    signal clicked()
+
+    border.color: style.borderColor
+    border.width: style.borderWidth
+    color: hovered ? style.hoverColor : "transparent"
+    implicitHeight: style.buttonHeight
+    implicitWidth: caption.implicitWidth + horizontalPadding
+
+    Text {
+      id: caption
+
+      anchors.centerIn: parent
+      color: button.hovered ? button.style.hoverTextColor : button.style.textColor
+      font.family: button.style.fontFamily
+      font.letterSpacing: button.style.letterSpacing
+      font.pixelSize: button.style.fontSize
+      font.weight: button.style.fontWeight
+      text: button.label
+    }
+
+    MouseArea {
+      id: area
+
+      anchors.fill: parent
+      hoverEnabled: true
+      onClicked: button.clicked()
     }
   }
 }
