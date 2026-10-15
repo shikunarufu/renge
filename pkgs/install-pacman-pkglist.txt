@@ -119,6 +119,9 @@ python
 wl-clipboard
 xsel
 
+# Console prompt
+starship
+
 # Terminal emulator
 foot
 foot-terminfo
