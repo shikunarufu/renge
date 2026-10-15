@@ -87,6 +87,24 @@ lact
 btop
 rocm-smi-lib
 
+# System information viewer
+fastfetch
+chafa
+dbus
+dconf
+glib2
+hwdata
+imagemagick
+libdrm
+libelf
+libglvnd
+libvdpau
+libxrandr
+lua
+ocl-icd
+sqlite
+zlib
+
 # File index and search
 plocate
 
