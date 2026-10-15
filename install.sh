@@ -244,7 +244,7 @@ sysinfo () {
     '3. Must end with a letter or a number.' \
     '4. Maximum character length is 63.'
   done
-  NAME_OF_MACHINE=$name_of_machine
+  NAME_OF_MACHINE=${name_of_machine,,}
 }
 
 # Start the functions
@@ -452,6 +452,7 @@ interface_resolution: 1920x1080
   protocol: linux
   path: boot():/vmlinuz-${kernel}
   cmdline: root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs${video_arg}
+  module_path: boot():/amd-ucode.img
   module_path: boot():/initramfs-${kernel}.img
 EOF
 
@@ -673,6 +674,16 @@ chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
 
 # Cursor theme
 install_aur bibata-cursor-theme-bin
+
+#######################################
+# Console improvements
+#######################################
+
+# Alternative shells
+# runuser --login "$USERNAME" --command "fish -c 'curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher'"
+
+# Console prompt
+# runuser --login "$USERNAME" --command "fish -c 'fisher install IlanCosman/tide@v6'"
 
 #######################################
 # Gaming
