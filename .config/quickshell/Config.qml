@@ -89,8 +89,9 @@ QtObject {
   property int appLauncherIconSize: 24
   property int appLauncherRecentMax: 12
   property string appLauncherIcon: "\uf002"
-  property string appLauncherPlaceholder: "Search apps…"
+  property string appLauncherPlaceholder: "Search"
   property string appLauncherEmpty: "No apps found"
+  property var appLauncherTerminal: ["foot", "-e"]
   
   // ── Layout ──
   property var layoutCycle: ["tile", "monocle", "grid", "scroller"]
