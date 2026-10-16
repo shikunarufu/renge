@@ -1540,7 +1540,7 @@ ShellRoot {
                 }
 
                 function launchEntry(entry) {
-                  recordLaunch(entry.id)
+                  launcher.record(entry.id)
                   if (entry.runInTerminal) {
                     Quickshell.execDetached({
                       command: config.appLauncherTerminal.concat(entry.command),
