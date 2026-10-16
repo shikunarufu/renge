@@ -697,6 +697,13 @@ install_aur heroic-games-launcher-bin
 # Cleanup
 #######################################
 
+# Hide desktop entries
+mkdir --parents /home/"${USERNAME}"/.local/share/applications/
+cp /usr/share/applications/avahi-discover.desktop /home/"${USERNAME}"/.local/share/applications/
+echo "NoDisplay=true" >> ~/.local/share/applications/avahi-discover.desktop
+cp /usr/share/applications/bssh.desktop /home/"${USERNAME}"/.local/share/applications/
+echo "NoDisplay=true" >> ~/.local/share/applications/bssh.desktop
+
 # Remove renge folder
 rm --recursive --force /renge
 CHROOT_EOF
