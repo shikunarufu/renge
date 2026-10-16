@@ -4,6 +4,7 @@ efibootmgr
 
 # pacman
 pacman-contrib
+informant
 
 # Mirrors
 rate-mirrors
