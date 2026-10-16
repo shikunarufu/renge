@@ -20,7 +20,7 @@ ShellRoot {
   property string trayPopupScreen: ""
 
   signal dismissPopups()
-
+  
   // ── Configuration File ──
   Config {
     id: config
@@ -118,6 +118,7 @@ ShellRoot {
       property string current: ""
 
       category: "Wallpaper"
+      location: "file://" + Quickshell.env("HOME") + "/.config/quickshell/settings.ini"
     }
 
     FolderListModel {
@@ -422,6 +423,7 @@ ShellRoot {
       property string recentIdsSerialized: "[]"
 
       category: "AppLauncher"
+      location: "file://" + Quickshell.env("HOME") + "/.config/quickshell/settings.ini"
     }
   }
 
