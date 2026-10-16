@@ -1540,9 +1540,16 @@ ShellRoot {
                 }
 
                 function launchEntry(entry) {
-                  launcher.record(entry.id);
-                  entry.execute();
-                  screenRoot.closePopup("launcher");
+                  recordLaunch(entry.id)
+                  if (entry.runInTerminal) {
+                    Quickshell.execDetached({
+                      command: config.appLauncherTerminal.concat(entry.command),
+                      workingDirectory: entry.workingDirectory
+                    })
+                  } else {
+                    entry.execute()
+                  }
+                  appLauncherPopup.visible = false
                 }
 
                 WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
