@@ -492,6 +492,29 @@ install_aur_optional() {
   fi
 }
 
+# Hide unnecessary desktop entry
+hide_desktop_entry() {
+  local app=$1
+  local src="/usr/share/applications/${app}.desktop"
+  local dst="/home/${USERNAME}/.local/share/applications/${app}.desktop"
+  local value
+ 
+  if [[ ! -f "${src}" ]]; then
+    echo "Warning: desktop entry not found: ${app}" >&2
+    return 1
+  fi
+ 
+  cp "${src}" "${dst}"
+  sed --in-place \
+    --expression='/^NoDisplay=/d' \
+    --expression='/^\[Desktop Entry\]/a NoDisplay=true' \
+    "${dst}"
+ 
+  value="$(awk -F= '/^\[/ {s = $0}
+                    s == "[Desktop Entry]" && $1 == "NoDisplay" {v = $2}
+                    END {print v}' "${dst}")"
+  [[ "${value}" == 'true' ]]
+}
 
 # Set time zone
 ln --force --symbolic /usr/share/zoneinfo/"${TIME_ZONE}" /etc/localtime
@@ -698,11 +721,16 @@ install_aur heroic-games-launcher-bin
 #######################################
 
 # Hide desktop entries
-mkdir --parents /home/"${USERNAME}"/.local/share/applications/
-cp /usr/share/applications/avahi-discover.desktop /home/"${USERNAME}"/.local/share/applications/
-echo "NoDisplay=true" >> ~/.local/share/applications/avahi-discover.desktop
-cp /usr/share/applications/bssh.desktop /home/"${USERNAME}"/.local/share/applications/
-echo "NoDisplay=true" >> ~/.local/share/applications/bssh.desktop
+mkdir --parents /home/"${USERNAME}"/.local/share/applications
+for app in avahi-discover bssh footclient foot-server kbd-layout-viewer5 org.fcitx.fcitx5-migrator org.xfce.Catfish protontricks qv4l2 qvidcap winetricks xfce4-about; do
+  if hide_desktop_entry "${app}"; then
+    echo "Hidden: ${app}"
+  else
+    echo "Warning: could not hide: ${app}" >&2
+  fi
+done
+chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.local
+
 
 # Remove renge folder
 rm --recursive --force /renge
