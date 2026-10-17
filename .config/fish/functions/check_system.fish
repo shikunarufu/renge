@@ -1,5 +1,5 @@
 function check_system
-  # Failed systemd services
+  # Systemd services
   clear
   printf '%s\n' 'Check if any systemd services have failed.'
   systemctl --failed
