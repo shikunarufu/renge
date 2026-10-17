@@ -5,7 +5,11 @@ return {
       transparent = true,
       colors = {
         theme = {
-          all = { ui = { bg_gutter = "none" } },
+          all = {
+            ui = {
+              bg_gutter = "none"
+            },
+          },
         },
       },
       overrides = function()
