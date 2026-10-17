@@ -18,6 +18,7 @@ fd
 luarocks
 nodejs
 npm
+cpanminus
 
 # Display servers
 wayland
