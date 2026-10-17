@@ -700,6 +700,9 @@ chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
 # Cursor theme
 install_aur bibata-cursor-theme-bin
 
+# LazyVim
+npm install --global neovim
+
 #######################################
 # Gaming
 #######################################
