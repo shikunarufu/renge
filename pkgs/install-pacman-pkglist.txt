@@ -11,6 +11,7 @@ rate-mirrors
 
 # Version control systems
 git
+lazygit
 
 # Display servers
 wayland
