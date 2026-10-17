@@ -12,6 +12,9 @@ rate-mirrors
 # Version control systems
 git
 lazygit
+tree-sitter-cli
+ripgrep
+fd
 
 # Display servers
 wayland
