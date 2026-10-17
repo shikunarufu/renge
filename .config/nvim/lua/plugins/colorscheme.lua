@@ -17,6 +17,8 @@ return {
           NormalFloat = { bg = "none" },
           FloatBorder = { bg = "none" },
           FloatTitle = { bg = "none" },
+          StatusLine = { bg = "none" },
+          StatusLineNC = { bg = "none" },
         }
       end,
     },
