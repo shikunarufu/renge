@@ -702,6 +702,7 @@ install_aur bibata-cursor-theme-bin
 
 # LazyVim
 npm install --global neovim
+cpanm --notest --sudo Neovim::Ext
 
 #######################################
 # Gaming
