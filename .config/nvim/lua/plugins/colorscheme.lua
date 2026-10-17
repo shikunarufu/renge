@@ -19,6 +19,11 @@ return {
           FloatTitle = { bg = "none" },
           StatusLine = { bg = "none" },
           StatusLineNC = { bg = "none" },
+          TabLine = { bg = "none" },
+          TabLineFill = { bg = "none" },
+          TabLineSel = { bg = "none" },
+          VertSplit = { bg = "none" },
+          WinSeparator = { fg = "#625e5a", bg = "none" },
         }
       end,
     },
