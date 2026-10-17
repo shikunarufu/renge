@@ -641,7 +641,7 @@ runuser --user="${USERNAME}" -- mkdir --parents \
 /home/"${USERNAME}"/.local/state/mpd
 
 # Enable audio player daemons
-systemctl --global enable mpd
+systemctl --global enable mpd.service
 systemctl --global enable spotifyd.service
 
 # Sound system
@@ -697,16 +697,6 @@ chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
 
 # Cursor theme
 install_aur bibata-cursor-theme-bin
-
-#######################################
-# Console improvements
-#######################################
-
-# Alternative shells
-# runuser --login "$USERNAME" --command "fish -c 'curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher'"
-
-# Console prompt
-# runuser --login "$USERNAME" --command "fish -c 'fisher install IlanCosman/tide@v6'"
 
 #######################################
 # Gaming
