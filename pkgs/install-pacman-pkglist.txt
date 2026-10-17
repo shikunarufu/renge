@@ -16,6 +16,8 @@ tree-sitter-cli
 ripgrep
 fd
 luarocks
+nodejs
+npm
 
 # Display servers
 wayland
