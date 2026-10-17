@@ -1,7 +1,33 @@
+function confirm
+  read --prompt-str "$argv[1] [Y/n] " --local answer
+  or return 1
+  not string match --quiet --regex --ignore-case '^n' -- $answer
+end
+
 function upgrade_system
+  # Systemd services
+  clear
+  printf '%s\n' 'Check if any systemd services have failed.'
+  systemctl --failed
+  confirm 'Continue?'
+  or return
+
+  # Pacman log
+  clear
+  confirm 'Look for errors in the pacman log file. Continue?'
+  or return
+  nvim -R /var/log/pacman.log
+
+  # Systemd journal
+  clear
+  confirm 'Look for errors in the systemd journal. Continue?'
+  or return
+  sudo journalctl -b
+
   # Upgrade the system
   clear
-  printf '%s\n' 'Upgrading the system...'
+  confirm 'Upgrade the system?'
+  or return
   sudo pacman --sync --refresh --sysupgrade
   or return
 
@@ -53,4 +79,3 @@ function upgrade_system
     sudo paccache --remove
   end
 end
-funcsave upgrade_system
