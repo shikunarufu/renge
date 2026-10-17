@@ -1,8 +1,4 @@
 function check
-  #######################################
-  # Check for errors
-  #######################################
-
   # Failed systemd services
   clear
   printf '%s\n' 'Check if any systemd services have failed:'
