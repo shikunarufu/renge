@@ -1012,6 +1012,19 @@ ShellRoot {
   Scope {
     id: root
 
+    Scope {
+      id: launcherIpc
+
+      signal toggleRequested()
+
+      IpcHandler {
+        target: "launcher"
+        function toggle(): void {
+          launcherIpc.toggleRequested()
+        }
+      }
+    }
+
     Variants {
       model: Quickshell.screens
 
@@ -1045,6 +1058,15 @@ ShellRoot {
           }
 
           target: shellRoot
+        }
+
+        Connections {
+          target: launcherIpc
+
+          function onToggleRequested() {
+            if (screenRoot.modelData === Quickshell.screens[0])
+              screenRoot.togglePopup("launcher")
+          }
         }
 
         PanelWindow {
