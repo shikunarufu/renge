@@ -15,6 +15,7 @@ lazygit
 tree-sitter-cli
 ripgrep
 fd
+luarocks
 
 # Display servers
 wayland
