@@ -18,6 +18,7 @@ fd
 viu
 ueberzugpp
 luarocks
+ghostscript
 nodejs
 npm
 
