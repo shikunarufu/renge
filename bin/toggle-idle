@@ -1,9 +1,0 @@
-#!/bin/bash
-
-if pgrep -x hypridle >/dev/null; then
-  pkill -x hypridle
-  notify-send "Auto-Lock Disabled"
-else
-  uwsm-app -- hypridle >/dev/null 2>&1 &
-  notify-send "Auto-Lock Enabled"
-fi
