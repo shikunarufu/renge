@@ -6,9 +6,9 @@
     "width": 24,
     "height": 16,
     "padding": {
-      "top": 7,
-      "left": 1,
-      "right": 2
+      "top": 8,
+      "left": 6,
+      "right": 10
     },
     "color": {
       "1": "\u001b[38;2;177;204;211m",
