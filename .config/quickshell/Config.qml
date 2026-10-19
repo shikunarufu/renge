@@ -101,23 +101,34 @@ QtObject {
   
   // ── App Icon ──
   property var focusWindowIcons: ({
+    "broken": "\uf1b6",
     "foot": "\uf489",
     "goverlay": "\ueea8",
     "heroic": "\udb86\udcbe",
+    "io.github.ilya_zlobintsev.LACT": "\udb82\udcae",
     "org.fcitx.fcitx5-config-qt": "\uf1fc",
+    "org.qbittorrent.qbittorrent": "\udb83\udc1c",
+    "steam": "\uf1b6",
     "thunar": "\uf07b",
+    "thunar-volman-settings": "\udb81\udd53",
     "zen": "\udb83\ude95"
   })
   
   // ── Window Title ──
   property string focusWindowPlaceholder: "Desktop"
   property var focusWindowNames: ({
+    "broken": "Steam",
     "foot": "Foot",
     "goverlay": "Goverlay",
     "heroic": "Heroic",
+    "io.github.ilya_zlobintsev.LACT": "LACT",
     "org.fcitx.fcitx5-config-qt": "Fcitx 5 Configuration",
+    "org.qbittorrent.qbittorrent": "qBittorrent",
+    "steam": "Steam",
     "thunar": "Thunar",
-    "zen": "Zen"
+    "thunar-volman-settings": "Removable Drives and Media",
+    "zen": "Zen",
+    "zenity": "Zenity"
   })
   
   // ── Wallpaper ──
