@@ -642,6 +642,7 @@ runuser --user="${USERNAME}" -- mkdir --parents \
 
 # Enable audio player daemons
 systemctl --global enable mpd.service
+systemctl --global enable mpd-mpris.service
 systemctl --global enable spotifyd.service
 
 # Sound system
