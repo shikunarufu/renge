@@ -102,6 +102,10 @@ QtObject {
   // ── App Icon ──
   property var focusWindowIcons: ({
     "foot": "\uf489",
+    "goverlay": "\ueea8",
+    "heroic": "\udb86\udcbe",
+    "org.fcitx.fcitx5-config-qt": "\uf1fc",
+    "thunar": "\uf07b",
     "zen": "\udb83\ude95"
   })
   
@@ -109,6 +113,10 @@ QtObject {
   property string focusWindowPlaceholder: "Desktop"
   property var focusWindowNames: ({
     "foot": "Foot",
+    "goverlay": "Goverlay",
+    "heroic": "Heroic",
+    "org.fcitx.fcitx5-config-qt": "Fcitx 5 Configuration",
+    "thunar": "Thunar",
     "zen": "Zen"
   })
   
@@ -163,7 +171,7 @@ QtObject {
   
   // ── Now Playing ──
   property int nowPlayingMaxLength: 45
-  property string nowPlayingSeparator: " - "
+  property string nowPlayingSeparator: "   ·   "
   
   // ── Visualizer ──
   property int visualizerBars: 10
