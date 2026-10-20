@@ -137,6 +137,7 @@ QtObject {
     "steam": "Steam",
     "thunar": "Thunar",
     "thunar-volman-settings": "Removable Drives and Media",
+    "xdg-desktop-portal-gtk": "XDG Desktop Portal",
     "zen": "Zen",
     "zenity": "Zenity"
   })
