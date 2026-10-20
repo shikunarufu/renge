@@ -101,13 +101,18 @@ QtObject {
   
   // ── App Icon ──
   property var focusWindowIcons: ({
+    "anki": "\uf005",
     "broken": "\uf1b6",
+    "com.github.wwmm.easyeffects": "\ue690",
+    "com.obsproject.Studio": "\ueba7",
     "foot": "\uf489",
     "goverlay": "\ueea8",
     "heroic": "\udb86\udcbe",
     "io.github.ilya_zlobintsev.LACT": "\udb82\udcae",
     "org.fcitx.fcitx5-config-qt": "\uf1fc",
+    "org.openrgb.OpenRGB": "\uf400",
     "org.qbittorrent.qbittorrent": "\udb83\udc1c",
+    "puddletag": "\udb80\udd5f",
     "steam": "\uf1b6",
     "thunar": "\uf07b",
     "thunar-volman-settings": "\udb81\udd53",
@@ -117,13 +122,18 @@ QtObject {
   // ── Window Title ──
   property string focusWindowPlaceholder: "Desktop"
   property var focusWindowNames: ({
+    "anki": "Anki",
     "broken": "Steam",
+    "com.github.wwmm.easyeffects": "Easy Effects",
+    "com.obsproject.Studio": "OBS Studio",
     "foot": "Foot",
     "goverlay": "Goverlay",
     "heroic": "Heroic",
     "io.github.ilya_zlobintsev.LACT": "LACT",
     "org.fcitx.fcitx5-config-qt": "Fcitx 5 Configuration",
+    "org.openrgb.OpenRGB": "OpenRGB",
     "org.qbittorrent.qbittorrent": "qBittorrent",
+    "puddletag": "Puddletag",
     "steam": "Steam",
     "thunar": "Thunar",
     "thunar-volman-settings": "Removable Drives and Media",
