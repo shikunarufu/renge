@@ -161,6 +161,13 @@ wqy-zenhei
 
 # GTK and Qt themes
 papirus-icon-theme
+gnome-themes-extra
+dconf
+qt5ct
+qt6ct
+kvantum
+qt5-wayland
+qt6-wayland
 
 # Command shell
 fish
