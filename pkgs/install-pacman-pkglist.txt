@@ -61,6 +61,15 @@ spotifyd
 spotify-player
 fzf
 
+# Audio Effects
+easyeffects
+calf
+lsp-plugins-lv2
+mda.lv2
+x42-plugins-lv2
+yelp
+zam-plugins-lv2
+
 # Audio visualizers
 cava
 
@@ -68,6 +77,13 @@ cava
 mpv
 mpv-mpris
 yt-dlp
+
+# Screencast
+obs-studio
+obs-studio-plugin-browser
+libfdk-aac
+sndio
+v4l2loopback-dkms
 
 # Sound system
 pipewire
@@ -165,6 +181,14 @@ bash-completion
 7zip
 tar
 unzip
+
+# Flashcards
+anki
+lame
+
+# OpenRGB
+openrgb
+i2c-tools
 
 # Gaming
 alsa-plugins
