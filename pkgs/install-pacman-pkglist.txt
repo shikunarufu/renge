@@ -21,6 +21,8 @@ luarocks
 ghostscript
 nodejs
 npm
+shellcheck
+shfmt
 
 # Display servers
 wayland
