@@ -163,7 +163,6 @@ wqy-zenhei
 papirus-icon-theme
 gnome-themes-extra
 dconf
-gtk2
 qt5ct
 qt6ct
 kvantum
