@@ -141,7 +141,9 @@ for file in ./renge/pkgs/install-pacstrap-pkglist.txt \
             ./renge/pkgs/install-pacman-pkglist.txt \
             ./renge/etc/greetd/config.toml \
             ./renge/etc/greetd/greeter/shell.qml \
-            ./renge/etc/greetd/greeter/wallpaper.png; do
+            ./renge/etc/greetd/greeter/wallpaper.png \
+            ./renge/etc/dconf/profile/user \
+            ./renge/etc/dconf/db/local.d/00-appearance; do
   if [[ ! -f "${file}" ]]; then
     printf '%s\n' "Missing file: ${file}" >&2
     exit 1
@@ -695,6 +697,10 @@ cp --recursive /renge/pictures/logo/. /home/"${USERNAME}"/Pictures/Logo
 mkdir --parents /home/"${USERNAME}"/Pictures/Wallpapers
 cp --recursive /renge/pictures/wallpapers/. /home/"${USERNAME}"/Pictures/Wallpapers
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
+mkdir --parents /etc/dconf
+cp --recursive /renge/etc/dconf/. /etc/dconf/
+dconf update
+cat /renge/etc/environment >> /etc/environment
 
 # OpenRGB
 systemctl enable openrgb.service
@@ -707,6 +713,7 @@ systemctl enable openrgb.service
 install_aur bibata-cursor-theme-bin
 
 # GTK and Qt themes
+install_aur gtk2
 install_aur gtk-engine-murrine
 install_aur kanagawa-gtk-theme-git
 
