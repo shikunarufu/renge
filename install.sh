@@ -640,14 +640,17 @@ runuser --user="${USERNAME}" -- mkdir --parents \
 /home/"${USERNAME}"/.config/mpd/playlists \
 /home/"${USERNAME}"/.local/state/mpd
 
+# Audio Tag Editor
+install_aur puddletag
+
+# Screencast
+install_aur obs-vkcapture
+install_aur lib32-obs-vkcapture
+
 # Enable audio player daemons
 systemctl --global enable mpd.service
 systemctl --global enable mpd-mpris.service
 systemctl --global enable spotifyd.service
-
-# Sound system
-#   amixer sset Master unmute; amixer sset Speaker unmute
-#   amixer sset Headphone unmute
 
 #######################################
 # Networking
@@ -694,6 +697,9 @@ mkdir --parents /home/"${USERNAME}"/Pictures/Wallpapers
 cp --recursive /renge/pictures/wallpapers/. /home/"${USERNAME}"/Pictures/Wallpapers
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
 
+# OpenRGB
+systemctl enable openrgb.service
+
 #######################################
 # Appearance
 #######################################
@@ -726,7 +732,6 @@ for app in avahi-discover bssh bvnc footclient foot-server kbd-layout-viewer5 ls
   fi
 done
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.local
-
 
 # Remove renge folder
 rm --recursive --force /renge
