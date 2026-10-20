@@ -706,6 +706,15 @@ systemctl enable openrgb.service
 # Cursor theme
 install_aur bibata-cursor-theme-bin
 
+# GTK and Qt themes
+install_aur_optional gtk-engine-murrine
+if pacman --query --quiet gtk-engine-murrine > /dev/null 2>&1; then
+  install_aur_optional kanagawa-gtk-theme-git
+else
+  echo 'Warning: gtk-engine-murrine is missing, skipping kanagawa-gtk-theme-git' >&2
+  failed_aur+=(kanagawa-gtk-theme-git)
+fi
+
 # LazyVim
 npm install --global neovim
 
