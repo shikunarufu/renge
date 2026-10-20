@@ -159,6 +159,9 @@ otf-geist-mono-nerd
 ttf-liberation
 wqy-zenhei
 
+# GTK and Qt themes
+papirus-icon-theme
+
 # Command shell
 fish
 groff
