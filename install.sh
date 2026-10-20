@@ -645,7 +645,6 @@ install_aur puddletag
 
 # Screencast
 install_aur obs-vkcapture
-install_aur lib32-obs-vkcapture
 
 # Enable audio player daemons
 systemctl --global enable mpd.service
