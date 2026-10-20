@@ -21,6 +21,7 @@ luarocks
 ghostscript
 nodejs
 npm
+bash-language-server
 shellcheck
 shfmt
 
