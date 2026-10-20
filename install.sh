@@ -700,7 +700,6 @@ chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
 mkdir --parents /etc/dconf
 cp --recursive /renge/etc/dconf/. /etc/dconf/
 dconf update
-cat /renge/etc/environment >> /etc/environment
 
 # OpenRGB
 systemctl enable openrgb.service
