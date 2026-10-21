@@ -1,6 +1,6 @@
 [org/gnome/desktop/interface]
 color-scheme='prefer-dark'
-gtk-theme='Kanagawa-Grey-Dark'
+gtk-theme='Kanagawa-Dragon'
 icon-theme='Papirus-Dark'
 font-name='GeistMono Nerd Font 10'
 monospace-font-name='GeistMono Nerd Font 10'
