@@ -137,13 +137,14 @@ mapfile -t disks < <(
 )
 
 # Check configuration files are present
-for file in ./renge/pkgs/install-pacstrap-pkglist.txt \
-            ./renge/pkgs/install-pacman-pkglist.txt \
+for file in ./renge/pkgs/install-pacman-pkglist.txt \
+            ./renge/pkgs/install-pacstrap-pkglist.txt \
             ./renge/etc/greetd/config.toml \
             ./renge/etc/greetd/greeter/shell.qml \
             ./renge/etc/greetd/greeter/wallpaper.png \
+            ./renge/etc/dconf/db/local.d/00-appearance \
             ./renge/etc/dconf/profile/user \
-            ./renge/etc/dconf/db/local.d/00-appearance; do
+            ./renge/usr/share/themes/Kanagawa-Dragon/index.theme; do
   if [[ ! -f "${file}" ]]; then
     printf '%s\n' "Missing file: ${file}" >&2
     exit 1
@@ -715,9 +716,8 @@ systemctl enable openrgb.service
 install_aur bibata-cursor-theme-bin
 
 # GTK and Qt themes
-install_aur gtk2
-install_aur gtk-engine-murrine
-install_aur kanagawa-gtk-theme-git
+mkdir --parents /usr/share/themes
+cp --recursive /renge/usr/share/themes/. /usr/share/themes/
 install_aur papirus-folders-git
 papirus-folders -C paleorange --theme Papirus-Dark
 
