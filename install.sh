@@ -718,6 +718,8 @@ install_aur bibata-cursor-theme-bin
 install_aur gtk2
 install_aur gtk-engine-murrine
 install_aur kanagawa-gtk-theme-git
+install_aur papirus-folders-git
+papirus-folders -C paleorange --theme Papirus-Dark
 
 # LazyVim
 npm install --global neovim
