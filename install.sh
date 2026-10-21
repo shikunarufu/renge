@@ -716,6 +716,8 @@ systemctl enable openrgb.service
 install_aur bibata-cursor-theme-bin
 
 # GTK and Qt themes
+install_aur gtk2
+install_aur gtk-engine-murrine
 mkdir --parents /usr/share/themes
 cp --recursive /renge/usr/share/themes/. /usr/share/themes/
 install_aur papirus-folders-git
