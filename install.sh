@@ -137,10 +137,13 @@ mapfile -t disks < <(
 )
 
 # Check configuration files are present
-for file in ./renge/pkgs/install-pacman-pkglist.txt \
+for file in ./renge/.config/qt5ct/qt5ct.conf \
+            ./renge/.config/qt6ct/qt6ct.conf
+            ./renge/pkgs/install-pacman-pkglist.txt \
             ./renge/pkgs/install-pacstrap-pkglist.txt \
             ./renge/etc/greetd/config.toml \
             ./renge/etc/greetd/greeter/shell.qml \
+            ./renge/etc/greetd/greeter/Config.qml \
             ./renge/etc/greetd/greeter/wallpaper.png \
             ./renge/etc/dconf/db/local.d/00-appearance \
             ./renge/etc/dconf/profile/user \
