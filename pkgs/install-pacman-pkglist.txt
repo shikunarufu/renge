@@ -161,6 +161,7 @@ wqy-zenhei
 
 # GTK and Qt themes
 papirus-icon-theme
+sassc
 gnome-themes-extra
 dconf
 qt5ct
