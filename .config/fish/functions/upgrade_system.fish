@@ -87,6 +87,7 @@ function upgrade_system
     clear
     if confirm 'Clean the package cache?'
         sudo paccache --remove
+    end
 
     # Reboot
     if confirm 'Reboot?'
