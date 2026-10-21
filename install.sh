@@ -743,7 +743,7 @@ install_aur heroic-games-launcher-bin
 
 # Hide desktop entries
 mkdir --parents /home/"${USERNAME}"/.local/share/applications
-for app in avahi-discover bssh bvnc cmake-gui footclient foot-server kbd-layout-viewer5 lstopo org.fcitx.fcitx5-migrator org.gnome.Yelp org.xfce.Catfish protontricks qv4l2 qvidcap winetricks xfce4-about; do
+for app in avahi-discover bssh bvnc cmake-gui footclient foot-server kbd-layout-viewer5 lstopo org.fcitx.fcitx5-config-qt org.fcitx.fcitx5-migrator org.gnome.Yelp org.xfce.Catfish protontricks qt5ct qt6ct qv4l2 qvidcap thunar-settings winetricks xfce4-about; do
   if hide_desktop_entry "${app}"; then
     echo "Hidden: ${app}"
   else
