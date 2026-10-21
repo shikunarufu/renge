@@ -565,8 +565,8 @@ visudo --check
 configure_pacman /etc/pacman.conf
 
 # Update Arch Linux keyring
-pacman --sync --refresh
-pacman --sync --noconfirm archlinux-keyring
+pacman --sync --refresh --needed --noconfirm archlinux-keyring 
+pacman --sync ----sysupgrade
 
 # Install CachyOS keyring and mirrorlist packages and add CachyOS v3 repositories
 if [[ "${USE_CACHYOS}" -eq 1 ]]; then
