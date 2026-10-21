@@ -2,3 +2,5 @@
 color-scheme='prefer-dark'
 gtk-theme='Kanagawa-Grey-Dark'
 icon-theme='Papirus-Dark'
+font-name='GeistMono Nerd Font 10'
+monospace-font-name='GeistMono Nerd Font 10'
