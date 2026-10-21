@@ -691,6 +691,9 @@ systemctl enable fstrim.timer
 # Apply config files
 mkdir --parents /home/"${USERNAME}"/.config
 cp --recursive /renge/.config/. /home/"${USERNAME}"/.config/
+sed --in-place "s|__USERNAME__|${USERNAME}|" \
+  /home/"${USERNAME}"/.config/qt5ct/qt5ct.conf \
+  /home/"${USERNAME}"/.config/qt6ct/qt6ct.conf
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.config
 mkdir --parents /home/"${USERNAME}"/Pictures/Logo
 cp --recursive /renge/pictures/logo/. /home/"${USERNAME}"/Pictures/Logo
