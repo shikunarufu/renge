@@ -33,7 +33,7 @@ QtObject {
   // ── Font ──
   property string fontFamily: "Segoe UI Variable"
   property int fontSize: 12
-  property int fontWeight: Font.DemiBold
+  property int fontWeight: Font.Bold
   property string iconFontFamily: "JetBrainsMono Nerd Font"
   property int iconSize: 16
   
