@@ -138,7 +138,7 @@ mapfile -t disks < <(
 
 # Check configuration files are present
 for file in ./renge/.config/qt5ct/qt5ct.conf \
-            ./renge/.config/qt6ct/qt6ct.conf
+            ./renge/.config/qt6ct/qt6ct.conf \
             ./renge/pkgs/install-pacman-pkglist.txt \
             ./renge/pkgs/install-pacstrap-pkglist.txt \
             ./renge/etc/greetd/config.toml \
@@ -569,7 +569,7 @@ configure_pacman /etc/pacman.conf
 
 # Update Arch Linux keyring
 pacman --sync --refresh --needed --noconfirm archlinux-keyring 
-pacman --sync ----sysupgrade
+pacman --sync --sysupgrade --noconfirm
 
 # Install CachyOS keyring and mirrorlist packages and add CachyOS v3 repositories
 if [[ "${USE_CACHYOS}" -eq 1 ]]; then
