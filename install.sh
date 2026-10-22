@@ -721,6 +721,9 @@ dconf update
 # OpenRGB
 systemctl enable openrgb.service
 
+# Docker
+systemctl enable docker.socket
+
 #######################################
 # Appearance
 #######################################
