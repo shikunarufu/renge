@@ -442,11 +442,12 @@ if [[ -z "${time_zone}" || ! -f "/usr/share/zoneinfo/${time_zone}" ]]; then
 fi
 
 # Configure bootloader
-root_uuid="$(blkid -s UUID -o value "$root_part")"
 video_arg=''
 if check_vm; then
   video_arg=' video=Virtual-1:1920x1080'
 fi
+root_uuid="$(blkid -s UUID -o value "$root_part")"
+cmdline="root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs${video_arg}"
 mkdir --parents /mnt/boot/EFI/arch-limine
 cat << EOF > /mnt/boot/EFI/arch-limine/limine.conf
 timeout: 3
@@ -457,7 +458,7 @@ interface_resolution: 1920x1080
   //${kernel}
   protocol: linux
   path: boot():/vmlinuz-${kernel}
-  cmdline: root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs${video_arg}
+  cmdline: ${cmdline}
   module_path: boot():/amd-ucode.img
   module_path: boot():/initramfs-${kernel}.img
   //linux-lts
