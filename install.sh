@@ -460,6 +460,13 @@ interface_resolution: 1920x1080
   cmdline: root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs${video_arg}
   module_path: boot():/amd-ucode.img
   module_path: boot():/initramfs-${kernel}.img
+  //linux-lts
+  protocol: linux
+  path: boot():/vmlinuz-linux-lts
+  cmdline: ${cmdline}
+  module_path: boot():/amd-ucode.img
+  module_path: boot():/initramfs-linux-lts.img
+
 EOF
 
 # Copy config files
