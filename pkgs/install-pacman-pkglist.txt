@@ -204,6 +204,9 @@ lame
 openrgb
 i2c-tools
 
+# Docker
+docker
+
 # Gaming
 alsa-plugins
 giflib
