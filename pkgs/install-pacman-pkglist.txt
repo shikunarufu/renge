@@ -206,6 +206,7 @@ i2c-tools
 
 # Docker
 docker
+docker-compose
 
 # Gaming
 alsa-plugins
