@@ -723,6 +723,14 @@ systemctl enable openrgb.service
 
 # Docker
 systemctl enable docker.socket
+mkdir --parents /home/"${USERNAME}"/searxng/core-config/
+curl --fail --silent --show-error --location --output-dir /home/"${USERNAME}"/searxng \
+  --remote-name https://raw.githubusercontent.com/searxng/searxng/master/container/docker-compose.yml \
+  --remote-name https://raw.githubusercontent.com/searxng/searxng/master/container/.env.example
+cp -i .env.example .env
+chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/searxng
+docker compose up -d
+docker compose down
 
 #######################################
 # Appearance
