@@ -2,6 +2,9 @@
 limine
 efibootmgr
 
+# System administration
+uutils-coreutils
+
 # pacman
 pacman-contrib
 informant
