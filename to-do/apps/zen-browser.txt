@@ -1,3 +1,8 @@
+# Configure Docker
+docker compose up -d
+docker compose down
+nvim core-config/settings.yml
+
 # Default search engine
 Name: SearXNG
 URL: http://localhost:8080/search?q=%s
