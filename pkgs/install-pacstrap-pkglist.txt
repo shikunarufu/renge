@@ -2,6 +2,8 @@
 base
 base-devel
 linux-firmware
+linux-lts
+linux-lts-headers
 
 # CPU Microcode
 amd-ucode
