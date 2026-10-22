@@ -31,6 +31,7 @@ function upgrade_system
         sudo informant read
         or return
     end
+    clear
     sudo pacman --sync --refresh --sysupgrade
     or return
 
