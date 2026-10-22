@@ -492,8 +492,8 @@ set -euo pipefail
 install_helper() {
   local pkg=$1
   runuser --login "${USERNAME}" --command \
-    "git clone https://aur.archlinux.org/${pkg}.git \"\$HOME/aur/${pkg}\" \
-    && cd \"\$HOME/aur/${pkg}\" \
+    "git clone https://aur.archlinux.org/${pkg}.git \"\$HOME/${pkg}\" \
+    && cd \"\$HOME/${pkg}\" \
     && makepkg --syncdeps --install --noconfirm"
 }
 
