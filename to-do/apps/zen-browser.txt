@@ -1,0 +1,3 @@
+# Default search engine
+Name: SearXNG
+URL: http://localhost:8080/search?q=%s
