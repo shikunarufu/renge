@@ -617,7 +617,7 @@ read_pkglist /renge/pkgs/install-pacman-pkglist.txt \
   | pacman --sync --noconfirm --needed -
 
 # Install AUR helper
-install_helper paru-bin
+install_helper paru
 
 # Deploy boot loader
 mkdir --parents /boot/EFI/arch-limine
