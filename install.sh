@@ -689,19 +689,6 @@ install_aur zen-browser-bin
 # Input method
 install_aur fcitx5-mozc-ut
 
-# mozc-ut (fcitx5-mozc-ut dependency)
-# runuser --login "${USERNAME}" --command 'rm --recursive --force "$HOME/.cache/bazel"'
-# install_aur_optional mozc-ut
-
-# Input method
-# if pacman --query --quiet mozc-ut > /dev/null 2>&1; then
-#   runuser --login "${USERNAME}" --command 'rm --recursive --force "$HOME/.cache/bazel"'
-#   install_aur_optional fcitx5-mozc-ut
-# else
-#   echo 'Warning: mozc-ut is missing, skipping fcitx5-mozc-ut' >&2
-#   failed_aur+=(fcitx5-mozc-ut)
-# fi
-
 #######################################
 # Optimization
 #######################################
@@ -753,7 +740,6 @@ chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/searxng
 install_aur bibata-cursor-theme-bin
 
 # GTK and Qt themes
-# install_aur gtk2
 install_aur gtk-engine-murrine
 mkdir --parents /usr/share/themes
 cp --recursive /renge/usr/share/themes/. /usr/share/themes/
