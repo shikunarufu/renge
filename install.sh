@@ -693,10 +693,6 @@ fi
 # Optimization
 #######################################
 
-# Hard disk drives
-systemctl enable udisks2.service
-systemctl enable handle_external_hdds.service
-
 # Solid state drives
 systemctl enable fstrim.timer
 
