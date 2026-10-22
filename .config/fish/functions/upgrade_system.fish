@@ -91,6 +91,7 @@ function upgrade_system
     end
 
     # Reboot
+    clear
     if confirm 'Reboot?'
         systemctl reboot
     end
