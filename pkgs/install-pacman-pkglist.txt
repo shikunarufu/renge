@@ -5,6 +5,9 @@ efibootmgr
 # System administration
 uutils-coreutils
 
+# System maintenance
+linux-lts
+
 # pacman
 pacman-contrib
 informant
