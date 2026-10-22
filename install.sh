@@ -709,6 +709,7 @@ sed --in-place "s|__USERNAME__|${USERNAME}|" \
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.config
 mkdir --parents /home/"${USERNAME}"/.local
 cp --recursive /renge/.local/. /home/"${USERNAME}"/.local/
+mkdir --parents /home/"${USERNAME}"/Pictures/Screenshots
 mkdir --parents /home/"${USERNAME}"/Pictures/Logo
 cp --recursive /renge/pictures/logo/. /home/"${USERNAME}"/Pictures/Logo
 mkdir --parents /home/"${USERNAME}"/Pictures/Wallpapers
