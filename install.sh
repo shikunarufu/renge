@@ -711,6 +711,8 @@ sed --in-place "s|__USERNAME__|${USERNAME}|" \
   /home/"${USERNAME}"/.config/qt5ct/qt5ct.conf \
   /home/"${USERNAME}"/.config/qt6ct/qt6ct.conf
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/.config
+mkdir --parents /home/"${USERNAME}"/.local
+cp --recursive /renge/.local/. /home/"${USERNAME}"/.local/
 mkdir --parents /home/"${USERNAME}"/Pictures/Logo
 cp --recursive /renge/pictures/logo/. /home/"${USERNAME}"/Pictures/Logo
 mkdir --parents /home/"${USERNAME}"/Pictures/Wallpapers
@@ -754,7 +756,6 @@ install_aur heroic-games-launcher-bin
 #######################################
 
 # Hide desktop entries
-mkdir --parents /home/"${USERNAME}"/.local/share/applications
 for app in avahi-discover bssh bvnc cmake-gui footclient foot-server kbd-layout-viewer5 lstopo org.fcitx.fcitx5-config-qt org.fcitx.fcitx5-migrator org.gnome.Yelp org.xfce.Catfish protontricks qt5ct qt6ct qv4l2 qvidcap thunar-settings winetricks xfce4-about; do
   if hide_desktop_entry "${app}"; then
     echo "Hidden: ${app}"
