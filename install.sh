@@ -690,7 +690,10 @@ systemctl enable greetd.service
 
 # User directories
 runuser --login "${USERNAME}" --command xdg-user-dirs-update
+
+# File managers
 runuser --login "${USERNAME}" --command 'xdg-mime default thunar.desktop inode/directory'
+sed --in-place "s/AutoMount=true/AutoMount=false/g" /usr/share/gvfs/mounts/network.mount
 
 #######################################
 # Multimedia
