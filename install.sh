@@ -733,6 +733,9 @@ curl --fail --silent --show-error --location --output-dir /home/"${USERNAME}"/se
 cp --no-clobber "/home/"${USERNAME}"/searxng/.env.example" "/home/"${USERNAME}"/searxng/.env"
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/searxng
 
+# Vesktop
+install_aur vesktop-bin
+
 #######################################
 # Appearance
 #######################################
