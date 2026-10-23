@@ -1,6 +1,7 @@
 # Boot loader
 limine
 efibootmgr
+memtest86+-efi
 
 # System administration
 uutils-coreutils
