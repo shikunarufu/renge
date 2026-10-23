@@ -654,6 +654,7 @@ systemctl enable greetd.service
 
 # User directories
 runuser --login "${USERNAME}" --command xdg-user-dirs-update
+xdg-mime default thunar.desktop inode/directory
 
 #######################################
 # Multimedia
