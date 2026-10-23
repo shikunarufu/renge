@@ -716,6 +716,9 @@ cp --recursive /renge/pictures/logo/. /home/"${USERNAME}"/Pictures/Logo
 mkdir --parents /home/"${USERNAME}"/Pictures/Wallpapers
 cp --recursive /renge/pictures/wallpapers/. /home/"${USERNAME}"/Pictures/Wallpapers
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Pictures
+mkdir --parents /home/"${USERNAME}"/to-do
+cp --recursive /renge/to-do/. /home/"${USERNAME}"/to-do/
+chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/to-do
 mkdir --parents /etc/dconf
 cp --recursive /renge/etc/dconf/. /etc/dconf/
 dconf update
