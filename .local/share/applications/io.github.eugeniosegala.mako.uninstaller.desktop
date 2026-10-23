@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Uninstall MAKO Renderer
+Comment=Remove the standalone MAKO Renderer installation.
+Exec="/home/shiku/.local/bin/mako-installer" --uninstall
+Icon=io.github.eugeniosegala.mako
+Terminal=false
+Categories=Settings;
+Keywords=gaming;graphics;uninstall;
+StartupNotify=true
+NoDisplay=true
