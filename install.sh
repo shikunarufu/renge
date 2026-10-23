@@ -739,6 +739,9 @@ install_aur fcitx5-mozc-ut
 # Optimization
 #######################################
 
+# Overclocking
+systemctl enable lactd.service
+
 # Solid state drives
 systemctl enable fstrim.timer
 
