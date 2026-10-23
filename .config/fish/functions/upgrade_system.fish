@@ -36,6 +36,7 @@ function upgrade_system
   or return
 
   # Upgrade AUR packages
+  clear
   if confirm 'Upgrade AUR packages?'
     paru --sync --sysupgrade --aur
   end
