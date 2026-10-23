@@ -172,7 +172,7 @@ if [[ ! -f /sys/firmware/efi/fw_platform_size ]]; then
 fi
 
 # Check IOMMU
-if ! compgen -G '/sys/kernel/iommu_groups/*' > /dev/null; then
+if ! check_vm && ! compgen -G '/sys/kernel/iommu_groups/*' > /dev/null; then
   printf '%s\n' "System is booted with IOMMU disabled. Refer to your motherboard's manual." >&2
   exit 1
 fi
@@ -184,7 +184,7 @@ if ! grep --quiet --word-regexp nx /proc/cpuinfo; then
 fi
 
 # Check SVM mode
-if ! grep --quiet --word-regexp svm /proc/cpuinfo; then
+if ! check_vm && ! grep --quiet --word-regexp svm /proc/cpuinfo; then
   printf '%s\n' "System is booted with SVM mode disabled. Refer to your motherboard's manual." >&2
   exit 1
 fi
