@@ -798,8 +798,11 @@ cp --recursive /renge/usr/share/themes/. /usr/share/themes/
 install_aur papirus-folders-git
 papirus-folders -C paleorange --theme Papirus-Dark
 
-# LazyVim
+# Neovim
 npm install --global neovim
+export VISUAL=nvim
+export EDITOR=nvim
+export MANPAGER=nvim +Man!
 
 #######################################
 # Gaming
