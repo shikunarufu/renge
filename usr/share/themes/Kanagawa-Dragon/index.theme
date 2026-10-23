@@ -1,4 +1,3 @@
-Type=X-GNOME-Metatheme
 [Desktop Entry]
 Name=Kanagawa-Dragon
 Comment=An Flat Gtk+ theme based on Elegant Design
@@ -6,7 +5,3 @@ Encoding=UTF-8
 
 [X-GNOME-Metatheme]
 GtkTheme=Kanagawa-Dragon
-MetacityTheme=Kanagawa-Dragon
-IconTheme=Tela-circle-Dark
-CursorTheme=Kanagawa-cursors
-ButtonLayout=close,minimize,maximize:menu
