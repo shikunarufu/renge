@@ -465,7 +465,8 @@ if check_vm; then
   video_arg=' video=Virtual-1:1920x1080'
 fi
 root_uuid="$(blkid -s UUID -o value "$root_part")"
-cmdline="root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs video=efifb:off pcie_acs_override=downstream,multifunction${video_arg}"
+cmdline="root=UUID=${root_uuid} rootflags=subvol=@,noatime,compress=zstd,ssd,commit=120 rw rootfstype=btrfs${video_arg}"
+cmdline_acs="${cmdline} video=efifb:off pcie_acs_override=downstream,multifunction"
 mkdir --parents /mnt/boot/EFI/arch-limine
 cat << EOF > /mnt/boot/EFI/arch-limine/limine.conf
 timeout: 3
@@ -476,7 +477,7 @@ interface_resolution: 1920x1080
   //${kernel}
   protocol: linux
   path: boot():/vmlinuz-${kernel}
-  cmdline: ${cmdline}
+  cmdline: ${cmdline_acs}
   module_path: boot():/amd-ucode.img
   module_path: boot():/initramfs-${kernel}.img
   //linux-lts
