@@ -115,6 +115,7 @@ QtObject {
     "steam": "\uf1b6",
     "thunar": "\uf07b",
     "thunar-volman-settings": "\udb81\udd53",
+    "vesktop": "\uf1ff",
     "zen": "\udb83\ude95"
   })
   
@@ -135,6 +136,7 @@ QtObject {
     "steam": "Steam",
     "thunar": "Thunar",
     "thunar-volman-settings": "Removable Drives and Media",
+    "vesktop": "Vesktop",
     "xdg-desktop-portal-gtk": "XDG Desktop Portal",
     "zen": "Zen",
     "zenity": "Zenity"
