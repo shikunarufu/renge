@@ -486,7 +486,9 @@ interface_resolution: 1920x1080
   cmdline: ${cmdline}
   module_path: boot():/amd-ucode.img
   module_path: boot():/initramfs-linux-lts.img
-
+/Memtest86+
+  protocol: efi
+  path: boot():/memtest86+/memtest86x64.efi
 EOF
 
 # Copy config files
@@ -641,6 +643,21 @@ install_helper paru
 # Deploy boot loader
 mkdir --parents /boot/EFI/arch-limine
 cp /usr/share/limine/BOOTX64.EFI /boot/EFI/arch-limine/
+
+# pacman hook
+mkdir --parents /etc/pacman.d/hooks
+cat << 'HOOK_EOF' > /etc/pacman.d/hooks/99-limine.hook
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = limine
+ 
+[Action]
+Description = Deploying Limine after upgrade...
+When = PostTransaction
+Exec = /usr/bin/cp /usr/share/limine/BOOTX64.EFI /boot/EFI/arch-limine/
+HOOK_EOF
 
 # Add entry for bootloader
 efibootmgr \
