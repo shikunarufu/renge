@@ -248,4 +248,3 @@ ebtables
 iptables-nft
 nftables
 dnsmasq
-bridge-utils
