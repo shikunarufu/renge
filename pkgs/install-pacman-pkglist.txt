@@ -100,6 +100,7 @@ wireplumber
 pipewire-audio
 pipewire-alsa
 pipewire-pulse
+playerctl
 
 # Web browser
 libnotify
