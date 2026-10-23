@@ -160,15 +160,46 @@ if [[ -r "${secure_boot_var}" ]]; then
   secure_boot="$(od --address-radix=n --format=u1 --skip-bytes=4 \
     --read-bytes=1 "${secure_boot_var}" | tr -d '[:space:]')"
   if [[ "${secure_boot}" == '1' ]]; then
-    printf '%s\n' 'Secure Boot is enabled. Disable it in the firmware setup.' >&2
+    printf '%s\n' 'System may be booted with Secure Boot enabled. Refer to your motherboard\'s manual.' >&2
     exit 1
   fi
 fi
 
 # Check boot mode
 if [[ ! -f /sys/firmware/efi/fw_platform_size ]]; then
-  printf '%s\n' 'Not booted in UEFI mode.' >&2
+  printf '%s\n' 'System may be booted in BIOS (or CSM) mode. Refer to your motherboard\'s manual.' >&2
   exit 1
+fi
+
+# Check IOMMU
+iommu="$(sudo dmesg | grep --extended-regexp 'IOMMU' | grep --extended-regexp --max-count 1 'IOMMU')"
+if [[ "${iommu}" == "[    0.000000] DMAR: IOMMU enabled" ]]; then
+  printf "%s\n" "System is booted with IOMMU enabled."
+elif [[ "${iommu}" == "[    0.000000] Warning: PCIe ACS overrides enabled; This may allow non-IOMMU protected peer-to-peer DMA" ]]; then
+  printf "%s\n" "System is booted with IOMMU enabled and has ACS override patch."
+else
+  printf "%s\n" "System may be booted with IOMMU disabled. Refer to your motherboard\'s manual."
+  exit
+fi
+
+# Check NX mode
+nx="$(sudo dmesg | grep --extended-regexp 'Execute Disable')"
+if [[ "${nx}" == "[    0.000000] NX (Execute Disable) protection: active" ]]; then
+  printf "%s\n" "System is booted with NX mode enabled"
+else
+  printf "%s\n" "System may be booted with NX mode disabled"
+  printf "%s\n" "Refer to your BIOS's manual"
+  exit
+fi
+
+# Check SVM mode
+svm="$(lscpu | grep --extended-regexp --word-regexp --only-matching 'svm')"
+if [[ "${svm}" == "svm" ]]; then
+  printf "%s\n" "System is booted with SVM mode enabled"
+else
+  printf "%s\n" "System may be booted with SVM mode disabled"
+  printf "%s\n" "Refer to your BIOS's manual"
+  exit
 fi
 
 #######################################
@@ -440,6 +471,10 @@ time_zone="$(curl --fail --max-time 5 --silent https://ipapi.co/timezone || true
 if [[ -z "${time_zone}" || ! -f "/usr/share/zoneinfo/${time_zone}" ]]; then
   time_zone="Asia/Manila"
 fi
+
+# Edit GRUB with ACS override patch
+sudo sed --in-place "s/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet\"/GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet video=efifb:off pcie_acs_override=downstream,multifunction\"/g" /etc/default/grub
+sudo grub-mkconfig -o /boot/grub/grub.cfg
 
 # Configure bootloader
 video_arg=''
