@@ -784,6 +784,24 @@ install_aur wine-cachyos-opt
 install_aur heroic-games-launcher-bin
 
 #######################################
+# Virtualization
+#######################################
+
+# Configuration of libvirt
+install_aur bridge-utils
+sed --in-place 's/#unix_sock_group = \"libvirt\"/unix_sock_group = \"libvirt\"/g' /etc/libvirt/libvirtd.conf
+sed --in-place 's/#unix_sock_rw_perms = \"0770\"/unix_sock_rw_perms = \"0770\"/g' /etc/libvirt/libvirtd.conf
+sed --in-place 's/#log_filters=\"1:qemu 1:libvirt 4:object 4:json 4:event 1:util\"/log_filters=\"3:qemu 1:libvirt\"/g' /etc/libvirt/libvirtd.conf
+sed --in-place 's|#log_outputs=\"3:syslog:libvirtd\"|log_outputs=\"2:file:/var/log/libvirt/libvirtd.log\"|g' /etc/libvirt/libvirtd.conf
+usermod --append --groups kvm,libvirt "${USERNAME}"
+sed --in-place "s/#user = \"libvirt-qemu\"/user = \"${USERNAME}\"/g" /etc/libvirt/qemu.conf
+sed --in-place "s/#group = \"libvirt-qemu\"/group = \"${USERNAME}\"/g" /etc/libvirt/qemu.conf
+systemctl enable libvirtd
+virsh net-autostart default
+mkdir /home/"${USERNAME}"/Virtualization
+chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Virtualization
+
+#######################################
 # Cleanup
 #######################################
 
