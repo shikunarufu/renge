@@ -1,0 +1,3 @@
+# Configure desktop entries
+Icon=utilities-tweak-tool    # MAKO Renderer Configuration
+NoDisplay=true               # Uninstall MAKO Renderer
