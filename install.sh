@@ -502,7 +502,7 @@ cp --recursive ./renge /mnt
 genfstab -U /mnt >> /mnt/etc/fstab
 
 # Show partition in file manager
-awk -v OFS='\t' '$1 !~ /^#/ && $2 == "/home" || $2 == "/data" { $4 = $4 ",x-gvfs-show" } { print }' \
+awk -v OFS='\t' '$1 !~ /^#/ && ($2 == "/home" || $2 == "/data") { $4 = $4 ",x-gvfs-show" } { print }' \
   /mnt/etc/fstab > /mnt/etc/fstab.new
 cat /mnt/etc/fstab.new > /mnt/etc/fstab
 rm --force /mnt/etc/fstab.new
@@ -800,9 +800,11 @@ papirus-folders -C paleorange --theme Papirus-Dark
 
 # Neovim
 npm install --global neovim
-export VISUAL=nvim
-export EDITOR=nvim
-export MANPAGER=nvim +Man!
+cat << 'ENV_EOF' >> /etc/environment
+VISUAL=nvim
+EDITOR=nvim
+MANPAGER="nvim +Man!"
+ENV_EOF
 
 #######################################
 # Gaming
