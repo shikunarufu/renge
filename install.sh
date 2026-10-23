@@ -501,6 +501,12 @@ cp --recursive ./renge /mnt
 # Generate fstab file
 genfstab -U /mnt >> /mnt/etc/fstab
 
+# Show partition in file manager
+awk -v OFS='\t' '$1 !~ /^#/ && $2 == "/home" || $2 == "/data" { $4 = $4 ",x-gvfs-show" } { print }' \
+  /mnt/etc/fstab > /mnt/etc/fstab.new
+cat /mnt/etc/fstab.new > /mnt/etc/fstab
+rm --force /mnt/etc/fstab.new
+
 # Create chroot script
 {
   declare -f check_vm configure_pacman add_cachyos_v3 install_cachyos_v3 read_pkglist
