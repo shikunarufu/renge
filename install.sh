@@ -797,7 +797,6 @@ usermod --append --groups kvm,libvirt "${USERNAME}"
 sed --in-place "s/#user = \"libvirt-qemu\"/user = \"${USERNAME}\"/g" /etc/libvirt/qemu.conf
 sed --in-place "s/#group = \"libvirt-qemu\"/group = \"${USERNAME}\"/g" /etc/libvirt/qemu.conf
 systemctl enable libvirtd
-virsh net-autostart default
 mkdir /home/"${USERNAME}"/Virtualization
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Virtualization
 
