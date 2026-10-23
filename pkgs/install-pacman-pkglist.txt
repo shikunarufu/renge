@@ -233,12 +233,19 @@ gamescope
 steam
 
 # Virtualization
-virt-manager
 qemu-full
+libvirt
+virt-install
+virt-manager
+virt-viewer
+edk2-ovmf
+swtpm
+qemu-img
+guestfs-tools
+libosinfo
 vde2
 ebtables
 iptables-nft
 nftables
 dnsmasq
 bridge-utils
-ovmf
