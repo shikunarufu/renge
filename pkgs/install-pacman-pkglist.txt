@@ -231,3 +231,14 @@ winetricks
 vulkan-tools
 gamescope
 steam
+
+# Virtualization
+virt-manager
+qemu-full
+vde2
+ebtables
+iptables-nft
+nftables
+dnsmasq
+bridge-utils
+ovmf
