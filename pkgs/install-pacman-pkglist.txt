@@ -55,6 +55,9 @@ greetd
 # User directories
 xdg-user-dirs
 
+# Image viewers
+imv
+
 # Audio players
 mpd
 mpd-mpris
@@ -65,7 +68,7 @@ spotifyd
 spotify-player
 fzf
 
-# Audio Effects
+# Audio effects
 easyeffects
 calf
 lsp-plugins-lv2
