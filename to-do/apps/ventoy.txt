@@ -1,2 +1,5 @@
 # Start Ventoy
 sudo ventoyweb
+
+# Start VentoyPlugson
+sudo ventoyplugson
