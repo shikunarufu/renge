@@ -23,6 +23,27 @@ function upgrade_system
   or return
   sudo journalctl -b
 
+  # Rank mirrors
+  clear
+  if confirm 'Rank mirrors?'
+    country="$(curl --fail --silent --max-time 5 --ipv4 ifconfig.io/country_code || true)"
+    country_args=()
+    if [[ -n "${country}" ]]; then
+      country_args=(--entry-country="${country}")
+    fi
+    rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 \
+      "${country_args[@]}" --allow-root arch \
+      || printf '%s\n' 'Warning: mirror ranking failed; keeping current mirrorlist.' >&2
+
+    if ! systemd-detect-virt --quiet --vm; then
+      rate-mirrors --save=/etc/pacman.d/cachyos-mirrorlist --max-jumps=0 \
+        "${country_args[@]}" --allow-root cachyos \
+        || printf '%s\n' 'Warning: CachyOS mirror ranking failed.' >&2
+      cp --force /etc/pacman.d/cachyos-mirrorlist /etc/pacman.d/cachyos-v3-mirrorlist
+      sed --in-place 's|/$arch/|/$arch_v3/|g' /etc/pacman.d/cachyos-v3-mirrorlist
+    fi
+  end
+
   # System upgrade
   clear
   confirm 'Upgrade the system?'
