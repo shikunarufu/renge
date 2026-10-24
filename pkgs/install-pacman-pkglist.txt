@@ -239,6 +239,7 @@ winetricks
 vulkan-tools
 gamescope
 steam
+ananicy-cpp
 
 # Virtualization
 qemu-full
