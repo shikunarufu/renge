@@ -842,7 +842,7 @@ chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/Virtualization
 #######################################
 
 # Hide desktop entries
-for app in avahi-discover bssh bvnc cmake-gui fcitx5-configtool footclient foot-server kbd-layout-viewer5 lstopo org.fcitx.fcitx5-migrator org.gnome.Yelp org.xfce.Catfish protontricks qt5ct qt6ct qv4l2 qvidcap remote-viewer thunar-settings winetricks xfce4-about; do
+for app in avahi-discover bssh bvnc cmake-gui fcitx5-configtool footclient foot-server kbd-layout-viewer5 lstopo org.fcitx.fcitx5-migrator org.gnome.Yelp org.xfce.Catfish protontricks qt5ct qt6ct qv4l2 qvidcap remote-viewer thunar-settings ventoy winetricks xfce4-about; do
   if hide_desktop_entry "${app}"; then
     echo "Hidden: ${app}"
   else
