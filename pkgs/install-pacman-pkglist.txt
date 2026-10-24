@@ -121,6 +121,9 @@ goverlay
 # Overclocking
 lact
 
+# Disk cleaning
+bleachbit
+
 # System monitors
 btop
 rocm-smi-lib
