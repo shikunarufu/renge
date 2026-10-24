@@ -299,7 +299,7 @@ ping -c 1 ping.archlinux.org
 # Update Arch Linux keyring
 pacman --sync --refresh --noconfirm --needed archlinux-keyring
 
-# Install CachyOS keyring and mirrorlist packages
+# Install CachyOS packages
 if (( use_cachyos )); then
   install_cachyos_v3
 fi
