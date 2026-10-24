@@ -785,7 +785,7 @@ chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/searxng
 systemctl enable openrgb.service
 
 # Ventoy
-install_aur ventoy
+install_aur ventoy-bin
 
 # Vesktop
 install_aur vesktop-bin
