@@ -55,6 +55,12 @@ function upgrade_system
     sudo paccache --remove
   end
 
+  # BleachBit
+  clear
+  if confirm 'Clean the disk space?'
+    bleachbit
+  end
+
   # Reboot
   clear
   if confirm 'Reboot?'
