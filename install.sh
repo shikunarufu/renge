@@ -742,6 +742,12 @@ install_aur fcitx5-mozc-ut
 # Overclocking
 systemctl enable lactd.service
 
+# Improving performance
+install_aur cachyos-ananicy-rules
+systemctl enable ananicy-cpp
+install_aur bpftune-git
+systemctl enable bpftune
+
 # Solid state drives
 systemctl enable fstrim.timer
 
