@@ -1,6 +1,6 @@
 theme = "kanagawa-dragon"
 login_redirect_uri = "http://127.0.0.1:8989/login"
-client_id = "d420a117a32841c2b3474932e49fb54b"
+client_id = "34b7656a67354ad8bbb5309ccb163206"
 ncspot_only_get_endpoints = ["me/playlists", "search", "playlists/"]
 client_port = 8080
 tracks_playback_limit = 50
@@ -14,7 +14,7 @@ app_refresh_duration_in_ms = 32
 playback_refresh_duration_in_ms = 0
 api_rate_limit_retries = 2
 page_size_in_rows = 20
-enable_media_control = false
+enable_media_control = true
 enable_streaming = "Always"
 enable_notify = true
 enable_cover_image_cache = true
