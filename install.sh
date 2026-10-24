@@ -650,8 +650,7 @@ visudo --check
 configure_pacman /etc/pacman.conf
 
 # Update Arch Linux keyring
-pacman --sync --refresh --needed --noconfirm archlinux-keyring 
-pacman --sync --sysupgrade --noconfirm
+pacman --sync --refresh --needed --noconfirm archlinux-keyring
 
 # Install CachyOS keyring and mirrorlist packages and add CachyOS v3 repositories
 if [[ "${USE_CACHYOS}" -eq 1 ]]; then
@@ -671,7 +670,7 @@ if [[ "${USE_CACHYOS}" -eq 1 ]]; then
 fi
 
 # Refresh repositories and upgrade packages
-pacman --sync --refresh --sysupgrade --noconfirm
+pacman --sync --refresh --sysupgrade --noconfirm --ask 4
 
 # Parallel compilation
 threads="$(nproc)"
@@ -683,7 +682,7 @@ sed --in-place "s/COMPRESSXZ=(xz -c -z -)/COMPRESSXZ=(xz -c --threads=${threads}
 # Install essential packages
 read_pkglist /renge/pkgs/install-pacman-pkglist.txt \
   | sort --unique \
-  | pacman --sync --noconfirm --needed -
+  | pacman --sync --noconfirm --ask 4 --needed -
 
 # Install AUR helper
 install_helper paru
