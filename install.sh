@@ -771,9 +771,6 @@ mkdir --parents /etc/dconf
 cp --recursive /renge/etc/dconf/. /etc/dconf/
 dconf update
 
-# OpenRGB
-systemctl enable openrgb.service
-
 # Docker
 systemctl enable docker.socket
 usermod --append --groups docker "${USERNAME}"
@@ -783,6 +780,12 @@ curl --fail --silent --show-error --location --output-dir /home/"${USERNAME}"/se
   --remote-name https://raw.githubusercontent.com/searxng/searxng/master/container/.env.example
 cp --no-clobber "/home/"${USERNAME}"/searxng/.env.example" "/home/"${USERNAME}"/searxng/.env"
 chown --recursive "${USERNAME}":"${USERNAME}" /home/"${USERNAME}"/searxng
+
+# OpenRGB
+systemctl enable openrgb.service
+
+# Ventoy
+install_aur ventoy
 
 # Vesktop
 install_aur vesktop-bin
