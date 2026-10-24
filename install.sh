@@ -745,8 +745,26 @@ systemctl enable lactd.service
 # Improving performance
 install_aur cachyos-ananicy-rules
 systemctl enable ananicy-cpp
-install_aur bpftune-git
-systemctl enable bpftune
+
+if install_aur bpftune-git; then
+  systemctl enable bpftune
+else
+  rm -f /home/"${USERNAME}"/.cache/paru/clone/bpftune-git/*.pkg.tar.zst
+  sed -i 's/^package()/_package_orig()/' PKGBUILD
+  cat >> PKGBUILD << 'EOF'
+
+package() {
+  _package_orig
+  if [ -d "$pkgdir/usr/sbin" ]; then
+    install -d "$pkgdir/usr/bin"
+    mv "$pkgdir"/usr/sbin/* "$pkgdir/usr/bin/"
+    rmdir "$pkgdir/usr/sbin"
+  fi
+  find "$pkgdir" -name '*.service' -exec sed -i 's|/usr/sbin/|/usr/bin/|g' {} +
+}
+EOF
+fi
+
 systemctl --global enable psd.service
 
 # Solid state drives
