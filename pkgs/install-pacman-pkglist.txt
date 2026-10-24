@@ -113,6 +113,10 @@ qbittorrent
 # Input method
 fcitx5-configtool
 
+# Optimization
+ananicy-cpp
+profile-sync-daemon
+
 # Benchmarking
 mangohud
 lib32-mangohud
@@ -239,7 +243,6 @@ winetricks
 vulkan-tools
 gamescope
 steam
-ananicy-cpp
 
 # Virtualization
 qemu-full
