@@ -789,9 +789,17 @@ else
   echo 'Warning: bpftune-git failed; skipping' >&2
 fi
 
-cp /usr/share/psd/contrib/zen /usr/share/psd/browsers/zen
-sed -i.bak 's|\$HOME"/\.zen|$HOME"/.config/zen|g; s|\$HOME/\.zen/|$HOME/.config/zen/|g' /usr/share/psd/browsers/zen
-systemctl --global enable psd.service
+if [[ -f /usr/share/psd/contrib/zen ]]; then
+  cp /usr/share/psd/contrib/zen /usr/share/psd/browsers/zen
+  sed --in-place 's|\$HOME"/\.zen|$HOME"/.config/zen|g; s|\$HOME/\.zen/|$HOME/.config/zen/|g' /usr/share/psd/browsers/zen
+  printf '%s\n' "${USERNAME} ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper" \
+    > /etc/sudoers.d/90-psd
+  chmod 0440 /etc/sudoers.d/90-psd
+  visudo --check
+  systemctl --global enable psd.service
+else
+  echo 'Warning: psd Zen definition not found; skipping psd setup' >&2
+fi
 
 # Solid state drives
 systemctl enable fstrim.timer
