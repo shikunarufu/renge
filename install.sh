@@ -540,6 +540,43 @@ install_aur_optional() {
   fi
 }
 
+# Patch bpftune
+install_bpftune() {
+  local dir="/home/${USERNAME}/.cache/paru/clone/bpftune-git"
+  local pkgfile=''
+  local f
+ 
+  [[ -f "${dir}/PKGBUILD" ]] || return 1
+ 
+  if ! grep --quiet '^_package_orig()' "${dir}/PKGBUILD"; then
+    sed --in-place 's/^package()/_package_orig()/' "${dir}/PKGBUILD" || return 1
+    cat >> "${dir}/PKGBUILD" << 'PKG_EOF'
+ 
+package() {
+  _package_orig
+  if [ -d "$pkgdir/usr/sbin" ]; then
+    install -d "$pkgdir/usr/bin"
+    mv "$pkgdir"/usr/sbin/* "$pkgdir/usr/bin/"
+    rmdir "$pkgdir/usr/sbin"
+  fi
+  find "$pkgdir" -name '*.service' -exec sed -i 's|/usr/sbin/|/usr/bin/|g' {} +
+}
+PKG_EOF
+  fi
+  chown "${USERNAME}:${USERNAME}" "${dir}/PKGBUILD" || return 1
+ 
+  rm --force "${dir}"/*.pkg.tar.zst
+  runuser --login "${USERNAME}" --command \
+    "cd \"\$HOME/.cache/paru/clone/bpftune-git\" && makepkg --syncdeps --force --noconfirm" \
+    || return 1
+ 
+  for f in "${dir}"/bpftune-git-r*.pkg.tar.zst; do
+    [[ -f "${f}" ]] && pkgfile="${f}" && break
+  done
+  [[ -n "${pkgfile}" ]] || return 1
+  pacman --upgrade --noconfirm "${pkgfile}" || return 1
+}
+
 # Hide unnecessary desktop entry
 hide_desktop_entry() {
   local app=$1
@@ -749,20 +786,8 @@ systemctl enable ananicy-cpp
 if install_aur bpftune-git; then
   systemctl enable bpftune
 else
-  rm -f /home/"${USERNAME}"/.cache/paru/clone/bpftune-git/*.pkg.tar.zst
-  sed -i 's/^package()/_package_orig()/' PKGBUILD
-  cat >> PKGBUILD << 'EOF'
-
-package() {
-  _package_orig
-  if [ -d "$pkgdir/usr/sbin" ]; then
-    install -d "$pkgdir/usr/bin"
-    mv "$pkgdir"/usr/sbin/* "$pkgdir/usr/bin/"
-    rmdir "$pkgdir/usr/sbin"
-  fi
-  find "$pkgdir" -name '*.service' -exec sed -i 's|/usr/sbin/|/usr/bin/|g' {} +
-}
-EOF
+  install_bpftune
+  systemctl enable bpftune
 fi
 
 systemctl --global enable psd.service
