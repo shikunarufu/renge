@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=Spotify Player
+Name=Spotify
 Comment=Terminal Spotify client
 Exec=spotify_player
 Icon=spotify
