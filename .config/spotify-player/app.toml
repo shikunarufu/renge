@@ -28,14 +28,14 @@ progress_bar_position = "Bottom"
 genre_num = 2
 cover_img_length = 0
 cover_img_width = 5
-cover_img_pixels = 16
+cover_img_pixels = 512
 seek_duration_secs = 5
 custom_queue = true
 enable_relative_line_number = false
 
 [device]
-name = "spotify-player"
-device_type = "speaker"
+name = "Renge"
+device_type = "computer"
 volume = 70
 bitrate = 320
 audio_cache = false
