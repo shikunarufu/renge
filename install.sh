@@ -95,7 +95,7 @@ add_cachyos_v3 () {
   rm --force "${tmp}"
 }
 
-# Install CachyOS keyring and mirrorlist packages
+# Install CachyOS packages
 install_cachyos_v3 () {
   pacman-key --recv-keys F3B607488DB35A47 --keyserver keyserver.ubuntu.com
   pacman-key --lsign-key F3B607488DB35A47
@@ -103,7 +103,8 @@ install_cachyos_v3 () {
     'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-keyring-20240331-1-any.pkg.tar.zst' \
     'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-mirrorlist-27-1-any.pkg.tar.zst' \
     'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v3-mirrorlist-27-1-any.pkg.tar.zst' \
-    'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v4-mirrorlist-27-1-any.pkg.tar.zst'
+    'https://mirror.cachyos.org/repo/x86_64/cachyos/cachyos-v4-mirrorlist-27-1-any.pkg.tar.zst' \
+    'https://mirror.cachyos.org/repo/x86_64/cachyos/pacman-7.1.0.r9.g54d9411-5-x86_64.pkg.tar.zst'
 }
 
 #######################################
