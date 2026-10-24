@@ -747,6 +747,7 @@ install_aur cachyos-ananicy-rules
 systemctl enable ananicy-cpp
 install_aur bpftune-git
 systemctl enable bpftune
+systemctl --global enable psd.service
 
 # Solid state drives
 systemctl enable fstrim.timer
