@@ -789,6 +789,8 @@ else
   echo 'Warning: bpftune-git failed; skipping' >&2
 fi
 
+cp /usr/share/psd/contrib/zen /usr/share/psd/browsers/zen
+sed -i.bak 's|\$HOME"/\.zen|$HOME"/.config/zen|g; s|\$HOME/\.zen/|$HOME/.config/zen/|g' /usr/share/psd/browsers/zen
 systemctl --global enable psd.service
 
 # Solid state drives
