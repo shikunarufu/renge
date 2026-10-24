@@ -783,11 +783,10 @@ systemctl enable lactd.service
 install_aur cachyos-ananicy-rules
 systemctl enable ananicy-cpp
 
-if install_aur bpftune-git; then
+if install_aur bpftune-git || install_bpftune; then
   systemctl enable bpftune
 else
-  install_bpftune
-  systemctl enable bpftune
+  echo 'Warning: bpftune-git failed; skipping' >&2
 fi
 
 systemctl --global enable psd.service
