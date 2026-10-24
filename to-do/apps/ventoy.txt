@@ -1,0 +1,2 @@
+# Start Ventoy
+sudo ventoyweb
