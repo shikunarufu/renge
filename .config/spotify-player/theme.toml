@@ -1,0 +1,42 @@
+[[themes]]
+name = "kanagawa-dragon"
+
+[themes.palette]
+foreground = "#c5c9c5"
+black = "#0d0c0c"
+red = "#c4746e"
+green = "#87a987"
+yellow = "#c4b28a"
+blue = "#8ba4b0"
+magenta = "#a292a3"
+cyan = "#8ea4a2"
+white = "#c5c9c5"
+bright_black = "#737c73"
+bright_red = "#c4746e"
+bright_green = "#87a987"
+bright_yellow = "#c4b28a"
+bright_blue = "#8ba4b0"
+bright_magenta = "#a292a3"
+bright_cyan = "#8ea4a2"
+bright_white = "#c5c9c5"
+
+[themes.component_style]
+block_title = { fg = "#c4b28a", modifiers = ["Bold"] }
+border = { fg = "#625e5a" }
+playback_status = { fg = "#8ba4b0", modifiers = ["Bold"] }
+playback_track = { fg = "#8ba4b0", modifiers = ["Bold"] }
+playback_artists = { fg = "#c4b28a", modifiers = ["Bold"] }
+playback_album = { fg = "#c5c9c5" }
+playback_genres = { fg = "#737c73", modifiers = ["Italic"] }
+playback_metadata = { fg = "#737c73" }
+playback_progress_bar = { fg = "#c4b28a" }
+playback_progress_bar_unfilled = { fg = "#282727" }
+current_playing = { fg = "#8ba4b0", modifiers = ["Bold"] }
+page_desc = { fg = "#8ba4b0", modifiers = ["Bold"] }
+playlist_desc = { fg = "#737c73", modifiers = ["Dim"] }
+table_header = { fg = "#c4b28a", modifiers = ["Bold"] }
+selection = { fg = "#181616", bg = "#8ba4b0", modifiers = ["Bold"] }
+like = { fg = "#c4746e" }
+lyrics_played = { modifiers = ["Dim"] }
+lyrics_playing = { fg = "#c4b28a", modifiers = ["Bold"] }
+visualization = { low = "#8ba4b0", mid = "#c4b28a", high = "#c4746e" }
