@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Spotify Player
+Comment=Terminal Spotify client
+Exec=spotify_player
+Icon=spotify
+Terminal=true
+Categories=Audio;Music;Player;AudioVideo;
+Keywords=spotify;music;
