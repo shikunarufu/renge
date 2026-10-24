@@ -318,9 +318,11 @@ rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 \
 # Add CachyOS v3 repositories
 if (( use_cachyos )); then
   add_cachyos_v3 /etc/pacman.conf
-  rate-mirrors --save=/etc/pacman.d/cachyos-v3-mirrorlist --max-jumps=0 \
+  rate-mirrors --save=/etc/pacman.d/cachyos-mirrorlist --max-jumps=0 \
     "${country_args[@]}" --allow-root cachyos \
     || printf '%s\n' 'Warning: CachyOS mirror ranking failed.' >&2
+  cp --force /etc/pacman.d/cachyos-mirrorlist /etc/pacman.d/cachyos-v3-mirrorlist
+  sed --in-place 's|/$arch/|/$arch_v3/|g' /etc/pacman.d/cachyos-v3-mirrorlist
 fi
 
 # Refresh repositories
@@ -664,6 +666,8 @@ if [[ "${USE_CACHYOS}" -eq 1 ]]; then
   rate-mirrors --save=/etc/pacman.d/cachyos-v3-mirrorlist --max-jumps=0 \
     "${country_args[@]}" --allow-root cachyos \
     || echo 'Warning: CachyOS mirror ranking failed.' >&2
+  cp --force /etc/pacman.d/cachyos-mirrorlist /etc/pacman.d/cachyos-v3-mirrorlist
+  sed --in-place 's|/$arch/|/$arch_v3/|g' /etc/pacman.d/cachyos-v3-mirrorlist
 fi
 
 # Refresh repositories and upgrade packages
