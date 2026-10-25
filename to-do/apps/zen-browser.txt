@@ -1,3 +1,6 @@
+# Fix screen share
+Customize Toolbar... > Title Bar
+
 # Configure Docker
 docker compose up -d
 docker compose down
