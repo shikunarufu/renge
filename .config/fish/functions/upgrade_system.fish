@@ -26,10 +26,10 @@ function upgrade_system
   # Rank mirrors
   clear
   if confirm 'Rank mirrors?'
-    country="$(curl --fail --silent --max-time 5 --ipv4 ifconfig.io/country_code || true)"
-    country_args=()
+    set country "$(curl --fail --silent --max-time 5 --ipv4 ifconfig.io/country_code || true)"
+    set country_args ()
     if [[ -n "${country}" ]]; then
-      country_args=(--entry-country="${country}")
+      country_args (--entry-country="${country}")
     fi
     rate-mirrors --save=/etc/pacman.d/mirrorlist --max-jumps=0 \
       "${country_args[@]}" --allow-root arch \
