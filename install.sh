@@ -813,6 +813,7 @@ systemctl enable fstrim.timer
 #######################################
 
 # Apply config files
+chown "${USERNAME}":"${USERNAME}" /data
 mkdir --parents /home/"${USERNAME}"/.config
 cp --recursive /renge/.config/. /home/"${USERNAME}"/.config/
 sed --in-place "s|__USERNAME__|${USERNAME}|" \
