@@ -1,2 +1,5 @@
+# ~/.steam/steam/steam_dev.cfg
+unShaderBackgroundProcessingThreads 6  # Faster shader pre-compilation
+
 # Add the following to launch options for Online-Fix
 WINEDLLOVERRIDES="OnlineFix64=n;SteamOverlay64=n;winmm=n,b;dnet=n;steam_api64=n;winhttp=n,b" %command%
